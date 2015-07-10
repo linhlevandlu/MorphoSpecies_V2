@@ -2469,7 +2469,7 @@ void ImageViewer::correctMorphAction() {
 	other->show();
 }
 
-// =================================================================================== add by LE Van Linh
+// ====== add by LE Van Linh
 void ImageViewer::readDirectory(QString path) {
 	qDebug() << "Read directory";
 	QDir qdir;
@@ -2479,7 +2479,6 @@ void ImageViewer::readDirectory(QString path) {
 	filterNames << "*.JPG";
 	qdir.setNameFilters(QStringList("*.JPG"));
 	QFileInfoList files = qdir.entryInfoList();
-	//qDebug() << files.size() << qdir.path();
 
 	qdir.cdUp();
 	QString pathToSave = qdir.path()+"/Images_without_grid/";
@@ -2494,12 +2493,12 @@ void ImageViewer::readDirectory(QString path) {
 		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, 130);
 
 		// display the result
-		//ImageViewer *other = new ImageViewer;
-		//other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
-		//		"On -- " + file.fileName());
-		//other->addParameterPanel(new impls_2015::Lines(other), x() + 40,
-		//		y() + 40);
-		//other->show();
+		/*ImageViewer *other = new ImageViewer;
+		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
+				"On -- " + file.fileName());
+		other->addParameterPanel(new impls_2015::Lines(other), x() + 40,
+				y() + 40);
+		other->show();*/
 
 		// save the result
 
@@ -2527,9 +2526,9 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Pronotum");
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Tete");
 
-	//readDirectory("/home/Images/Morphometrics/elytre/Original_images");
+	readDirectory("/home/Images/Morphometrics/elytre/Original_images");
 	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
-	readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
+	//readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
 	//readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
 	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
@@ -2553,6 +2552,7 @@ void ImageViewer::removeYLinesAction(int minBrightness, int synValue) {
 					+ tr(", Synchronize value: ") + QString::number(synValue));
 }
 
+// remove yellow grid by using Histogram
 void ImageViewer::removeLinesHistogramAction() {
 	qDebug() << "Remove the yellow lines using histogram";
 	cv::Mat dest = YellowGrid::usingHistogram(matImage);

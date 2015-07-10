@@ -30,16 +30,18 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 
 	cv::Point limit_point = cv::Point(0, 0);
 	int yellow_count = 0;
+	int blue_count =0;
 	for (int j = 10; j < bgr_planes[0].cols / 3 + 200; j++) {
 		if (bgr_planes[0].at<uchar>(0, j) > 100) {
 			limit_point.x = j;
 			limit_point.y = 0;
+			blue_count++;
 			yellow_count = 0;
 			for (int i = 1; i < bgr_planes[0].rows * 2 / 3; i++) {
 				if (bgr_planes[0].at<uchar>(i, j) >= 0
 						&& bgr_planes[0].at<uchar>(i, j) <= 40) {
 					yellow_count++;
-					if (yellow_count >= 5) {
+					if (yellow_count >= 10) {
 						limit_point.x = 0;
 						limit_point.y = 0;
 						break;
@@ -50,6 +52,9 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 				break;
 		}
 	}
+
+	qDebug() << "Blue count: " << blue_count;
+	qDebug() << "Yellow count: " << yellow_count;
 	if (limit_point.x == 0) {
 		limit_point.x = bgr_planes[0].cols / 3 + 200;
 		limit_point.y = 0;
@@ -66,7 +71,6 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 			<< bgr_planes[2].at<uchar>(bg.x, bg.y) << ")";
 
 	// replace the points
-	//int break_points[bgr_planes[0].rows];
 	for (int i = 0; i < bgr_planes[0].rows; i++) {
 		for (int j = 0; j < limit_point.x; j++) {
 			if (j > bgr_planes[0].cols / 4
@@ -100,96 +104,12 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 				}
 			}
 		}
-		//break_points[i] = j;
 	}
 
-	// synchronize the background
-	//// synchronize cac diem trong vung xanh duong voi do sang
-	// replace cac diem vang va do sang
-	// replace cac diem trong vung mau xanh va do sang
-	/*for (int i = 0; i < bgr_planes[0].rows; i++) {
-	 for (int j = break_points[i]; j < bgr_planes[0].cols / 2 - 100; j++) {
-	 if (((bgr_planes[0].at<uchar>(i, j) > 75
-	 && bgr_planes[0].at<uchar>(i, j) <= 135)
-	 && bgr_planes[1].at<uchar>(i, j) <= 100
-	 && (bgr_planes[2].at<uchar>(i, j) >= 135
-	 && bgr_planes[2].at<uchar>(i, j) <= 250))
-	 || (bgr_planes[0].at<uchar>(i, j) < 75
-	 && bgr_planes[1].at<uchar>(i, j) <= 30
-	 && bgr_planes[2].at<uchar>(i, j) >= 150)) {
-	 bgr_planes[0].at<uchar>(i, j) = bgr_planes[0].at<uchar>(bg.x,
-	 limit_point.x - 50);
-	 bgr_planes[1].at<uchar>(i, j) = bgr_planes[1].at<uchar>(bg.x,
-	 limit_point.x - 50);
-	 bgr_planes[2].at<uchar>(i, j) = bgr_planes[2].at<uchar>(bg.x,
-	 limit_point.x - 50);
-	 }
-	 }
-	 }*/
 	// merge bgr_planes to dest image
 	cv::merge(bgr_planes, dest);
 	cv::cvtColor(dest, dest, cv::COLOR_HSV2BGR);
 	cv::Mat enddest;
-	//enddest = usingHistogram(dest);
-	//dest.copyTo(enddest);
-
-	// Masking process
-	// Create the mask base on the dest image
-	/*cv::Mat gray_img, gray_img2;
-	 cv::cvtColor(dest, gray_img, cv::COLOR_BGR2GRAY);
-	 cv::bitwise_not(gray_img, gray_img2); // invert the bit
-
-	 // synchronize the background of gray image
-	 for (int i = 0; i < gray_img2.rows; i++) {
-	 for (int j = 0; j < gray_img2.cols; j++) {
-	 if (gray_img2.at<uchar>(i, j) <= synValue) {
-	 gray_img2.at<uchar>(i, j) = 0;
-	 } else {
-	 gray_img2.at<uchar>(i, j) = 255;
-	 }
-	 }
-	 }
-
-	 bool current_is_black = true;
-	 for (int i = 0; i < gray_img2.rows; i++) {
-	 for (int j = 0; j < gray_img2.cols/2; j++) {
-	 int k = j, count_black = 0;
-	 while (k < j + 25 && k < gray_img2.cols/2) {
-	 if (gray_img2.at<uchar>(i, k) == 0)
-	 count_black++;
-	 k++;
-	 }
-
-	 if(current_is_black){
-	 if (gray_img2.at<uchar>(i, j) == 255) {
-	 if (count_black >= 12) {
-	 gray_img2.at<uchar>(i, j) = 0;
-	 } else {
-	 current_is_black = false;
-	 }
-	 }
-	 }else{ // current is white
-	 if (gray_img2.at<uchar>(i, j) == 0) {
-	 if (count_black < 12) {
-	 gray_img2.at<uchar>(i, j) = 255;
-	 } else {
-	 current_is_black = true;
-	 }
-	 }
-	 }
-	 }
-	 }
-
-	 gray_img2.copyTo(enddest);*/
-	// mask with the source image
-	/*vector<cv::Mat> splits(3), rs(3);
-	 cv::split(matImage, splits);
-	 cv::bitwise_and(splits[0], gray_img2, rs[0]);
-	 cv::bitwise_and(splits[1], gray_img2, rs[1]);
-	 cv::bitwise_and(splits[2], gray_img2, rs[2]);
-
-	 // merge the result
-	 cv::merge(rs, enddest);*/
 
 	// Masking V2
 	cv::Mat mask(matImage.size(), CV_8UC1);
@@ -212,14 +132,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 			cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1),
 			cv::Point(-1, -1));
 	cv::erode(mask, mask, element);
-	// lam min mask
-	/*for (int i = mask.rows; i >= mask.rows * 2 / 3; i--) {
-	 for (int j = 0; j < limit_point.x; j++) {
-	 if (mask.at<uchar>(i, j) == 255)
-	 mask.at<uchar>(i, j) = 0;
-	 }
 
-	 }*/
 	// mask with the source image
 	vector<cv::Mat> splits(3), rs(3);
 	cv::split(matImage, splits);
@@ -265,11 +178,11 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	 cv::line(enddest, cv::Point(2 * enddest.cols / 3, 0),
 	 cv::Point(2 * enddest.cols / 3, enddest.rows), cv::Scalar(0, 255, 255), 5,
 	 8);
-
+*/
 
 	cv::line(enddest, cv::Point(limit_point.x, 0),
 			cv::Point(limit_point.x, enddest.rows), cv::Scalar(255, 255, 255),
-			5, 8);*/
+			5, 8);
 
 	return enddest;
 }
