@@ -27,6 +27,7 @@ NOTE
 ==================================================================
 Version 2.0
 ==================================================================
-- Design and implement the algorithm to remove the yellow lines.
+- Design and implement the algorithm to remove the yellow lines on
+the left part of image.
 
 
