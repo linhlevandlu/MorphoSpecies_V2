@@ -31,8 +31,11 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	cv::Point limit_point = cv::Point(0, 0);
 	int yellow_count = 0;
 	int blue_count =0;
-	for (int j = 10; j < bgr_planes[0].cols / 3 + 200; j++) {
-		if (bgr_planes[0].at<uchar>(0, j) > 100) {
+	for (int j = 10; j < bgr_planes[0].cols * 2 / 3; j++) {
+		if (bgr_planes[0].at<uchar>(0, j) > 100 ||
+				(bgr_planes[0].at<uchar>(0, j) > 70
+						&& bgr_planes[1].at<uchar>(0, j) < 10
+						&& bgr_planes[2].at<uchar>(0, j) > 175)) {
 			limit_point.x = j;
 			limit_point.y = 0;
 			blue_count++;
@@ -41,7 +44,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 				if (bgr_planes[0].at<uchar>(i, j) >= 0
 						&& bgr_planes[0].at<uchar>(i, j) <= 40) {
 					yellow_count++;
-					if (yellow_count >= 10) {
+					if (yellow_count >= 8) {
 						limit_point.x = 0;
 						limit_point.y = 0;
 						break;
@@ -74,10 +77,12 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	for (int i = 0; i < bgr_planes[0].rows; i++) {
 		for (int j = 0; j < limit_point.x; j++) {
 			if (j > bgr_planes[0].cols / 4
-					&& (bgr_planes[0].at<uchar>(i, j) >= 90
-							&& bgr_planes[0].at<uchar>(i, j) <= 130)
-					&& (bgr_planes[2].at<uchar>(i, j) >= 10
-							&& bgr_planes[2].at<uchar>(i, j) <= 90)) {
+					&& (bgr_planes[0].at<uchar>(i, j + 50) >= 40)
+					&& ((bgr_planes[2].at<uchar>(i, j + 50) >= 10
+							&& bgr_planes[2].at<uchar>(i, j + 50) <= 90)
+					|| (bgr_planes[2].at<uchar>(i, j + 50) >= 100
+							&& bgr_planes[2].at<uchar>(i, j + 50) <= 150)
+					)) {
 				break;
 			} else {
 				// replace the yellow points
@@ -163,26 +168,19 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 
 	// draw some lines
 
-	/*cv::line(enddest, cv::Point(enddest.cols / 2, 0),
-	 cv::Point(enddest.cols / 2, enddest.rows), cv::Scalar(0, 0, 255), 5,
-	 8);//1/4
-	 cv::line(enddest, cv::Point(enddest.cols / 4, 0),
-	 cv::Point(enddest.cols / 4, enddest.rows), cv::Scalar(0, 0, 255), 5,
+	 /*cv::line(enddest, cv::Point(enddest.cols / 2, 0),
+	 cv::Point(enddest.cols / 2, enddest.rows), cv::Scalar(0, 255, 255), 5,
 	 8);//2/4
-	 cv::line(enddest, cv::Point(enddest.cols * 3 / 4, 0),
-	 cv::Point(enddest.cols * 3 / 4, enddest.rows), cv::Scalar(0, 255,0), 5,
-	 8);//3/4*/
-	/*cv::line(enddest, cv::Point(enddest.cols / 3, 0),
-	 cv::Point(enddest.cols / 3, enddest.rows), cv::Scalar(0, 255, 255), 5,
-	 8);//1/3
-	 cv::line(enddest, cv::Point(2 * enddest.cols / 3, 0),
-	 cv::Point(2 * enddest.cols / 3, enddest.rows), cv::Scalar(0, 255, 255), 5,
+	 cv::line(enddest, cv::Point(0, enddest.rows/2),
+	 cv::Point(enddest.cols, enddest.rows/2), cv::Scalar(0, 255, 255), 5,
 	 8);
-*/
 
 	cv::line(enddest, cv::Point(limit_point.x, 0),
 			cv::Point(limit_point.x, enddest.rows), cv::Scalar(255, 255, 255),
 			5, 8);
+	cv::line(enddest, cv::Point(limit_point.x - 100, 0),
+				cv::Point(limit_point.x- 100, enddest.rows), cv::Scalar(255, 0, 0),
+				1, 8);*/
 
 	return enddest;
 }
@@ -191,6 +189,25 @@ cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 	float range[] = { 0, 256 };
 	const float* histRange = { range };
 
+	vector<cv::Mat> hsv_planes;
+	cv::Mat hsvImage;
+	cv::cvtColor(input,hsvImage,CV_BGR2HSV);
+	cv::split(hsvImage,hsv_planes);
+	for(int i=0;i<hsv_planes[2].rows;i++){
+		for(int j = 0; j< (hsv_planes[2].cols/3) + 200;j++){
+			if(hsv_planes[0].at<uchar>(i,j) >= 100 && hsv_planes[0].at<uchar>(i,j) <= 120
+					&& hsv_planes[2].at<uchar>(i,j) >160 && hsv_planes[2].at<uchar>(i,j) < 230)
+				hsv_planes[2].at<uchar>(i,j) = 230;
+			if(hsv_planes[0].at<uchar>(i,j) <= 38
+					&& hsv_planes[1].at<uchar>(i,j) >50 && hsv_planes[1].at<uchar>(i,j) < 80){
+				hsv_planes[0].at<uchar>(i,j) = 110;
+				hsv_planes[2].at<uchar>(i,j) = 230;
+			}
+		}
+	}
+
+	cv::merge(hsv_planes,hsvImage);
+	cv::cvtColor(hsvImage,input,CV_HSV2BGR);
 	cv::Mat gray_img, hist_img;
 	cv::cvtColor(input, gray_img, CV_BGR2GRAY);
 
@@ -204,7 +221,7 @@ cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 		nb_pixel += hist_img.at<uchar>(i);
 	}
 	avg = nbs_temp/nb_pixel;
-
+	//avg = otSu(hist_img);
 	qDebug() << "average value" << avg;
 
 	// replace the background by white color
@@ -215,22 +232,8 @@ cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 			}
 		}
 	}
-	cv::Mat hsv_img;
-	vector<cv::Mat> hsv_planes;
-	cv::cvtColor(gray_img,hsv_img,COLOR_GRAY2BGR);
-	cv::cvtColor(hsv_img,hsv_img,COLOR_BGR2HSV);
-	split(hsv_img,hsv_planes);
-	for(int i = 0 ;i < hsv_planes[2].rows;i++){
-		for(int j =0; j < hsv_planes[2].rows;j++){
-			if(hsv_planes[2].at<uchar>(i,j) >= 110){
-				hsv_planes[2].at<uchar>(i,j) = 255;
-			}
-		}
-	}
-	merge(hsv_planes,hsv_img);
-	cv::Mat bgr_img;
-	cv::cvtColor(hsv_img,bgr_img,COLOR_HSV2BGR);
-	return bgr_img;
+
+	return gray_img;
 }
 
 float YellowGrid::otSu(cv::Mat histogram) {
