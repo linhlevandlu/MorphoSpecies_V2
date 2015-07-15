@@ -77,18 +77,31 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	for (int i = 0; i < bgr_planes[0].rows; i++) {
 		for (int j = 0; j < limit_point.x; j++) {
 			if (j > bgr_planes[0].cols / 4
-					&& (bgr_planes[0].at<uchar>(i, j + 50) >= 40)
-					&& ((bgr_planes[2].at<uchar>(i, j + 50) >= 10
-							&& bgr_planes[2].at<uchar>(i, j + 50) <= 90)
-					|| (bgr_planes[2].at<uchar>(i, j + 50) >= 100
-							&& bgr_planes[2].at<uchar>(i, j + 50) <= 150)
-					)) {
+					&&
+					(
+							((bgr_planes[0].at<uchar>(i, j + 50) >= 90 && bgr_planes[0].at<uchar>(i, j + 50) <= 130)
+									&& (bgr_planes[2].at<uchar>(i, j + 50) >= 10 && bgr_planes[2].at<uchar>(i, j + 50) <= 170)
+							)
+						|| ((bgr_planes[0].at<uchar>(i, j + 50) > 130 && bgr_planes[0].at<uchar>(i, j + 50) <= 160)
+								&& (bgr_planes[2].at<uchar>(i, j + 50) >= 110 && bgr_planes[2].at<uchar>(i, j + 50) <= 170))
+						|| (bgr_planes[0].at<uchar>(i, j + 50) > 160 && bgr_planes[2].at<uchar>(i, j + 50) >= 140)
+						|| (bgr_planes[0].at<uchar>(i, j + 50) < 8 && bgr_planes[2].at<uchar>(i, j + 50) <= 90)
+						)
+
+				//	&& (bgr_planes[0].at<uchar>(i, j + 50) >= 40)
+					//&& ((bgr_planes[2].at<uchar>(i, j + 50) >= 10
+			//				&& bgr_planes[2].at<uchar>(i, j + 50) <= 90)
+			//		|| (bgr_planes[2].at<uchar>(i, j + 50) >= 100
+			//				&& bgr_planes[2].at<uchar>(i, j + 50) <= 190)
+				//	)
+				) {
 				break;
 			} else {
 				// replace the yellow points
 				if (bgr_planes[0].at<uchar>(i, j) <= 38
 						&& (bgr_planes[2].at<uchar>(i, j) >= 10
-								&& bgr_planes[2].at<uchar>(i, j) <= 100)) {
+								&& bgr_planes[2].at<uchar>(i, j) <= 100)
+								) {
 					bgr_planes[0].at<uchar>(i, j) = bgr_planes[0].at<uchar>(
 							bg.x, bg.y);
 					bgr_planes[1].at<uchar>(i, j) = bgr_planes[1].at<uchar>(
@@ -177,10 +190,10 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 
 	cv::line(enddest, cv::Point(limit_point.x, 0),
 			cv::Point(limit_point.x, enddest.rows), cv::Scalar(255, 255, 255),
-			5, 8);
-	cv::line(enddest, cv::Point(limit_point.x - 100, 0),
-				cv::Point(limit_point.x- 100, enddest.rows), cv::Scalar(255, 0, 0),
-				1, 8);*/
+			5, 8);*/
+	cv::line(enddest, cv::Point(limit_point.x, 0),
+				cv::Point(limit_point.x, enddest.rows), cv::Scalar(0, 0, 255),
+				1, 8);
 
 	return enddest;
 }
