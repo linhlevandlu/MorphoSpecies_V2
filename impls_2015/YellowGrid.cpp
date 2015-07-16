@@ -79,13 +79,22 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 			if (j > bgr_planes[0].cols / 4
 					&&
 					(
-							((bgr_planes[0].at<uchar>(i, j + 50) >= 90 && bgr_planes[0].at<uchar>(i, j + 50) <= 130)
-									&& (bgr_planes[2].at<uchar>(i, j + 50) >= 10 && bgr_planes[2].at<uchar>(i, j + 50) <= 170)
-							)
-						|| ((bgr_planes[0].at<uchar>(i, j + 50) > 130 && bgr_planes[0].at<uchar>(i, j + 50) <= 160)
-								&& (bgr_planes[2].at<uchar>(i, j + 50) >= 110 && bgr_planes[2].at<uchar>(i, j + 50) <= 170))
-						|| (bgr_planes[0].at<uchar>(i, j + 50) > 160 && bgr_planes[2].at<uchar>(i, j + 50) >= 140)
-						|| (bgr_planes[0].at<uchar>(i, j + 50) < 8 && bgr_planes[2].at<uchar>(i, j + 50) <= 90)
+							// elytre condition
+							/*((bgr_planes[0].at<uchar>(i, j + 50) >= 90 && bgr_planes[0].at<uchar>(i, j + 50) <= 130)
+									&& (bgr_planes[2].at<uchar>(i, j + 50) >= 10 && bgr_planes[2].at<uchar>(i, j + 50) <= 110))*/
+						// tete condition
+							/*
+						((bgr_planes[0].at<uchar>(i, j + 50) >= 90 && bgr_planes[0].at<uchar>(i, j + 50) <= 130)
+								&& (bgr_planes[2].at<uchar>(i, j + 50) >= 10 && bgr_planes[2].at<uchar>(i, j + 50) <= 110))
+						|| (bgr_planes[0].at<uchar>(i, j + 50) > 130)
+						|| (bgr_planes[0].at<uchar>(i, j + 50) < 15 && bgr_planes[2].at<uchar>(i, j + 50) >= 100 &&  bgr_planes[2].at<uchar>(i, j + 50) <= 160)*/
+					// condition for pronotum
+					((bgr_planes[0].at<uchar>(i, j + 50) >= 40
+							&& bgr_planes[0].at<uchar>(i, j + 50) <= 130)
+							&& (bgr_planes[2].at<uchar>(i, j + 50) >= 80
+									&& bgr_planes[2].at<uchar>(i, j + 50) <= 170))
+							|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
+									&& bgr_planes[2].at<uchar>(i, j + 50) >= 60)
 						)
 
 				//	&& (bgr_planes[0].at<uchar>(i, j + 50) >= 40)
@@ -202,7 +211,7 @@ cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 	float range[] = { 0, 256 };
 	const float* histRange = { range };
 
-	vector<cv::Mat> hsv_planes;
+	/*vector<cv::Mat> hsv_planes;
 	cv::Mat hsvImage;
 	cv::cvtColor(input,hsvImage,CV_BGR2HSV);
 	cv::split(hsvImage,hsv_planes);
@@ -220,9 +229,12 @@ cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 	}
 
 	cv::merge(hsv_planes,hsvImage);
-	cv::cvtColor(hsvImage,input,CV_HSV2BGR);
+	cv::cvtColor(hsvImage,input,CV_HSV2BGR);*/
 	cv::Mat gray_img, hist_img;
-	cv::cvtColor(input, gray_img, CV_BGR2GRAY);
+	if(input.channels() == 3)
+		cv::cvtColor(input, gray_img, CV_BGR2GRAY);
+	else
+		gray_img = input;
 
 	cv::calcHist(&gray_img, 1, 0, cv::Mat(), hist_img, 1, &histSize, &histRange,
 			true, false);
@@ -277,4 +289,57 @@ float YellowGrid::otSu(cv::Mat histogram) {
 	}
 	return (thr1 + thr2) / 2;
 }
+cv::Mat YellowGrid::tryRemove(cv::Mat input){
+
+	cv::Mat result, gray_img;
+	cv::cvtColor(input,gray_img,CV_BGR2GRAY);
+
+	cv::Mat kernel = getStructuringElement(MORPH_RECT,cv::Size(30,30),cv::Point(-1,-1));
+	cv::Mat kernel2 = getStructuringElement(MORPH_RECT,cv::Size(15,15),cv::Point(-1,-1));
+
+
+	for(int i=0;i<gray_img.rows;i++){
+		for(int j=0;j<gray_img.cols/2;j++){
+			if(j+50 > gray_img.cols / 5 && gray_img.at<uchar>(i,j+ 50) <=  76.5){
+				break;
+			}else{
+				gray_img.at<uchar>(i,j) = 250;
+			}
+		}
+	}
+	cv::bitwise_not(gray_img,gray_img);
+	cv::morphologyEx(gray_img,gray_img,MORPH_OPEN,kernel);
+
+	gray_img.copyTo(result);
+	return result;
+}
 } /* namespace impls_2015 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
