@@ -24,14 +24,27 @@ using namespace cv;
 using namespace std;
 namespace impls_2015 {
 
+
+
 class YellowGrid {
+
 public:
+	enum SpeciesType {
+			ELYTRE,
+			MDROITE,
+			MGAUCHE,
+			PRONOTUM,
+			TETE
+		};
 	YellowGrid();
 	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
-			int synValue);
+			QString pathImage);
 	static cv::Mat usingHistogram(cv::Mat input);
 	static float otSu(cv::Mat histogram);
 	static cv::Mat tryRemove(cv::Mat input);
+
+private:
+	static SpeciesType getType(QString path);
 };
 
 } /* namespace impls_2015 */

@@ -43,10 +43,10 @@ Lines::Lines(QWidget *parent) :
 
 void Lines::on_minBrightness_valueChanged(int value) {
 	ImageViewer* parent = qobject_cast<ImageViewer *>(this->parentWidget());
-	parent->removeYLinesAction(value, sliderEle->value());
+	//parent->removeYLinesAction(value,"abc");
 }
 void Lines::on_sliderEle_valueChanged(int value) {
 	ImageViewer* parent = qobject_cast<ImageViewer *>(this->parentWidget());
-	parent->removeYLinesAction(minBrightness->value(), value);
+	//parent->removeYLinesAction("abc", value);
 }
 } /* namespace impls_2015 */

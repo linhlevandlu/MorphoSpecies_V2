@@ -1,0 +1,100 @@
+/*
+ Image processing for morphometrics (IPM)
+ Copyright (C) 2014  Nguyen Hoang Thao (hoangthao.ng@gmail.com)
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+For Window and Linux OS
+
+Dependency libraries:
+- Qt (> 4.8, included OpenGL) 
+- OpenCV (> 2.4.2) 
+[- OpenCL (>5.0 for NVIDIA) for GPGPU] 
+
+Builds and run:
+- modify path in file "Ipm.pro"
+- qmake => create a makefile (must)
+- make => build program
+
+=============================================================
+NOTE
+=============================================================
+
+Version 1.0
+=============================================================
+Algorithms:
+	- To grayscale img
+	- To binary img
+	- Roberts
+	- Sobel
+	- Hit and miss
+	- Otsu
+	- Region growing
+	- Social ant
+Using opencv
+	- smooth
+		- normal Blur
+		- gaussian Blur
+		- median Blur
+		- bilateral Filter
+		- convolution Filter
+	- morphology
+		- erosion
+		- dilation
+		- opening
+		- closing
+		- morphological gradient
+		- top Hat
+		- black Hat
+	- transformation
+		- pyramid
+		- remap
+		- affine
+	- segmentation
+		- threshold
+		- Sobel
+		- Scharr
+		- laplace
+		- Canny
+		- hough cine
+		- hough circle
+		- find contour
+		- convex Hull
+		- bounding box and circle
+		- bounding rotate and eclipse
+		- image moments
+	- point, feature detector
+		- Harris
+		- Shi-Tomasi
+		- Corner detect
+		- SURF feature detector
+		- SIFT feature detector
+		- feature description
+		- feature detect with FLANN
+		- Homography to find feature
+		- template matching
+	- histogram
+		- histogram calculate
+		- equalization
+		- back projection
+=============================================================
+
+Version 1.1
+=============================================================
+- Modify panel for the parameters for implementation using opencv package.
+- Save the information of description + image data
+- Implement algorithms correct features proposed by Jean-Pierre
+=============================================================
+

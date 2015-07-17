@@ -1,2 +1,4 @@
-# MorphoSpecies_V2
-About MorphoSpecies version 2...
+MorphoSpecies
+=============
+
+Morphometrics for species

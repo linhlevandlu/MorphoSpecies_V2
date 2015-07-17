@@ -15,8 +15,31 @@ namespace impls_2015 {
 YellowGrid::YellowGrid() {
 
 }
+YellowGrid::SpeciesType YellowGrid::getType(QString path){
+	YellowGrid::SpeciesType sType;
+	QString temp = path.toLower();
+	if(temp.contains("ely"))
+		sType = ELYTRE;
+	else{
+		if(temp.contains("md"))
+			sType = MDROITE;
+		else{
+			if (temp.contains("mg"))
+				sType = MGAUCHE;
+			else {
+				if (temp.contains("prono"))
+					sType = PRONOTUM;
+				else {
+					if (temp.contains("tete"))
+						sType = TETE;
+				}
+			}
+		}
+	}
+	return sType;
+}
 cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
-		int synValue) {
+		QString pathImage) {
 	qDebug() << "Remove yellow lines action...";
 	cv::Mat hsvImage;
 	cv::Mat dest;
@@ -56,78 +79,90 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		}
 	}
 
-	qDebug() << "Blue count: " << blue_count;
-	qDebug() << "Yellow count: " << yellow_count;
+	//qDebug() << "Blue count: " << blue_count;
+	//qDebug() << "Yellow count: " << yellow_count;
 	if (limit_point.x == 0) {
 		limit_point.x = bgr_planes[0].cols / 3 + 200;
 		limit_point.y = 0;
 	}
-	qDebug() << "Number of yellow point: " << yellow_count;
-	qDebug() << "The limit point: " << limit_point.x << ", " << limit_point.y;
+	//qDebug() << "Number of yellow point: " << yellow_count;
+	//qDebug() << "The limit point: " << limit_point.x << ", " << limit_point.y;
 
 	// assign value to replace
 	bg.x = bgr_planes[0].rows - limit_point.y - 5;
 	bg.y = bgr_planes[0].cols - 30;
-	qDebug() << "The replace point: " << bg.x << ", " << bg.y << ", value: ("
+	/*qDebug() << "The replace point: " << bg.x << ", " << bg.y << ", value: ("
 			<< bgr_planes[0].at<uchar>(bg.x, bg.y) << ","
 			<< bgr_planes[1].at<uchar>(bg.x, bg.y) << ", "
-			<< bgr_planes[2].at<uchar>(bg.x, bg.y) << ")";
+			<< bgr_planes[2].at<uchar>(bg.x, bg.y) << ")";*/
+
+	YellowGrid::SpeciesType _type = YellowGrid::getType(pathImage);
+	qDebug() << "Species type: " << _type;
+
 
 	// replace the points
 	for (int i = 0; i < bgr_planes[0].rows; i++) {
 		for (int j = 0; j < limit_point.x; j++) {
-			if (j > bgr_planes[0].cols / 4
-					&&
-					(
-							// elytre condition
-							/*((bgr_planes[0].at<uchar>(i, j + 50) >= 90 && bgr_planes[0].at<uchar>(i, j + 50) <= 130)
-									&& (bgr_planes[2].at<uchar>(i, j + 50) >= 10 && bgr_planes[2].at<uchar>(i, j + 50) <= 110))*/
-						// tete condition
-							/*
-						((bgr_planes[0].at<uchar>(i, j + 50) >= 90 && bgr_planes[0].at<uchar>(i, j + 50) <= 130)
-								&& (bgr_planes[2].at<uchar>(i, j + 50) >= 10 && bgr_planes[2].at<uchar>(i, j + 50) <= 110))
-						|| (bgr_planes[0].at<uchar>(i, j + 50) > 130)
-						|| (bgr_planes[0].at<uchar>(i, j + 50) < 15 && bgr_planes[2].at<uchar>(i, j + 50) >= 100 &&  bgr_planes[2].at<uchar>(i, j + 50) <= 160)*/
-					// condition for pronotum
-					((bgr_planes[0].at<uchar>(i, j + 50) >= 40
-							&& bgr_planes[0].at<uchar>(i, j + 50) <= 130)
-							&& (bgr_planes[2].at<uchar>(i, j + 50) >= 80
-									&& bgr_planes[2].at<uchar>(i, j + 50) <= 170))
-							|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
-									&& bgr_planes[2].at<uchar>(i, j + 50) >= 60)
-						)
-
-				//	&& (bgr_planes[0].at<uchar>(i, j + 50) >= 40)
-					//&& ((bgr_planes[2].at<uchar>(i, j + 50) >= 10
-			//				&& bgr_planes[2].at<uchar>(i, j + 50) <= 90)
-			//		|| (bgr_planes[2].at<uchar>(i, j + 50) >= 100
-			//				&& bgr_planes[2].at<uchar>(i, j + 50) <= 190)
-				//	)
-				) {
-				break;
-			} else {
-				// replace the yellow points
-				if (bgr_planes[0].at<uchar>(i, j) <= 38
-						&& (bgr_planes[2].at<uchar>(i, j) >= 10
-								&& bgr_planes[2].at<uchar>(i, j) <= 100)
-								) {
+			if(_type == ELYTRE){
+				if (j > bgr_planes[0].cols / 4
+						&& (bgr_planes[0].at<uchar>(i, j + 50) >= 90
+								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
+								&& bgr_planes[2].at<uchar>(i, j + 50) >= 10
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 105))
+					break;
+			}
+			if(_type == MDROITE || _type == MGAUCHE){
+				if ((bgr_planes[0].at<uchar>(i, j + 50) >= 120
+						&& bgr_planes[0].at<uchar>(i, j + 50) <= 160
+						&& bgr_planes[2].at<uchar>(i, j + 50) <= 150)
+						|| (bgr_planes[0].at<uchar>(i, j + 50) > 160
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 160))
+					break;
+			}
+			if(_type == PRONOTUM){
+				if (j > bgr_planes[0].cols / 5
+						&& ((bgr_planes[0].at<uchar>(i, j + 50) >= 40
+								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 160)
+								|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
+										&& bgr_planes[2].at<uchar>(i, j + 50)
+												>= 60)))
+					break;
+			}
+			if(_type == TETE){
+				if (j > bgr_planes[0].cols / 4
+						&& ((bgr_planes[0].at<uchar>(i, j + 50) >= 90
+								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
+								&& bgr_planes[2].at<uchar>(i, j + 50) >= 10
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 105)
+								|| (bgr_planes[0].at<uchar>(i, j + 50) > 130)
+								|| (bgr_planes[0].at<uchar>(i, j + 50) <= 15
+										&& bgr_planes[2].at<uchar>(i, j + 50)
+												>= 100
+										&& bgr_planes[2].at<uchar>(i, j + 50)
+												<= 160)))
+					break;
+			}
+			// replace the points
+			if (bgr_planes[0].at<uchar>(i, j) <= 38
+					&& (bgr_planes[2].at<uchar>(i, j) >= 10
+							&& bgr_planes[2].at<uchar>(i, j) <= 100)) {
+				bgr_planes[0].at<uchar>(i, j) = bgr_planes[0].at<uchar>(bg.x,
+						bg.y);
+				bgr_planes[1].at<uchar>(i, j) = bgr_planes[1].at<uchar>(bg.x,
+						bg.y);
+				bgr_planes[2].at<uchar>(i, j) = bgr_planes[2].at<uchar>(bg.x,
+						bg.y);
+			} else { // there are not yellow points
+					 // replace the point what do not enough the bright (not in yellow range)
+				if (bgr_planes[2].at<uchar>(i, j) > minBrightness
+						&& bgr_planes[2].at<uchar>(i, j) <= 255) {
 					bgr_planes[0].at<uchar>(i, j) = bgr_planes[0].at<uchar>(
 							bg.x, bg.y);
 					bgr_planes[1].at<uchar>(i, j) = bgr_planes[1].at<uchar>(
 							bg.x, bg.y);
 					bgr_planes[2].at<uchar>(i, j) = bgr_planes[2].at<uchar>(
 							bg.x, bg.y);
-				} else { // there are not yellow points
-						 // replace the point what do not enough the bright (not in yellow range)
-					if (bgr_planes[2].at<uchar>(i, j) > minBrightness
-							&& bgr_planes[2].at<uchar>(i, j) <= 255) {
-						bgr_planes[0].at<uchar>(i, j) = bgr_planes[0].at<uchar>(
-								bg.x, bg.y);
-						bgr_planes[1].at<uchar>(i, j) = bgr_planes[1].at<uchar>(
-								bg.x, bg.y);
-						bgr_planes[2].at<uchar>(i, j) = bgr_planes[2].at<uchar>(
-								bg.x, bg.y);
-					}
 				}
 			}
 		}

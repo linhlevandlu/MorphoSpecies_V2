@@ -2490,7 +2490,7 @@ void ImageViewer::readDirectory(QString path) {
 		QString _name = file.absoluteFilePath();
 		loadImage(_name);
 
-		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, 130);
+		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
 		//cv::Mat enddest = YellowGrid::tryRemove(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
@@ -2527,11 +2527,11 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Pronotum");
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Tete");
 
-	//readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
-	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
-	//readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
+	readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
+	readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
+	readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
 	readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
-	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
+	readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
 	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, 90);
 	ImageViewer *other = new ImageViewer;
@@ -2542,15 +2542,14 @@ void ImageViewer::removeYLinesAction() {
 }
 
 // Remove yellow lines with parameter
-void ImageViewer::removeYLinesAction(int minBrightness, int synValue) {
+void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {
 	qDebug() << "HSV basic...";
 	cv::Mat enddest = YellowGrid::removeYellowLines(matImage, minBrightness,
-			synValue);
+			pathImage);
 	qImage = ImageConvert::cvMatToQImage(enddest);
 	imageLabel->setPixmap(QPixmap::fromImage(qImage));
 	statusBar()->showMessage(
-			tr("Minimal brightness value: ") + QString::number(minBrightness)
-					+ tr(", Synchronize value: ") + QString::number(synValue));
+			tr("Minimal brightness value: ") + QString::number(minBrightness));
 }
 
 // remove yellow grid by using Histogram
