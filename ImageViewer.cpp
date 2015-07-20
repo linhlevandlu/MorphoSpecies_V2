@@ -2490,8 +2490,8 @@ void ImageViewer::readDirectory(QString path) {
 		QString _name = file.absoluteFilePath();
 		loadImage(_name);
 
-		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
-		//cv::Mat enddest = YellowGrid::tryRemove(matImage);
+		//cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
+		cv::Mat enddest = YellowGrid::tryRemove(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
 		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
@@ -2527,11 +2527,13 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Pronotum");
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Tete");
 
-	readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
-	readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
-	readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
-	readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
-	readDirectory("/home/Images/Morphometrics/tete/Original_images");
+	readDirectory("/home/linh/Desktop/new_images");
+
+	//readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
+	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
+	//readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
+	//readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
+	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
 	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, 90);
 	ImageViewer *other = new ImageViewer;

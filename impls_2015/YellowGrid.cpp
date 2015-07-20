@@ -326,26 +326,37 @@ float YellowGrid::otSu(cv::Mat histogram) {
 }
 cv::Mat YellowGrid::tryRemove(cv::Mat input){
 
-	cv::Mat result, gray_img;
+	cv::Mat result, gray_img,gray;
 	cv::cvtColor(input,gray_img,CV_BGR2GRAY);
-
-	cv::Mat kernel = getStructuringElement(MORPH_RECT,cv::Size(30,30),cv::Point(-1,-1));
-	cv::Mat kernel2 = getStructuringElement(MORPH_RECT,cv::Size(15,15),cv::Point(-1,-1));
-
-
-	for(int i=0;i<gray_img.rows;i++){
-		for(int j=0;j<gray_img.cols/2;j++){
-			if(j+50 > gray_img.cols / 5 && gray_img.at<uchar>(i,j+ 50) <=  76.5){
-				break;
-			}else{
-				gray_img.at<uchar>(i,j) = 250;
-			}
-		}
-	}
 	cv::bitwise_not(gray_img,gray_img);
-	cv::morphologyEx(gray_img,gray_img,MORPH_OPEN,kernel);
+	cv::Mat kernel = getStructuringElement(MORPH_ELLIPSE,cv::Size(5,5),cv::Point(-1,-1));
+	cv::Mat kernel2 = getStructuringElement(MORPH_RECT,cv::Size(15,15),cv::Point(-1,-1));
+	cv::threshold(gray_img,gray,204,255,THRESH_BINARY);
+	/*cv::morphologyEx(gray,gray,MORPH_DILATE,kernel2);
+	//cv::GaussianBlur(gray,gray,cv::Size(15,15),0,0);
 
-	gray_img.copyTo(result);
+	for(int i=0;i<gray.rows;i++){
+		for(int j =0;j< gray.cols/2;j++){
+			if(gray.at<uchar>(i,j + 50) > 0 )
+				break;
+			else
+				gray.at<uchar>(i,j) = 255;
+		}
+	}*/
+
+	/*cv::Mat gray2;
+	cv::threshold(gray_img,gray2,165,255,THRESH_BINARY_INV);
+	cv::bitwise_and(gray,gray2,result,cv::Mat());
+	cv::bitwise_not(result,result);
+
+	vector<cv::Mat> bgr(3),rs(3);
+	cv::split(input,bgr);
+	cv::bitwise_and(bgr[0],result,rs[0]);
+	cv::bitwise_and(bgr[1],result,rs[1]);
+	cv::bitwise_and(bgr[2],result,rs[2]);
+	cv::merge(rs,result);*/
+
+	gray.copyTo(result);
 	return result;
 }
 } /* namespace impls_2015 */
