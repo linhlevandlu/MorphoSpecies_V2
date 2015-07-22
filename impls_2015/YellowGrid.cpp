@@ -49,23 +49,20 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	cv::split(hsvImage, bgr_planes); // split the hsv image to process
 	cv::Point bg = cv::Point(0, 0); // point to store the value to replace
 
-	// find the point out of yellow grid (limited on the left hand side of image (cols/3 + 200))
+	// find the point out of yellow grid (limited on the left hand side of image)
 
 	cv::Point limit_point = cv::Point(0, 0);
 	int yellow_count = 0;
-	int blue_count =0;
-	for (int j = 10; j < bgr_planes[0].cols * 2 / 3; j++) {
+	for (int j = 10; j < bgr_planes[0].cols; j++) {
 		if (bgr_planes[0].at<uchar>(0, j) > 100 ||
 				(bgr_planes[0].at<uchar>(0, j) > 70
 						&& bgr_planes[1].at<uchar>(0, j) < 10
 						&& bgr_planes[2].at<uchar>(0, j) > 175)) {
 			limit_point.x = j;
 			limit_point.y = 0;
-			blue_count++;
 			yellow_count = 0;
 			for (int i = 1; i < bgr_planes[0].rows * 2 / 3; i++) {
-				if (bgr_planes[0].at<uchar>(i, j) >= 0
-						&& bgr_planes[0].at<uchar>(i, j) <= 40) {
+				if (bgr_planes[0].at<uchar>(i, j) <= 40) {
 					yellow_count++;
 					if (yellow_count >= 8) {
 						limit_point.x = 0;
@@ -79,22 +76,14 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		}
 	}
 
-	//qDebug() << "Blue count: " << blue_count;
-	//qDebug() << "Yellow count: " << yellow_count;
 	if (limit_point.x == 0) {
 		limit_point.x = bgr_planes[0].cols / 3 + 200;
 		limit_point.y = 0;
 	}
-	//qDebug() << "Number of yellow point: " << yellow_count;
-	//qDebug() << "The limit point: " << limit_point.x << ", " << limit_point.y;
 
 	// assign value to replace
 	bg.x = bgr_planes[0].rows - limit_point.y - 5;
 	bg.y = bgr_planes[0].cols - 30;
-	/*qDebug() << "The replace point: " << bg.x << ", " << bg.y << ", value: ("
-			<< bgr_planes[0].at<uchar>(bg.x, bg.y) << ","
-			<< bgr_planes[1].at<uchar>(bg.x, bg.y) << ", "
-			<< bgr_planes[2].at<uchar>(bg.x, bg.y) << ")";*/
 
 	YellowGrid::SpeciesType _type = YellowGrid::getType(pathImage);
 	qDebug() << "Species type: " << _type;
@@ -155,8 +144,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 						bg.y);
 			} else { // there are not yellow points
 					 // replace the point what do not enough the bright (not in yellow range)
-				if (bgr_planes[2].at<uchar>(i, j) > minBrightness
-						&& bgr_planes[2].at<uchar>(i, j) <= 255) {
+				if (bgr_planes[2].at<uchar>(i, j) > minBrightness) {
 					bgr_planes[0].at<uchar>(i, j) = bgr_planes[0].at<uchar>(
 							bg.x, bg.y);
 					bgr_planes[1].at<uchar>(i, j) = bgr_planes[1].at<uchar>(
@@ -213,11 +201,11 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 					&& bgr_planes2[1].at<uchar>(i, j) == 0
 					&& bgr_planes2[2].at<uchar>(i, j) == 0) {
 				bgr_planes2[0].at<uchar>(i, j) = bgr_planes2[0].at<uchar>(
-						bgr_planes2[0].rows - 20, bgr_planes2[0].cols - 20);
+						20, bgr_planes2[0].cols - 20);//bgr_planes2[0].rows - 20
 				bgr_planes2[1].at<uchar>(i, j) = bgr_planes2[1].at<uchar>(
-						bgr_planes2[0].rows - 20, bgr_planes2[0].cols - 20);
+						20, bgr_planes2[0].cols - 20);//bgr_planes2[1].rows - 20
 				bgr_planes2[2].at<uchar>(i, j) = bgr_planes2[2].at<uchar>(
-						bgr_planes2[0].rows - 20, bgr_planes2[0].cols - 20);
+						20, bgr_planes2[0].cols - 20);//bgr_planes2[2].rows - 20
 			}
 		}
 	}
@@ -234,37 +222,19 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 
 	cv::line(enddest, cv::Point(limit_point.x, 0),
 			cv::Point(limit_point.x, enddest.rows), cv::Scalar(255, 255, 255),
-			5, 8);*/
+			5, 8);
 	cv::line(enddest, cv::Point(limit_point.x, 0),
 				cv::Point(limit_point.x, enddest.rows), cv::Scalar(0, 0, 255),
-				1, 8);
+				1, 8);*/
 
 	return enddest;
 }
-cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
+/*cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 	int histSize = 256;
 	float range[] = { 0, 256 };
 	const float* histRange = { range };
 
-	/*vector<cv::Mat> hsv_planes;
-	cv::Mat hsvImage;
-	cv::cvtColor(input,hsvImage,CV_BGR2HSV);
-	cv::split(hsvImage,hsv_planes);
-	for(int i=0;i<hsv_planes[2].rows;i++){
-		for(int j = 0; j< (hsv_planes[2].cols/3) + 200;j++){
-			if(hsv_planes[0].at<uchar>(i,j) >= 100 && hsv_planes[0].at<uchar>(i,j) <= 120
-					&& hsv_planes[2].at<uchar>(i,j) >160 && hsv_planes[2].at<uchar>(i,j) < 230)
-				hsv_planes[2].at<uchar>(i,j) = 230;
-			if(hsv_planes[0].at<uchar>(i,j) <= 38
-					&& hsv_planes[1].at<uchar>(i,j) >50 && hsv_planes[1].at<uchar>(i,j) < 80){
-				hsv_planes[0].at<uchar>(i,j) = 110;
-				hsv_planes[2].at<uchar>(i,j) = 230;
-			}
-		}
-	}
 
-	cv::merge(hsv_planes,hsvImage);
-	cv::cvtColor(hsvImage,input,CV_HSV2BGR);*/
 	cv::Mat gray_img, hist_img;
 	if(input.channels() == 3)
 		cv::cvtColor(input, gray_img, CV_BGR2GRAY);
@@ -323,41 +293,39 @@ float YellowGrid::otSu(cv::Mat histogram) {
 		}
 	}
 	return (thr1 + thr2) / 2;
-}
-cv::Mat YellowGrid::tryRemove(cv::Mat input){
+}*/
+cv::Mat YellowGrid::landmarkIndentify(cv::Mat inputImage){
 
-	cv::Mat result, gray_img,gray;
-	cv::cvtColor(input,gray_img,CV_BGR2GRAY);
-	cv::bitwise_not(gray_img,gray_img);
-	cv::Mat kernel = getStructuringElement(MORPH_ELLIPSE,cv::Size(5,5),cv::Point(-1,-1));
-	cv::Mat kernel2 = getStructuringElement(MORPH_RECT,cv::Size(15,15),cv::Point(-1,-1));
-	cv::threshold(gray_img,gray,204,255,THRESH_BINARY);
-	/*cv::morphologyEx(gray,gray,MORPH_DILATE,kernel2);
-	//cv::GaussianBlur(gray,gray,cv::Size(15,15),0,0);
+	cv::Mat rsImage,grayImage,temp1, temp2;
+	cv::cvtColor(inputImage,grayImage,CV_BGR2GRAY);
 
-	for(int i=0;i<gray.rows;i++){
-		for(int j =0;j< gray.cols/2;j++){
-			if(gray.at<uchar>(i,j + 50) > 0 )
-				break;
-			else
-				gray.at<uchar>(i,j) = 255;
-		}
-	}*/
+	// DoG and feature extraction
+	cv::GaussianBlur(grayImage,temp1,cv::Size(1,1),0,0,BORDER_DEFAULT);
+	cv::GaussianBlur(grayImage,temp2,cv::Size(51,51),0,0,BORDER_DEFAULT);
+	cv::subtract(temp2,temp1,rsImage);
+	cv::bitwise_not(rsImage,rsImage);
+	cv::threshold(rsImage,rsImage,230,255,THRESH_BINARY); // 235 -
 
-	/*cv::Mat gray2;
-	cv::threshold(gray_img,gray2,165,255,THRESH_BINARY_INV);
-	cv::bitwise_and(gray,gray2,result,cv::Mat());
-	cv::bitwise_not(result,result);
 
-	vector<cv::Mat> bgr(3),rs(3);
-	cv::split(input,bgr);
-	cv::bitwise_and(bgr[0],result,rs[0]);
-	cv::bitwise_and(bgr[1],result,rs[1]);
-	cv::bitwise_and(bgr[2],result,rs[2]);
-	cv::merge(rs,result);*/
+	// edge detection
+	cv::Mat cannyImage;
+	int lowThreshold = 10;
+	//cv::GaussianBlur(rsImage,rsImage,cv::Size(3,3),0,0,BORDER_DEFAULT);
+	cv::Canny(rsImage,cannyImage,lowThreshold,2*lowThreshold,3);
 
-	gray.copyTo(result);
-	return result;
+	vector<vector<Point> > contours;
+	  vector<Vec4i> hierarchy;
+	cv::findContours(cannyImage, contours, hierarchy, CV_RETR_TREE,
+			CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+	/// Draw contours
+	Mat drawing = Mat::zeros(cannyImage.size(), CV_8UC3);
+	for(size_t i = 0; i < contours.size(); i++) {
+		Scalar color = Scalar(255,255,255);
+		drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+	}
+
+	return drawing;
 }
 } /* namespace impls_2015 */
 

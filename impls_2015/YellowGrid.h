@@ -39,9 +39,11 @@ public:
 	YellowGrid();
 	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
 			QString pathImage);
-	static cv::Mat usingHistogram(cv::Mat input);
-	static float otSu(cv::Mat histogram);
-	static cv::Mat tryRemove(cv::Mat input);
+	//static cv::Mat usingHistogram(cv::Mat input);
+	//static float otSu(cv::Mat histogram);
+	//static cv::Mat tryRemove(cv::Mat input);
+
+	static cv::Mat landmarkIndentify(cv::Mat inputImage);
 
 private:
 	static SpeciesType getType(QString path);

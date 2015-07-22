@@ -521,11 +521,11 @@ void ImageViewer::createActions() {
 	connect(removeLinesAct, SIGNAL(triggered()), this,
 			SLOT(removeYLinesAction()));
 
-	removeLinesAct2 = new QAction(tr("Remove Yellow lines - Histogram"), this);
+	removeLinesAct2 = new QAction(tr("Landmarks identifying"), this);
 	removeLinesAct2->setEnabled(false);
 	removeLinesAct2->setShortcut(tr("Ctrl+H"));
 	connect(removeLinesAct2, SIGNAL(triggered()), this,
-			SLOT(removeLinesHistogramAction()));
+			SLOT(landmarks()));
 
 	//end
 }
@@ -2490,8 +2490,8 @@ void ImageViewer::readDirectory(QString path) {
 		QString _name = file.absoluteFilePath();
 		loadImage(_name);
 
-		//cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
-		cv::Mat enddest = YellowGrid::tryRemove(matImage);
+		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
+		//cv::Mat enddest = YellowGrid::tryRemove(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
 		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
@@ -2527,7 +2527,7 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Pronotum");
 	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Tete");
 
-	readDirectory("/home/linh/Desktop/new_images");
+	//readDirectory("/home/linh/Desktop/new_images");
 
 	//readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
 	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
@@ -2535,7 +2535,7 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
 	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
-	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, 90);
+	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, "temp");
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
@@ -2555,10 +2555,11 @@ void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {
 }
 
 // remove yellow grid by using Histogram
-void ImageViewer::removeLinesHistogramAction() {
-	qDebug() << "Remove the yellow lines using histogram";
-	//cv::Mat dest = YellowGrid::usingHistogram(matImage);
-	cv::Mat dest = YellowGrid::tryRemove(matImage);
+void ImageViewer::landmarks() {
+
+	qDebug() << "Identification of landmarks function ...";
+
+	cv::Mat dest = YellowGrid::landmarkIndentify(matImage);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(dest),
 			"Using Histogram -- " + this->fileName);

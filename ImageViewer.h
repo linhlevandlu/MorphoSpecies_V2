@@ -146,7 +146,7 @@ private slots:
 
 	// add by LE Van Linh
 	void removeYLinesAction();
-	void removeLinesHistogramAction();
+	void landmarks();
 
 private:
 	void createActions();
