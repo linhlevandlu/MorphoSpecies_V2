@@ -159,75 +159,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	// merge bgr_planes to dest image
 	cv::merge(bgr_planes, dest);
 	cv::cvtColor(dest, dest, cv::COLOR_HSV2BGR);
-	cv::Mat enddest;
-
-	// Masking V2
-	cv::Mat mask(matImage.size(), CV_8UC1);
-	for (int i = 0; i < matImage.rows; i++) {
-		for (int j = 0; j < matImage.cols; j++) {
-			if (matImage.at<cv::Vec3b>(i, j)[0] != dest.at<cv::Vec3b>(i, j)[0]
-					&& matImage.at<cv::Vec3b>(i, j)[1]
-							!= dest.at<cv::Vec3b>(i, j)[1]
-					&& matImage.at<cv::Vec3b>(i, j)[2]
-							!= dest.at<cv::Vec3b>(i, j)[2]) {
-				mask.at<uchar>(i, j) = 0;
-			} else {
-				mask.at<uchar>(i, j) = 255;
-			}
-		}
-	}
-
-	int erosion_size = 6;
-	cv::Mat element = getStructuringElement(cv::MORPH_CROSS,
-			cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-			cv::Point(-1, -1));
-	cv::erode(mask, mask, element);
-
-	// mask with the source image
-	vector<cv::Mat> splits(3), rs(3);
-	cv::split(matImage, splits);
-	cv::bitwise_and(splits[0], mask, rs[0]);
-	cv::bitwise_and(splits[1], mask, rs[1]);
-	cv::bitwise_and(splits[2], mask, rs[2]);
-
-	cv::merge(rs, enddest);
-
-	cv::vector<cv::Mat> bgr_planes2;
-	cv::split(enddest, bgr_planes2);
-	// chuyen phan den thanh xanh
-	for (int i = 0; i < bgr_planes2[0].rows; i++) {
-		for (int j = 0; j < bgr_planes2[0].cols; j++) {
-			if (bgr_planes2[0].at<uchar>(i, j) == 0
-					&& bgr_planes2[1].at<uchar>(i, j) == 0
-					&& bgr_planes2[2].at<uchar>(i, j) == 0) {
-				bgr_planes2[0].at<uchar>(i, j) = bgr_planes2[0].at<uchar>(
-						20, bgr_planes2[0].cols - 20);//bgr_planes2[0].rows - 20
-				bgr_planes2[1].at<uchar>(i, j) = bgr_planes2[1].at<uchar>(
-						20, bgr_planes2[0].cols - 20);//bgr_planes2[1].rows - 20
-				bgr_planes2[2].at<uchar>(i, j) = bgr_planes2[2].at<uchar>(
-						20, bgr_planes2[0].cols - 20);//bgr_planes2[2].rows - 20
-			}
-		}
-	}
-	cv::merge(bgr_planes2, enddest);
-
-	// draw some lines
-
-	 /*cv::line(enddest, cv::Point(enddest.cols / 2, 0),
-	 cv::Point(enddest.cols / 2, enddest.rows), cv::Scalar(0, 255, 255), 5,
-	 8);//2/4
-	 cv::line(enddest, cv::Point(0, enddest.rows/2),
-	 cv::Point(enddest.cols, enddest.rows/2), cv::Scalar(0, 255, 255), 5,
-	 8);
-
-	cv::line(enddest, cv::Point(limit_point.x, 0),
-			cv::Point(limit_point.x, enddest.rows), cv::Scalar(255, 255, 255),
-			5, 8);
-	cv::line(enddest, cv::Point(limit_point.x, 0),
-				cv::Point(limit_point.x, enddest.rows), cv::Scalar(0, 0, 255),
-				1, 8);*/
-
-	return enddest;
+	return dest;
 }
 /*cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 	int histSize = 256;
