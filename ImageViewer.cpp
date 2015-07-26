@@ -2535,12 +2535,16 @@ void ImageViewer::removeYLinesAction() {
 	readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
 	readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
+<<<<<<< HEAD
 	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
+=======
+	cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, "temp");
+>>>>>>> 4a58a9bb86ae1db6d3c14da46cb8355e13c72651
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
 	other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
-	other->show();*/
+	other->show();
 }
 // Remove yellow lines with parameter
 void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {

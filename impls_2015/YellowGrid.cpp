@@ -162,6 +162,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	// merge bgr_planes to dest image
 	cv::merge(bgr_planes, dest);
 	cv::cvtColor(dest, dest, cv::COLOR_HSV2BGR);
+<<<<<<< HEAD
 	cv::Mat enddest;
 
 	// Making a mask
@@ -216,6 +217,9 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	}
 	cv::merge(bgr_planes2, enddest);
 	return enddest;
+=======
+	return dest;
+>>>>>>> 4a58a9bb86ae1db6d3c14da46cb8355e13c72651
 }
 /*cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
 	int histSize = 256;
