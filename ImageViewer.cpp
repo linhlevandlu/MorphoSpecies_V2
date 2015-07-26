@@ -2531,18 +2531,17 @@ void ImageViewer::removeYLinesAction() {
 
 	//readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
 	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
-	//readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
-	//readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
-	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
+	readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
+	readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
+	readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
-	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, "temp");
+	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
 	other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
 	other->show();*/
 }
-
 // Remove yellow lines with parameter
 void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {
 	qDebug() << "HSV basic...";

@@ -97,14 +97,17 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 						&& (bgr_planes[0].at<uchar>(i, j + 50) >= 90
 								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
 								&& bgr_planes[2].at<uchar>(i, j + 50) >= 10
-								&& bgr_planes[2].at<uchar>(i, j + 50) <= 105))
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 110))
 					break;
 			}
+
 			if(_type == MDROITE || _type == MGAUCHE){
-				if ((bgr_planes[0].at<uchar>(i, j + 50) >= 120
-						&& bgr_planes[0].at<uchar>(i, j + 50) <= 160
+				if ((bgr_planes[0].at<uchar>(i, j + 50) >= 100
+						&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
+						&& bgr_planes[2].at<uchar>(i, j + 50) >= 110
 						&& bgr_planes[2].at<uchar>(i, j + 50) <= 150)
-						|| (bgr_planes[0].at<uchar>(i, j + 50) > 160
+						|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
+								&& bgr_planes[2].at<uchar>(i, j + 50) >= 60
 								&& bgr_planes[2].at<uchar>(i, j + 50) <= 160))
 					break;
 			}
@@ -161,7 +164,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	cv::cvtColor(dest, dest, cv::COLOR_HSV2BGR);
 	cv::Mat enddest;
 
-	// Masking V2
+	// Making a mask
 	cv::Mat mask(matImage.size(), CV_8UC1);
 	for (int i = 0; i < matImage.rows; i++) {
 		for (int j = 0; j < matImage.cols; j++) {
@@ -177,6 +180,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		}
 	}
 
+	// Morphological image
 	int erosion_size = 6;
 	cv::Mat element = getStructuringElement(cv::MORPH_CROSS,
 			cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1),
@@ -194,7 +198,8 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 
 	cv::vector<cv::Mat> bgr_planes2;
 	cv::split(enddest, bgr_planes2);
-	// chuyen phan den thanh xanh
+
+	// Convert the left-background (black) to right-background
 	for (int i = 0; i < bgr_planes2[0].rows; i++) {
 		for (int j = 0; j < bgr_planes2[0].cols; j++) {
 			if (bgr_planes2[0].at<uchar>(i, j) == 0
@@ -210,23 +215,6 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		}
 	}
 	cv::merge(bgr_planes2, enddest);
-
-	// draw some lines
-
-	 /*cv::line(enddest, cv::Point(enddest.cols / 2, 0),
-	 cv::Point(enddest.cols / 2, enddest.rows), cv::Scalar(0, 255, 255), 5,
-	 8);//2/4
-	 cv::line(enddest, cv::Point(0, enddest.rows/2),
-	 cv::Point(enddest.cols, enddest.rows/2), cv::Scalar(0, 255, 255), 5,
-	 8);
-
-	cv::line(enddest, cv::Point(limit_point.x, 0),
-			cv::Point(limit_point.x, enddest.rows), cv::Scalar(255, 255, 255),
-			5, 8);
-	cv::line(enddest, cv::Point(limit_point.x, 0),
-				cv::Point(limit_point.x, enddest.rows), cv::Scalar(0, 0, 255),
-				1, 8);*/
-
 	return enddest;
 }
 /*cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
@@ -304,28 +292,31 @@ cv::Mat YellowGrid::landmarkIndentify(cv::Mat inputImage){
 	cv::GaussianBlur(grayImage,temp2,cv::Size(51,51),0,0,BORDER_DEFAULT);
 	cv::subtract(temp2,temp1,rsImage);
 	cv::bitwise_not(rsImage,rsImage);
-	cv::threshold(rsImage,rsImage,230,255,THRESH_BINARY); // 235 -
+	//cv::threshold(rsImage,rsImage,230,255,THRESH_BINARY); // 235 -
 
 
 	// edge detection
 	cv::Mat cannyImage;
 	int lowThreshold = 10;
-	//cv::GaussianBlur(rsImage,rsImage,cv::Size(3,3),0,0,BORDER_DEFAULT);
+	cv::GaussianBlur(rsImage,rsImage,cv::Size(3,3),0,0,BORDER_DEFAULT);
 	cv::Canny(rsImage,cannyImage,lowThreshold,2*lowThreshold,3);
 
-	vector<vector<Point> > contours;
-	  vector<Vec4i> hierarchy;
-	cv::findContours(cannyImage, contours, hierarchy, CV_RETR_TREE,
-			CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	//vector<vector<Point> > contours;
+	//  vector<Vec4i> hierarchy;
+	//cv::findContours(cannyImage, contours, hierarchy, CV_RETR_TREE,
+	//		CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 	/// Draw contours
-	Mat drawing = Mat::zeros(cannyImage.size(), CV_8UC3);
+	/*Mat drawing = Mat::zeros(cannyImage.size(), CV_8UC3);
 	for(size_t i = 0; i < contours.size(); i++) {
-		Scalar color = Scalar(255,255,255);
-		drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
-	}
+		Scalar color = Scalar(255,255,0);
+		qDebug() << "=================================";
+		for(int j = 0; j < contours[i].size(); j++)
+		      qDebug() << contours[i][j].x << "x" << contours[i][j].y << " ";
+			drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
+	}*/
 
-	return drawing;
+	return cannyImage;
 }
 } /* namespace impls_2015 */
 
