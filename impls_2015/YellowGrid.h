@@ -39,6 +39,7 @@ public:
 	YellowGrid();
 	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
 			QString pathImage);
+	static cv::Mat act2(cv::Mat inputImage);
 	//static cv::Mat usingHistogram(cv::Mat input);
 	//static float otSu(cv::Mat histogram);
 	//static cv::Mat tryRemove(cv::Mat input);

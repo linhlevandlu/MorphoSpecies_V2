@@ -2491,7 +2491,7 @@ void ImageViewer::readDirectory(QString path) {
 		loadImage(_name);
 
 		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
-		//cv::Mat enddest = YellowGrid::tryRemove(matImage);
+		//cv::Mat enddest = YellowGrid::usingHistogram(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
 		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
@@ -2532,19 +2532,17 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
 	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
 	readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
-	readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
-	readDirectory("/home/Images/Morphometrics/tete/Original_images");
+	//readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
+	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
-<<<<<<< HEAD
 	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
-=======
-	cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, "temp");
->>>>>>> 4a58a9bb86ae1db6d3c14da46cb8355e13c72651
+	//cv::Mat enddest = YellowGrid::act2(matImage);
+	//cv::Mat enddest = YellowGrid::usingHistogram(matImage);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
 	other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
-	other->show();
+	other->show();*/
 }
 // Remove yellow lines with parameter
 void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {

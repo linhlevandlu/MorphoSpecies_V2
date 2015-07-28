@@ -38,6 +38,7 @@ YellowGrid::SpeciesType YellowGrid::getType(QString path){
 	}
 	return sType;
 }
+
 cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		QString pathImage) {
 	qDebug() << "Remove yellow lines action...";
@@ -62,7 +63,7 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 			limit_point.y = 0;
 			yellow_count = 0;
 			for (int i = 1; i < bgr_planes[0].rows * 2 / 3; i++) {
-				if (bgr_planes[0].at<uchar>(i, j) <= 40) {
+				if (bgr_planes[0].at<uchar>(i, j) <= 38) {
 					yellow_count++;
 					if (yellow_count >= 8) {
 						limit_point.x = 0;
@@ -94,45 +95,52 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		for (int j = 0; j < limit_point.x; j++) {
 			if(_type == ELYTRE){
 				if (j > bgr_planes[0].cols / 4
-						&& (bgr_planes[0].at<uchar>(i, j + 50) >= 90
+						&& ((bgr_planes[0].at<uchar>(i, j + 50) >= 90
 								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
 								&& bgr_planes[2].at<uchar>(i, j + 50) >= 10
-								&& bgr_planes[2].at<uchar>(i, j + 50) <= 110))
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 120)
+								|| (bgr_planes[0].at<uchar>(i, j + 50) >= 90
+										&& bgr_planes[0].at<uchar>(i, j + 50)
+												<= 130
+										&& bgr_planes[1].at<uchar>(i, j + 50)
+												>= 60
+										&& bgr_planes[2].at<uchar>(i, j + 50)
+												>= 10
+										&& bgr_planes[2].at<uchar>(i, j + 50)
+												<= 120)))
 					break;
 			}
 
 			if(_type == MDROITE || _type == MGAUCHE){
-				if ((bgr_planes[0].at<uchar>(i, j + 50) >= 100
-						&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
-						&& bgr_planes[2].at<uchar>(i, j + 50) >= 110
-						&& bgr_planes[2].at<uchar>(i, j + 50) <= 150)
-						|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
-								&& bgr_planes[2].at<uchar>(i, j + 50) >= 60
-								&& bgr_planes[2].at<uchar>(i, j + 50) <= 160))
+				if ((bgr_planes[0].at<uchar>(i, j + 50) >= 39
+						&& bgr_planes[0].at<uchar>(i, j + 50) <= 160
+						&& bgr_planes[1].at<uchar>(i, j + 50) >= 39))
 					break;
 			}
 			if(_type == PRONOTUM){
 				if (j > bgr_planes[0].cols / 5
 						&& ((bgr_planes[0].at<uchar>(i, j + 50) >= 40
 								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
-								&& bgr_planes[2].at<uchar>(i, j + 50) <= 160)
-								|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
-										&& bgr_planes[2].at<uchar>(i, j + 50)
-												>= 60)))
+								&& bgr_planes[1].at<uchar>(i, j + 50) >= 10
+								&& bgr_planes[1].at<uchar>(i, j + 50) <= 95
+								&& bgr_planes[2].at<uchar>(i, j + 50) >= 35
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 200
+								)))
 					break;
 			}
 			if(_type == TETE){
 				if (j > bgr_planes[0].cols / 4
-						&& ((bgr_planes[0].at<uchar>(i, j + 50) >= 90
-								&& bgr_planes[0].at<uchar>(i, j + 50) <= 130
+						&& ((bgr_planes[0].at<uchar>(i, j + 50) >= 39
+								&& bgr_planes[0].at<uchar>(i, j + 50) <= 140
 								&& bgr_planes[2].at<uchar>(i, j + 50) >= 10
-								&& bgr_planes[2].at<uchar>(i, j + 50) <= 105)
-								|| (bgr_planes[0].at<uchar>(i, j + 50) > 130)
-								|| (bgr_planes[0].at<uchar>(i, j + 50) <= 15
-										&& bgr_planes[2].at<uchar>(i, j + 50)
-												>= 100
-										&& bgr_planes[2].at<uchar>(i, j + 50)
-												<= 160)))
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 145)
+						|| (bgr_planes[0].at<uchar>(i, j + 50) > 130
+								&& bgr_planes[1].at<uchar>(i, j + 50) < 70
+								&& bgr_planes[2].at<uchar>(i, j + 50) > 120)
+						|| (bgr_planes[0].at<uchar>(i, j + 50) >=  3
+								&& bgr_planes[0].at<uchar>(i, j + 50) <= 15
+								&& bgr_planes[2].at<uchar>(i, j + 50) >= 120
+								&& bgr_planes[2].at<uchar>(i, j + 50) <= 153)))
 					break;
 			}
 			// replace the points
@@ -162,11 +170,11 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 	// merge bgr_planes to dest image
 	cv::merge(bgr_planes, dest);
 	cv::cvtColor(dest, dest, cv::COLOR_HSV2BGR);
-<<<<<<< HEAD
 	cv::Mat enddest;
 
+	dest.copyTo(enddest);
 	// Making a mask
-	cv::Mat mask(matImage.size(), CV_8UC1);
+	/*cv::Mat mask(matImage.size(), CV_8UC1);
 	for (int i = 0; i < matImage.rows; i++) {
 		for (int j = 0; j < matImage.cols; j++) {
 			if (matImage.at<cv::Vec3b>(i, j)[0] != dest.at<cv::Vec3b>(i, j)[0]
@@ -215,13 +223,60 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 			}
 		}
 	}
-	cv::merge(bgr_planes2, enddest);
+	cv::merge(bgr_planes2, enddest);*/
 	return enddest;
-=======
-	return dest;
->>>>>>> 4a58a9bb86ae1db6d3c14da46cb8355e13c72651
+}
+cv::Mat YellowGrid::act2(cv::Mat inputImage){
+	cv::Mat hsvImage;
+	vector<cv::Mat> hsv_images;
+	cv::cvtColor(inputImage,hsvImage,CV_BGR2HSV);
+	cv::split(hsvImage,hsv_images);
+	cv::Point limit_point = cv::Point(0, 0);
+	int yellow_count = 0;
+	int blue_count =0;
+	int max = 0;
+	int row_index = 0;
+	int col_index = 0;
+
+	for(int j=10;j<hsv_images[0].cols/2;j++){
+		yellow_count = 0;
+		blue_count = 0;
+		for(int i = 0;i<500;i++){
+			if(hsv_images[0].at<uchar>(i, j) <= 38)
+				yellow_count++;
+			else
+				blue_count++;
+		}
+		if(j < 20)
+		qDebug() << j << "blue: " << blue_count << "yellow: " << yellow_count;
+		if(yellow_count > max){
+			max = yellow_count;
+			col_index = j;
+		}
+	}
+	/*for(int j=0;j<hsvImage.cols;j++){
+		if(hsv_images[0].at<uchar>(row_index,j) > 39)
+			blue_count++;
+		if(blue_count > 20){
+			col_index = j;
+			break;
+		}
+	}*/
+
+	limit_point.x = col_index;
+	limit_point.y = row_index;
+	qDebug() << limit_point.x << "," << limit_point.y;
+	qDebug() << max << "," << blue_count;
+	cv::Mat result;
+	cv::merge(hsv_images,result);
+	cv::cvtColor(result,result,CV_HSV2BGR);
+
+	cv::circle(result,limit_point,5,cv::Scalar(0,255,255),1,8);
+	cv::line(result,cv::Point(limit_point.x,0),cv::Point(limit_point.x,result.rows),cv::Scalar(0,0,255));
+	return result;
 }
 /*cv::Mat YellowGrid::usingHistogram(cv::Mat input) {
+
 	int histSize = 256;
 	float range[] = { 0, 256 };
 	const float* histRange = { range };
@@ -232,7 +287,6 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 		cv::cvtColor(input, gray_img, CV_BGR2GRAY);
 	else
 		gray_img = input;
-
 	cv::calcHist(&gray_img, 1, 0, cv::Mat(), hist_img, 1, &histSize, &histRange,
 			true, false);
 
@@ -254,7 +308,20 @@ cv::Mat YellowGrid::removeYellowLines(cv::Mat matImage, int minBrightness,
 			}
 		}
 	}
+	for (int i = 0; i < gray_img.rows; i++) {
+		for (int j = 0; j < gray_img.cols; j++) {
+			if(gray_img.at<uchar>(i, j) < 76.5)
+				break;
+			else{
+				if (gray_img.at<uchar>(i, j) >= 76.5) { // background
+					gray_img.at<uchar>(i, j) = 255;
+				}
+			}
+		}
+	}
 
+	//cv::Mat mask(gray_img.size(),gray_img.type(),cv::Scalar(0));
+	//cv::bitwise_xor(gray_img,mask,gray_img);
 	return gray_img;
 }
 
@@ -296,7 +363,7 @@ cv::Mat YellowGrid::landmarkIndentify(cv::Mat inputImage){
 	cv::GaussianBlur(grayImage,temp2,cv::Size(51,51),0,0,BORDER_DEFAULT);
 	cv::subtract(temp2,temp1,rsImage);
 	cv::bitwise_not(rsImage,rsImage);
-	//cv::threshold(rsImage,rsImage,230,255,THRESH_BINARY); // 235 -
+	cv::threshold(rsImage,rsImage,230,255,THRESH_BINARY); // 235 -
 
 
 	// edge detection
@@ -305,20 +372,22 @@ cv::Mat YellowGrid::landmarkIndentify(cv::Mat inputImage){
 	cv::GaussianBlur(rsImage,rsImage,cv::Size(3,3),0,0,BORDER_DEFAULT);
 	cv::Canny(rsImage,cannyImage,lowThreshold,2*lowThreshold,3);
 
-	//vector<vector<Point> > contours;
-	//  vector<Vec4i> hierarchy;
-	//cv::findContours(cannyImage, contours, hierarchy, CV_RETR_TREE,
-	//		CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	/*vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	cv::findContours(cannyImage, contours, hierarchy, CV_RETR_TREE,
+			CV_CHAIN_APPROX_SIMPLE, Point(0, 0));*/
 
 	/// Draw contours
-	/*Mat drawing = Mat::zeros(cannyImage.size(), CV_8UC3);
-	for(size_t i = 0; i < contours.size(); i++) {
+	Mat drawing = Mat::zeros(cannyImage.size(), CV_8UC3);
+	/*for(size_t i = 0; i < contours.size(); i++) {
 		Scalar color = Scalar(255,255,0);
 		qDebug() << "=================================";
-		for(int j = 0; j < contours[i].size(); j++)
-		      qDebug() << contours[i][j].x << "x" << contours[i][j].y << " ";
-			drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
+		for(int j = 0; j < contours[i].size(); j++){
+		    qDebug() << contours[i][j].x << "x" << contours[i][j].y << " ";
+		    drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
+		}
 	}*/
+
 
 	return cannyImage;
 }
