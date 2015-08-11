@@ -10,6 +10,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
+#include <QtCore/qqueue.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -29,6 +30,7 @@ namespace impls_2015 {
 class YellowGrid {
 
 public:
+	static QQueue<cv::Point> queuePoints ;
 	enum SpeciesType {
 			ELYTRE,
 			MDROITE,
@@ -37,14 +39,21 @@ public:
 			TETE
 		};
 	YellowGrid();
+
 	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
 			QString pathImage);
 	static cv::Mat act2(cv::Mat inputImage);
-	//static cv::Mat usingHistogram(cv::Mat input);
-	//static float otSu(cv::Mat histogram);
-	//static cv::Mat tryRemove(cv::Mat input);
+	static cv::Mat calcHistogram(cv::Mat inputImage);
+	static cv::Mat histogram(cv::Mat inputImage);
+	static float otSu(cv::Mat histogram);
 
 	static cv::Mat landmarkIndentify(cv::Mat inputImage);
+	static cv::Point breakArc(cv::Mat &image,vector<cv::Point> lsPoints);
+	static bool sortByXaxis( const cv::Point &a, const cv::Point &p);
+	static bool sortByYaxis( const cv::Point &a, const cv::Point &p);
+	static cv::Mat edgeSegmentation(cv::Mat inputImage,vector<cv::Point> contours);// ok
+	static void getStepEdges(vector<cv::Point> listPoints);
+	static int getFirstIndexPoint(vector<cv::Point> listPoints, cv::Point point);
 
 private:
 	static SpeciesType getType(QString path);

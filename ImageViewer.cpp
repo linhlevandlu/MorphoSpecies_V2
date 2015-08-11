@@ -2490,8 +2490,9 @@ void ImageViewer::readDirectory(QString path) {
 		QString _name = file.absoluteFilePath();
 		loadImage(_name);
 
-		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
-		//cv::Mat enddest = YellowGrid::usingHistogram(matImage);
+		//cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
+		//cv::Mat enddest = YellowGrid::act2(matImage);
+		cv::Mat enddest = YellowGrid::histogram(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
 		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
@@ -2518,31 +2519,45 @@ void ImageViewer::readDirectory(QString path) {
 
 void ImageViewer::removeYLinesAction() {
 
-	// display the result
+	// run on all directory
 
-	//readDirectory("./data/new_images");
-	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Elytre");
-	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/MandibuleDroite");
-	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/MandibuleGauche");
-	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Pronotum");
-	//readDirectory("/home/linh/Documents/Image_processing/ImagesExemple/Tete");
-
-	//readDirectory("/home/linh/Desktop/new_images");
+	//readDirectory("/home/linh/Desktop/mandibule");
 
 	//readDirectory("/home/Images/Morphometrics/elytre/Original_images"); // ok
 	//readDirectory("/home/Images/Morphometrics/mandibule-droite/Original_images");
-	readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
+	//readDirectory("/home/Images/Morphometrics/mandibule-gauche/Original_images");
 	//readDirectory("/home/Images/Morphometrics/pronotum/Original_images");
 	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
-	/*cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
+	// run on a image
+
+	//cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
 	//cv::Mat enddest = YellowGrid::act2(matImage);
-	//cv::Mat enddest = YellowGrid::usingHistogram(matImage);
+	cv::Mat enddest = YellowGrid::histogram(matImage);
+
+
+	vector<cv::Point> contours;
+
+		contours.push_back(cv::Point(100,100));
+		contours.push_back(cv::Point(103,90));
+		contours.push_back(cv::Point(110,82));
+		contours.push_back(cv::Point(112,80));
+		contours.push_back(cv::Point(120,73));
+		contours.push_back(cv::Point(130,70));
+		contours.push_back(cv::Point(140,72));
+		contours.push_back(cv::Point(150,74));
+		contours.push_back(cv::Point(160,78));
+		contours.push_back(cv::Point(162,80));
+		contours.push_back(cv::Point(170,90));
+
+	//cv::Mat enddest = YellowGrid::edgeSegmentation(matImage,contours);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
 	other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
-	other->show();*/
+	other->show();
+
+	qDebug() << "the points: "<<YellowGrid::queuePoints.size();
 }
 // Remove yellow lines with parameter
 void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {
