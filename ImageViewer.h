@@ -73,7 +73,7 @@ public:
 	void featureSurfAction(int minHessian, bool refresh = true);
 
 	//add by LE Van Linh
-	void removeYLinesAction(int minBrightness, QString pathImage);
+	//void removeYLinesAction(int minBrightness, QString pathImage);
 	void readDirectory(QString path);
 	//end
 

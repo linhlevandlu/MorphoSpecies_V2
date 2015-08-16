@@ -1,12 +1,12 @@
 /*
- * YellowGrid.h
+ * Classification.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 13, 2015
  *      Author: linh
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef CLASSIFICATION_H_
+#define CLASSIFICATION_H_
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
@@ -21,32 +21,19 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
+
 using namespace cv;
 using namespace std;
+
 namespace impls_2015 {
 
-
-
-class YellowGrid {
-
+class Classification {
 public:
-
-	enum SpeciesType {
-			ELYTRE,
-			MDROITE,
-			MGAUCHE,
-			PRONOTUM,
-			TETE
-		};
-	YellowGrid();
-
-	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
-			QString pathImage);
-
-
-private:
-	static SpeciesType getType(QString path);
+	Classification();
+	static cv::Mat classification(cv::Mat inputImage);
+	static QQueue<cv::Point> featuresExtraction(cv::Mat inputImage);
+	static cv::Mat drawingEdges(cv::Mat inputImage, QQueue<cv::Point> queuePoints);
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* CLASSIFICATION_H_ */

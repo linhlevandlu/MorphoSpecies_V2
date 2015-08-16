@@ -62,6 +62,10 @@
 #include "impls/algorithms/MyImpl.h"
 #include "impls_2015/Lines.h"
 #include "impls_2015/YellowGrid.h"
+#include "impls_2015/Classification.h"
+#include "impls_2015/EdgeSegmentation.h"
+#include "impls_2015/HistogramImp.h"
+#include "impls_2015/Helper.h"
 
 using namespace std;
 using namespace algorithms;
@@ -2490,9 +2494,9 @@ void ImageViewer::readDirectory(QString path) {
 		QString _name = file.absoluteFilePath();
 		loadImage(_name);
 
-		//cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
+		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
 		//cv::Mat enddest = YellowGrid::act2(matImage);
-		cv::Mat enddest = YellowGrid::histogram(matImage);
+		//cv::Mat enddest = YellowGrid::histogram(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
 		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
@@ -2530,44 +2534,12 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
 	// run on a image
-
-	//cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
-	//cv::Mat enddest = YellowGrid::act2(matImage);
-	cv::Mat enddest = YellowGrid::histogram(matImage);
-
-
-	vector<cv::Point> contours;
-
-		contours.push_back(cv::Point(100,100));
-		contours.push_back(cv::Point(103,90));
-		contours.push_back(cv::Point(110,82));
-		contours.push_back(cv::Point(112,80));
-		contours.push_back(cv::Point(120,73));
-		contours.push_back(cv::Point(130,70));
-		contours.push_back(cv::Point(140,72));
-		contours.push_back(cv::Point(150,74));
-		contours.push_back(cv::Point(160,78));
-		contours.push_back(cv::Point(162,80));
-		contours.push_back(cv::Point(170,90));
-
-	//cv::Mat enddest = YellowGrid::edgeSegmentation(matImage,contours);
+	cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
 	other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
 	other->show();
-
-	qDebug() << "the points: "<<YellowGrid::queuePoints.size();
-}
-// Remove yellow lines with parameter
-void ImageViewer::removeYLinesAction(int minBrightness, QString pathImage) {
-	qDebug() << "HSV basic...";
-	cv::Mat enddest = YellowGrid::removeYellowLines(matImage, minBrightness,
-			pathImage);
-	qImage = ImageConvert::cvMatToQImage(enddest);
-	imageLabel->setPixmap(QPixmap::fromImage(qImage));
-	statusBar()->showMessage(
-			tr("Minimal brightness value: ") + QString::number(minBrightness));
 }
 
 // remove yellow grid by using Histogram
@@ -2575,9 +2547,29 @@ void ImageViewer::landmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
 
-	cv::Mat dest = YellowGrid::landmarkIndentify(matImage);
+	// initialization a contours to test
+	vector<cv::Point> contours;
+	contours.push_back(cv::Point(100, 100));
+	contours.push_back(cv::Point(103, 90));
+	contours.push_back(cv::Point(110, 82));
+	contours.push_back(cv::Point(112, 80));
+	contours.push_back(cv::Point(120, 73));
+	contours.push_back(cv::Point(130, 70));
+	contours.push_back(cv::Point(140, 72));
+	contours.push_back(cv::Point(150, 74));
+	contours.push_back(cv::Point(160, 78));
+	contours.push_back(cv::Point(162, 80));
+	contours.push_back(cv::Point(170, 90));
+
+
+	cv::Mat enddest;
+	QQueue<cv::Point> queue = Classification::featuresExtraction(matImage);
+	enddest = Classification::drawingEdges(matImage,queue);
+
+	//cv::Mat enddest =
+
 	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ImageConvert::cvMatToQImage(dest),
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Using Histogram -- " + this->fileName);
 	other->show();
 }

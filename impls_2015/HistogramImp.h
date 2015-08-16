@@ -1,13 +1,12 @@
 /*
- * YellowGrid.h
+ * Histogram.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 13, 2015
  *      Author: linh
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
-
+#ifndef HISTOGRAMIMP_H_
+#define HISTOGRAMIMP_H_
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
 #include <QtCore/qqueue.h>
@@ -20,33 +19,22 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
+#include <QtCore/QDebug>
+#include <QtCore/qqueue.h>
 
 using namespace cv;
 using namespace std;
+
 namespace impls_2015 {
 
-
-
-class YellowGrid {
-
+class HistogramImp {
 public:
-
-	enum SpeciesType {
-			ELYTRE,
-			MDROITE,
-			MGAUCHE,
-			PRONOTUM,
-			TETE
-		};
-	YellowGrid();
-
-	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
-			QString pathImage);
-
-
-private:
-	static SpeciesType getType(QString path);
+	HistogramImp();
+	static cv::Mat calcHistogram(cv::Mat inputImage);
+	static double medianHistogram(cv::Mat hImage);
+	static float meanHistogram(cv::Mat hImage);
+	static void drawHistogram(cv::Mat hImage);
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* HISTOGRAM_H_ */

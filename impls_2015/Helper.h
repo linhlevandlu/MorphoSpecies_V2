@@ -1,13 +1,12 @@
 /*
- * YellowGrid.h
+ * Helper.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 12, 2015
  *      Author: linh
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
-
+#ifndef HELPER_H_
+#define HELPER_H_
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
 #include <QtCore/qqueue.h>
@@ -25,28 +24,17 @@ using namespace cv;
 using namespace std;
 namespace impls_2015 {
 
-
-
-class YellowGrid {
-
+class Helper {
 public:
+	Helper();
+	static bool sortByXaxis(const cv::Point &point1, const cv::Point &point2);
+	static bool sortByYaxis(const cv::Point &point1, const cv::Point &point2);
+	static int getFirstIndexPoint(vector<cv::Point> listPoints,
+			cv::Point point);
+	static double distanceBetweenPoints(cv::Point point1, cv::Point point2);
+	static bool checkPointInQueue(QQueue<cv::Point> queue, cv::Point point);
 
-	enum SpeciesType {
-			ELYTRE,
-			MDROITE,
-			MGAUCHE,
-			PRONOTUM,
-			TETE
-		};
-	YellowGrid();
-
-	static cv::Mat removeYellowLines(cv::Mat matImage, int minBrightness,
-			QString pathImage);
-
-
-private:
-	static SpeciesType getType(QString path);
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* HELPER_H_ */
