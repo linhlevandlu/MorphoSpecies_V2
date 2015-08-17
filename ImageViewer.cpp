@@ -66,6 +66,7 @@
 #include "impls_2015/EdgeSegmentation.h"
 #include "impls_2015/HistogramImp.h"
 #include "impls_2015/Helper.h"
+#include "impls_2015/Drawing.h"
 
 using namespace std;
 using namespace algorithms;
@@ -527,7 +528,7 @@ void ImageViewer::createActions() {
 
 	removeLinesAct2 = new QAction(tr("Landmarks identifying"), this);
 	removeLinesAct2->setEnabled(false);
-	removeLinesAct2->setShortcut(tr("Ctrl+H"));
+	removeLinesAct2->setShortcut(tr("Ctrl+E"));
 	connect(removeLinesAct2, SIGNAL(triggered()), this,
 			SLOT(landmarks()));
 
@@ -2538,7 +2539,7 @@ void ImageViewer::removeYLinesAction() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
-	other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
+	//other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
 	other->show();
 }
 
@@ -2564,9 +2565,9 @@ void ImageViewer::landmarks() {
 
 	cv::Mat enddest;
 	QQueue<cv::Point> queue = Classification::featuresExtraction(matImage);
-	enddest = Classification::drawingEdges(matImage,queue);
+	enddest = Drawing::drawingEdges(matImage,queue);
+	//enddest = Drawing::drawingEdges(matImage,Lines::getLines(queue));
 
-	//cv::Mat enddest =
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),

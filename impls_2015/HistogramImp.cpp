@@ -83,25 +83,5 @@ float HistogramImp::meanHistogram(cv::Mat hImage){
 	return (pi / total);
 }
 
-/**
- * Drawing the histogram of an image
- * @parameter: histogram of an image presented by a matrix
- */
-void HistogramImp::drawHistogram(cv::Mat hImage){
-	int hist_w = 512;
-	int hist_h = 300;
-	int bin_w = cvRound((double) hist_w / 256);
-	cv::Mat histImage(hist_h, hist_w, CV_8UC3, cv::Scalar(0, 0, 0));
-	cv::normalize(hImage, hImage, 0, histImage.rows, cv::NORM_MINMAX, -1,
-			cv::Mat());
-	for (int i = 1; i < 256; i++) {
-		cv::line(histImage,
-				cv::Point(bin_w * (i - 1),
-						hist_h - cvRound(hImage.at<float>(i - 1))),
-				cv::Point(bin_w * (i), hist_h - cvRound(hImage.at<float>(i))),
-				cv::Scalar(255, 0, 0), 1, 8, 0);
-	}
-	cv::namedWindow("Histogram", CV_WINDOW_AUTOSIZE);
-	cv::imshow("Histogram", histImage);
-}
+
 } /* namespace impls_2015 */

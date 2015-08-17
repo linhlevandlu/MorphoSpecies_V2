@@ -11,26 +11,20 @@
 #include <QtGui/QDialog>
 #include <QtGui/QWidget>
 #include <QtGui/QSlider>
+#include <QtCore/qqueue.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
 
+using namespace std;
 namespace impls_2015 {
 
-class Lines: public QDialog {
-Q_OBJECT
+class Lines {
 public:
-	Lines(QWidget *parent);
-	static const int SLIDER_VALUE = 90;
-	static const int BRIGHTNESS_VALUE = 90;
-private slots:
-	void on_sliderEle_valueChanged(int value);
-	void on_minBrightness_valueChanged(int value);
-private:
-	QSlider *sliderEle;
-	QSlider *minBrightness;
+	Lines();
+	static QList<QLine> getLines(QQueue<cv::Point> queuePoints);
 };
 
 } /* namespace impls_2015 */

@@ -1,12 +1,12 @@
 /*
- * Histogram.h
+ * Drawing.h
  *
- *  Created on: Aug 13, 2015
+ *  Created on: Aug 17, 2015
  *      Author: linh
  */
 
-#ifndef HISTOGRAMIMP_H_
-#define HISTOGRAMIMP_H_
+#ifndef DRAWING_H_
+#define DRAWING_H_
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
 #include <QtCore/qqueue.h>
@@ -19,22 +19,19 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
-#include <QtCore/QDebug>
-#include <QtCore/qqueue.h>
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
 namespace impls_2015 {
 
-class HistogramImp {
+class Drawing {
 public:
-	HistogramImp();
-	static cv::Mat calcHistogram(cv::Mat inputImage);
-	static double medianHistogram(cv::Mat hImage);
-	static float meanHistogram(cv::Mat hImage);
-
+	Drawing();
+	static void drawHistogram(cv::Mat hImage);
+	static cv::Mat drawingEdges(cv::Mat inputImage, QQueue<cv::Point> queuePoints);
+	static cv::Mat drawingEdges(cv::Mat inputImage, QList<QLine> listLines);
 };
 
 } /* namespace impls_2015 */
-#endif /* HISTOGRAM_H_ */
+#endif /* DRAWING_H_ */

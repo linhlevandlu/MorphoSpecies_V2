@@ -105,6 +105,7 @@ QQueue<cv::Point> Classification::featuresExtraction(cv::Mat inputImage){
 	for (size_t i = 0; i < contours.size(); i++) {
 		/*Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
 				rng.uniform(0, 255));*/
+
 		if(contours[i].size() > 2500){
 			int nParts = 4; // number of parts, which we want to
 			int splitSize =contours[i].size()/nParts;
@@ -175,22 +176,5 @@ QQueue<cv::Point> Classification::featuresExtraction(cv::Mat inputImage){
 	return EdgeSegmentation::queuePoints;
 }
 
-/**
- * Drawing the step edges
- * @parameter 1: inputImage - the input image
- * @parameter 2: queuePoints - queue of points to draw
- * @return: an image represented the points in queue points.
- */
-cv::Mat Classification::drawingEdges(cv::Mat inputImage, QQueue<cv::Point> queuePoints){
-	Mat output = Mat::zeros(inputImage.size(), CV_8UC3);
-	qDebug() << "Extract from queue...";
-	cv::Point p = queuePoints.dequeue();
-	while (!queuePoints.isEmpty()) {
-		cv::Point q = queuePoints.dequeue();
-		cv::line(output, p, q, cv::Scalar(0, 255, 0), 1, 8);
-		qDebug() << "(" << q.x << "," << q.y << ") ";
-		p = q;
-	}
-	return output;
-}
+
 } /* namespace impls_2015 */

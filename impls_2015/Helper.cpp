@@ -15,26 +15,6 @@ Helper::Helper() {
 }
 
 /**
- * Sort two points by the x value (X axis)
- * @parameter 1: point1 - the first point
- * @parameter 2: point2 - the second point
- * @return: true, if point1 stay on left of point2 (by X axis), otherwise, return false.
- */
-bool Helper::sortByXaxis(const Point &point1, const Point &point2){
-	return point1.x < point2.x;
-}
-
-/**
- * Sort two points by the y value (Y axis)
- * @parameter 1: point1 - the first point
- * @parameter 2: point2 - the second point
- * @return: true, if point1 stay on left of point2 (by X axis), otherwise, return false.
- */
-bool Helper::sortByYaxis(const Point &point1, const Point &point2){
-	return point1.y < point2.y;
-}
-
-/**
  * Get the first position of a point in a list of points
  * @parameter 1: listPoints - list of points
  * @parameter 2: point - the point need to check

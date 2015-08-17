@@ -11,42 +11,34 @@
 #include <QtGui/QFormLayout>
 #include <QtGui/QLabel>
 #include <QtGui/qslider.h>
-#include "../ImageViewer.h"
+#include <QtCore/qset.h>
+#include <QtCore/qlist.h>
+
 
 namespace impls_2015 {
 
-Lines::Lines(QWidget *parent) :
-		QDialog(parent) {
-
-	sliderEle = new QSlider(Qt::Horizontal, this);
-	sliderEle->setRange(0, 190);
-	sliderEle->setSingleStep(1);
-	sliderEle->setValue(SLIDER_VALUE);
-	connect(sliderEle, SIGNAL(valueChanged(int)), this,
-			SLOT(on_sliderEle_valueChanged(int)));
-
-	minBrightness = new QSlider(Qt::Horizontal, this);
-	minBrightness->setRange(50, 250);
-	minBrightness->setSingleStep(1);
-	minBrightness->setValue(BRIGHTNESS_VALUE);
-	connect(minBrightness, SIGNAL(valueChanged(int)), this,
-			SLOT(on_minBrightness_valueChanged(int)));
-
-	QFormLayout *layout = new QFormLayout;
-	layout->addRow(new QLabel(tr("Minimum Brightness: ")), minBrightness);
-	layout->addRow(new QLabel(tr("Gray synchronize: ")), sliderEle);
-
-	setLayout(layout);
-	setWindowTitle(tr("Parameters"));
-	this->setAttribute(Qt::WA_QuitOnClose, false);
+Lines::Lines() {
 }
 
-void Lines::on_minBrightness_valueChanged(int value) {
-	ImageViewer* parent = qobject_cast<ImageViewer *>(this->parentWidget());
-	//parent->removeYLinesAction(value,"abc");
-}
-void Lines::on_sliderEle_valueChanged(int value) {
-	ImageViewer* parent = qobject_cast<ImageViewer *>(this->parentWidget());
-	//parent->removeYLinesAction("abc", value);
+/**
+ * Constructor a set of line from a queue of points
+ * @paramater: a queue of points
+ * @return: set of line
+ */
+QList<QLine> Lines::getLines(QQueue<cv::Point> queuePoints){
+
+	QList<QLine> listLines;
+	cv::Point p0;
+	cv::Point p1;
+	if(!queuePoints.isEmpty()){
+		p0 = queuePoints.dequeue();
+	}
+	while(!queuePoints.isEmpty()){
+		p1 = queuePoints.dequeue();
+		QLine line(p0.x, p0.y,p1.x,p1.y);
+		listLines.append(line);
+		p0 = p1;
+	}
+	return listLines;
 }
 } /* namespace impls_2015 */

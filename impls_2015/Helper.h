@@ -27,8 +27,7 @@ namespace impls_2015 {
 class Helper {
 public:
 	Helper();
-	static bool sortByXaxis(const cv::Point &point1, const cv::Point &point2);
-	static bool sortByYaxis(const cv::Point &point1, const cv::Point &point2);
+
 	static int getFirstIndexPoint(vector<cv::Point> listPoints,
 			cv::Point point);
 	static double distanceBetweenPoints(cv::Point point1, cv::Point point2);

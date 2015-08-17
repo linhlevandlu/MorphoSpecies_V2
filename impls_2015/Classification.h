@@ -32,7 +32,6 @@ public:
 	Classification();
 	static cv::Mat classification(cv::Mat inputImage);
 	static QQueue<cv::Point> featuresExtraction(cv::Mat inputImage);
-	static cv::Mat drawingEdges(cv::Mat inputImage, QQueue<cv::Point> queuePoints);
 };
 
 } /* namespace impls_2015 */
