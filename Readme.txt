@@ -29,5 +29,7 @@ Version 2.0
 ==================================================================
 - Design and implement the algorithm to remove the yellow lines on
 the left part of image.
+- Implementation the algorithm to detect the structure of image
+- Automatic detection the landmarks in image
 
 
