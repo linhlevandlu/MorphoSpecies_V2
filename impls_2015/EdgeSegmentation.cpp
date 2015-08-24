@@ -2,125 +2,121 @@
  * EdgeSegmentation.cpp
  *
  *  Created on: Aug 13, 2015
- *      Author: linh
+ *  Image processing for morphometrics (IPM) Version 2
+ *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
+ *
+ *	This program is free software: you can redistribute it and/or modify
+ * 	it under the terms of the GNU General Public License as published by
+ * 	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	This program is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
 #include "EdgeSegmentation.h"
 #include <QtCore/QDebug>
 #include <QtCore/qqueue.h>
 
-
-
 namespace impls_2015 {
-QQueue<cv::Point> EdgeSegmentation::queuePoints;
-EdgeSegmentation::EdgeSegmentation() {
+
+/**
+ * Constructor an edgeSegmentation
+ */
+EdgeSegmentation::EdgeSegmentation(Image image) {
+	this->image = image;
 }
 
 /**
- * Get the step edges using the findContours function
- * @parameter: cannyImage - the image after apply the Canny algorithm
- * @return: list of the step edges, which was presented by the list of Point
+ * Get the image
+ * @return: the image
  */
-vector<vector<cv::Point> > EdgeSegmentation::stepEdgesByFindContours(cv::Mat cannyImage){
+Image EdgeSegmentation::getImage() {
+	return this->image;
+}
 
-	// using findContours to obtain the step edges
+/**
+ * Set the image
+ * @parameter: image - the input image
+ */
+void EdgeSegmentation::setImage(Image image) {
+	this->image = image;
+}
+
+/**
+ * Get the edges of an image
+ * @return: list of edge which construct the image
+ */
+QList<Edge> EdgeSegmentation::getEdges() {
+	cv::Mat grayImg;
+	cv::cvtColor(image.getMatImage(), grayImg, CV_BGR2GRAY);
+
+	cv::Mat histImg = image.histogram();
+	// calculate the median
+	double median = image.medianHistogram(); //  impls_2015::HistogramImp::medianHistogram(histImg);
+	float mean = image.meanHistogram(); // impls_2015::HistogramImp::meanHistogram(histImg);
+	// find the first maximal point
+	int limit = (mean > median ? median : mean);
+	limit = (limit >= 120 ? (limit - 25) : (limit - 5));
+	int imax = -1, max = -1;
+	for (int i = 0; i < limit; i++) {
+		if (histImg.at<float>(i) > max) {
+			max = histImg.at<float>(i);
+			imax = i;
+		}
+	}
+
+	int limit2 = (mean > median ? mean : median);
+	int imin = -1, min = max;
+	for (int k = imax; k < limit2; k++) {
+		if (histImg.at<float>(k) < min) {
+			min = histImg.at<float>(k);
+			imin = k;
+		}
+	}
+
+	int max2 = -1, imax2 = -1;
+	for (int j = limit2; j < 256; j++) {
+		if (histImg.at<float>(j) > max2) {
+			max2 = histImg.at<float>(j);
+			imax2 = j;
+		}
+	}
+
+	int mid1 = (imin + imax) / 2;
+	int mid2 = (imin + imax2) / 2;
+	int mid = (mid1 + mid2) / 2;
+	cv::threshold(grayImg, grayImg, mid, 255, CV_THRESH_BINARY);
+
+	Mat cannyImage;
+	cv::Canny(grayImg, cannyImage, mid, 3 * mid, 5);
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 	RNG rng(12345);
 	findContours(cannyImage, contours, hierarchy, RETR_TREE,
 			CHAIN_APPROX_SIMPLE, Point(0, 0));
+	QList<Edge> edges;
 
-	// drawing the contours
-	Mat contourImg = Mat::zeros(cannyImage.size(), CV_8UC3);
 	for (size_t i = 0; i < contours.size(); i++) {
-		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
-				rng.uniform(0, 255));
-		if (contours[i].size() > 10) {
-			for (int j = 0; j < contours[i].size(); j++) {
-				//qDebug() << contours[i][j].x << "x" << contours[i][j].y << " ";
-				cv::drawContours(contourImg, contours, i, color, 1, 8, hierarchy, 0,
-						Point());
-			}
-		}
+		std::list<Point> list(contours[i].begin(), contours[i].end());
+		QList<Point> points = QList<Point>::fromStdList(list);
+		Edge edge(points);
+		edges.append(edge);
 	}
-	//cv::namedWindow("Contours", CV_WINDOW_AUTOSIZE);
-	//cv::imshow("Contours", contourImg);
-	return contours;
+	return edges;
 }
 
 /**
- * Get the step edges using the probabilistic Hough transform algorithm for line detection
- * @parameter: cannyImage - the image after apply the Canny algorithm
- * @return: list of lines, which was presented by a vector for begin and end point of line
+ * Get the landmarks on image
+ * @return: list of landmark on the image
  */
-vector<Vec4i> EdgeSegmentation::stepEdgesByHoughLines(cv::Mat cannyImage){
-
-	// using HoughLinesP to obtain the step edges
-	vector<Vec4i> lines;
-	cv::HoughLinesP(cannyImage, lines, 1, CV_PI / 180, 5, 5, 10);
-
-	//drawing the lines
-	Mat hLinesImg = Mat::zeros(cannyImage.size(), CV_8UC3);
-	for (size_t i = 0; i < lines.size(); i++) {
-		Vec4i l = lines[i];
-		cv::line(hLinesImg, Point(l[0], l[1]), Point(l[2], l[3]),
-				Scalar(0, 255, 0), 1, 8);
-	}
-	cv::namedWindow("HoughLinesP", CV_WINDOW_AUTOSIZE);
-	cv::imshow("HoughLinesP", hLinesImg);
-	return lines;
-}
-
-/**
- * Representation the edge by the connected lines
- * @parameter contours: set of points on the edge
- * @return:
- */
-void EdgeSegmentation::edgeSegmentation(cv::Mat inputImage,vector<cv::Point> contours){
-
-	cv::Point p0 = contours[0];
-	cv::Point pend = contours[contours.size() - 1];
-	double length = sqrt(pow(pend.x - p0.x,2) + pow(pend.y - p0.y,2));
-
-
-	//cv::line(result,p0,pend,cv::Scalar(0,0,255),1,8);
-	double m  = (double)(pend.y - p0.y)/(double)(pend.x-p0.x);
-	double a = m;
-	double b = -1;
-	double c = p0.y - (m * p0.x);
-
-	double distance  = 0;
-	double maxDistance  = 0;
-	double imax =-1;
-	for(int i = 0;i < contours.size();i++){
-		cv::Point pointi = contours[i];
-		distance = abs(a * pointi.x + b * pointi.y + c)/(sqrt(pow(a,2) +  pow(b,2)));
-		if(distance > maxDistance){
-			maxDistance = distance;
-			imax = i;
-		}
-	}
-
-	double lamda = maxDistance/length;
-	double l1 = sqrt(pow(contours[imax].x - p0.x,2) + pow(contours[imax].y - p0.y,2));
-	double ratio = (maxDistance/l1);
-	if(ratio > lamda){
-		vector<cv::Point> part1(contours.begin(),contours.begin()+imax + 1);
-		vector<cv::Point> part2(contours.begin() + imax, contours.end());
-		edgeSegmentation(inputImage,part1);
-		edgeSegmentation(inputImage,part2);
-	}
-	RNG rng(12345);
-	if(imax != -1){
-		//cv::circle(inputImage,contours[imax],1,cv::Scalar(0,0,255),1,8);
-		if(!Helper::checkPointInQueue(queuePoints,p0))
-			queuePoints.enqueue(p0);
-		if(!Helper::checkPointInQueue(queuePoints,contours[imax]))
-			queuePoints.enqueue(contours[imax]);
-		if(!Helper::checkPointInQueue(queuePoints,pend))
-			queuePoints.enqueue(pend);
-		//qDebug() << imax <<" - ("<<p0.x<<","<<p0.y<<") - ("<<pend.x<<","<<pend.y <<")" ;
-	}
-	// the output is the queue of points
+QList<Landmark> EdgeSegmentation::getLandmarks() {
+	QList<Landmark> landmarks;
+	return landmarks;
 }
 } /* namespace impls_2015 */

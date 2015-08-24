@@ -25,13 +25,15 @@ HEADERS += ImageViewer.h ImageConvert.h ui/NormalBlurPanel.h \
 	ui/ErosionPanel.h ui/DilationPanel.h ui/MorphoExtPanel.h \
 	ui/ThresholdingPanel.h ui/SobelPanel.h ui/ScharrPanel.h ui/LaplacePanel.h ui/CannyPanel.h \
 	impls/algorithms/MyImpl.h impls/algorithms/Ant.h impls/algorithms/Position.h \
-	ui/SurfPanel.h impls_2015/Lines.h impls_2015/YellowGrid.h impls_2015/Helper.h \
-	impls_2015/EdgeSegmentation.h impls_2015/Classification.h impls_2015/HistogramImp.h
+	ui/SurfPanel.h impls_2015/Line.h impls_2015/EdgeSegmentation.h \
+	impls_2015/IDrawOperation.h impls_2015/Edge.h impls_2015/IExtraction.h \
+	impls_2015/Image.h  impls_2015/Landmark.h  impls_2015/LandmarkDetection.h  impls_2015/Scenario.h
 	
 SOURCES += Ipm.cpp ImageViewer.cpp ImageConvert.cpp ui/NormalBlurPanel.cpp \
 	ui/GaussianBlurPanel.cpp ui/MedianBlurPanel.cpp ui/BilateralFilterPanel.cpp ui/ConvolutionFilterPanel.cpp\
 	ui/ErosionPanel.cpp ui/DilationPanel.cpp ui/MorphoExtPanel.cpp \
 	ui/ThresholdingPanel.cpp ui/SobelPanel.cpp ui/ScharrPanel.cpp ui/LaplacePanel.cpp ui/CannyPanel.cpp \
 	impls/algorithms/MyImpl.cpp impls/algorithms/Ant.cpp impls/algorithms/Position.cpp \
-	ui/SurfPanel.cpp impls_2015/Lines.cpp impls_2015/YellowGrid.cpp impls_2015/Helper.cpp \
-	impls_2015/EdgeSegmentation.cpp impls_2015/Classification.cpp impls_2015/HistogramImp.cpp
+	ui/SurfPanel.cpp impls_2015/Line.cpp impls_2015/EdgeSegmentation.cpp \
+	impls_2015/IDrawOperation.cpp impls_2015/Edge.cpp impls_2015/IExtraction.cpp \
+	impls_2015/Image.cpp  impls_2015/Landmark.cpp  impls_2015/LandmarkDetection.cpp  impls_2015/Scenario.cpp 

@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * DrawOperation.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 20, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,12 +19,9 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef IDRAWOPERATION_H_
+#define IDRAWOPERATION_H_
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
-#include <QtCore/qqueue.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -35,20 +32,18 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
-using namespace cv;
 using namespace std;
+using namespace cv;
+
 namespace impls_2015 {
 
-class YellowGrid {
-private:
-	cv::Point limitPoint;
-
+class IDrawOperation {
 public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
+	IDrawOperation();
+	static IDrawOperation* create();
+	virtual ~IDrawOperation();
+	virtual cv::Mat drawing(cv::Mat outputImage)=0;
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* DRAWOPERATION_H_ */

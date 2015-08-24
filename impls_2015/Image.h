@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * Image.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 21, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,12 +19,13 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef IMAGE_H_
+#define IMAGE_H_
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
-#include <QtCore/qqueue.h>
+#include <QtCore/qlist.h>
+#include <QtCore/qstring.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -35,20 +36,52 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
-using namespace cv;
-using namespace std;
+#include "Edge.h"
+#include "Landmark.h"
+
 namespace impls_2015 {
 
-class YellowGrid {
+class Image: public IDrawOperation {
 private:
-	cv::Point limitPoint;
-
+	QString fileName;
+	QList<Edge> listOfEdges;
+	QList<Landmark> listOfLandmarks;
+	int histogramSize;
 public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
+	enum InsectPart {
+		ELYTRE, MDROITE, MGAUCHE, PRONOTUM, TETE
+	};
+
+	Image();
+	Image(QString filePath);
+	virtual ~Image();
+
+	QString getFileName();
+	void setFileName(QString filePath);
+	QList<Edge> getEdges();
+	void setEdges(QList<Edge> edges);
+	QList<Landmark> getLandmarks();
+	void setLandmarks(QList<Landmark> landmarks);
+	int getHistSize();
+	void setHistSize(int histSize);
+
+	cv::Mat getMatImage();
+	void addEdge(Edge edge);
+	void addLandmark(Landmark landmark);
+
+	cv::Mat histogram();
+	double medianHistogram();
+	float meanHistogram();
+	cv::Mat drawingHistogram();
+	cv::Mat drawing(cv::Mat outputImage);
+
+	// removing yellow grid
+	InsectPart getPart();
+	vector<cv::Mat> splitChannels();
+	cv::Point findLimitPoint();
+	cv::Point findReplacePoint();
+	cv::Mat removingGrid(int minBrightness);
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* IMAGE_H_ */

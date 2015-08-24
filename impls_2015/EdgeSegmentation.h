@@ -2,7 +2,21 @@
  * EdgeSegmentation.h
  *
  *  Created on: Aug 13, 2015
- *      Author: linh
+ *  Image processing for morphometrics (IPM) Version 2
+ *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
+ *
+ *	This program is free software: you can redistribute it and/or modify
+ * 	it under the terms of the GNU General Public License as published by
+ * 	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	This program is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
 #ifndef EDGESEGMENTATION_H_
@@ -21,24 +35,28 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 #include <QtCore/QDebug>
-#include <QtCore/qqueue.h>
+#include <QtCore/qlist.h>
 
-#include "Helper.h"
-
+#include "Image.h"
+#include "Edge.h"
+#include "IExtraction.h"
 
 using namespace cv;
 using namespace std;
 
 namespace impls_2015 {
 
-class EdgeSegmentation {
+class EdgeSegmentation: public IExtraction {
+private:
+	Image image;
 public:
-	static QQueue<cv::Point> queuePoints ;
-	EdgeSegmentation();
-	static vector<vector<cv::Point> > stepEdgesByFindContours(
-			cv::Mat cannyImage);
-	static vector<Vec4i> stepEdgesByHoughLines(cv::Mat cannyImage);
-	static void edgeSegmentation(cv::Mat inputImage,vector<cv::Point> contours);
+
+	EdgeSegmentation(Image image);
+	Image getImage();
+	void setImage(Image image);
+	QList<Edge> getEdges();
+	QList<Landmark> getLandmarks();
+
 };
 
 } /* namespace impls_2015 */

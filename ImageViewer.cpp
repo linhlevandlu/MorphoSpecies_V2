@@ -60,13 +60,16 @@
 #include "ui/SurfPanel.h"
 
 #include "impls/algorithms/MyImpl.h"
-#include "impls_2015/Lines.h"
+
+
+#include "impls_2015/Line.h"
+#include "impls_2015/Edge.h"
 #include "impls_2015/YellowGrid.h"
-#include "impls_2015/Classification.h"
+#include "impls_2015/Image.h"
+#include "impls_2015/Landmark.h"
+#include "impls_2015/LandmarkDetection.h"
 #include "impls_2015/EdgeSegmentation.h"
-#include "impls_2015/HistogramImp.h"
-#include "impls_2015/Helper.h"
-#include "impls_2015/Drawing.h"
+#include "impls_2015/Scenario.h"
 
 using namespace std;
 using namespace algorithms;
@@ -530,7 +533,7 @@ void ImageViewer::createActions() {
 	removeLinesAct2->setEnabled(false);
 	removeLinesAct2->setShortcut(tr("Ctrl+E"));
 	connect(removeLinesAct2, SIGNAL(triggered()), this,
-			SLOT(landmarks()));
+			SLOT(getLandmarks()));
 
 	//end
 }
@@ -2495,7 +2498,7 @@ void ImageViewer::readDirectory(QString path) {
 		QString _name = file.absoluteFilePath();
 		loadImage(_name);
 
-		cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, _name);
+		cv::Mat enddest;// = YellowGrid::removeYellowLines(matImage, 90, _name);
 		//cv::Mat enddest = YellowGrid::act2(matImage);
 		//cv::Mat enddest = YellowGrid::histogram(matImage);
 		// display the result
@@ -2535,7 +2538,8 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
 	// run on a image
-	cv::Mat enddest = YellowGrid::removeYellowLines(matImage, 90, fileName);
+	Image image(fileName);
+	cv::Mat enddest = image.removingGrid(90);// = YellowGrid::removeYellowLines(matImage, 90, fileName);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
@@ -2544,7 +2548,7 @@ void ImageViewer::removeYLinesAction() {
 }
 
 // remove yellow grid by using Histogram
-void ImageViewer::landmarks() {
+void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
 
@@ -2564,10 +2568,11 @@ void ImageViewer::landmarks() {
 
 
 	cv::Mat enddest;
-	QQueue<cv::Point> queue = Classification::featuresExtraction(matImage);
-	enddest = Drawing::drawingEdges(matImage,queue);
-	//enddest = Drawing::drawingEdges(matImage,Lines::getLines(queue));
-
+	Image image(fileName);
+	//image.setHistSize(256);
+	IExtraction *extraction = new EdgeSegmentation(image);
+	Scenario scenario(extraction);
+	enddest = scenario.landmarksAutoDetect();
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),

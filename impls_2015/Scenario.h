@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * Scenario.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 21, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,12 +19,12 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef SCENARIO_H_
+#define SCENARIO_H_
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
-#include <QtCore/qqueue.h>
+#include <QtCore/qlist.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -35,20 +35,24 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
+#include "Image.h"
+#include "Edge.h"
+#include "EdgeSegmentation.h"
+#include "IExtraction.h"
+
 using namespace cv;
 using namespace std;
+
 namespace impls_2015 {
 
-class YellowGrid {
+class Scenario {
 private:
-	cv::Point limitPoint;
-
+	IExtraction* extraction;
 public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
+	Scenario(IExtraction* extraction);
+	virtual ~Scenario();
+	cv::Mat landmarksAutoDetect();
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* SCENARIO_H_ */

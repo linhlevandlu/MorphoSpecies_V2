@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * Lines.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Jun 24, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,36 +19,46 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef LINE_H_
+#define LINE_H_
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
+#include <QtGui/QDialog>
+#include <QtGui/QWidget>
+#include <QtGui/QSlider>
 #include <QtCore/qqueue.h>
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/nonfree/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/nonfree/nonfree.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/opencv.hpp"
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <math.h>
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+#include "IDrawOperation.h"
 
 using namespace cv;
 using namespace std;
+
 namespace impls_2015 {
 
-class YellowGrid {
+class Line: public QLine, IDrawOperation {
 private:
-	cv::Point limitPoint;
-
+	cv::Point p1;
+	cv::Point p2;
 public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
+	Line();
+	Line(cv::Point p1, cv::Point p2);
+	Line(QPoint p1, QPoint p2);
+	cv::Point getP1();
+	void setP1(cv::Point p);
+	cv::Point getP2();
+	void setP2(cv::Point p);
+	double length();
+	double perpendicularDistance(cv::Point point);
+	double angleBetweenLines(Line objectLine);
+	bool checkBelongPoint(cv::Point point);
+	void pairwiseHistogram(Line objectLine);
+	cv::Mat drawing(cv::Mat outputImage);
+
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* LINES_H_ */

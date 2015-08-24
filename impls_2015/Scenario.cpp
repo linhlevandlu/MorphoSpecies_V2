@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * Scenario.cpp
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 21, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,36 +19,42 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#include "Scenario.h"
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
-#include <QtCore/qqueue.h>
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/nonfree/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/nonfree/nonfree.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/opencv.hpp"
-#include <opencv2/imgproc/imgproc.hpp>
-#include <math.h>
-
-using namespace cv;
-using namespace std;
 namespace impls_2015 {
 
-class YellowGrid {
-private:
-	cv::Point limitPoint;
+/**
+ * Constructor
+ */
+Scenario::Scenario(IExtraction* extraction) {
+	this->extraction = extraction;
 
-public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
-};
+}
 
+Scenario::~Scenario() {
+
+}
+
+/**
+ * Detect the landmarks on image automatically
+ * @return: the image contains the landmarks
+ */
+cv::Mat Scenario::landmarksAutoDetect() {
+	cv::Mat result;
+
+	// detect the step edges
+
+	EdgeSegmentation* edgeSeg =
+			dynamic_cast<EdgeSegmentation *>(this->extraction);
+	result = cv::Mat(edgeSeg->getImage().getMatImage().size(), CV_8UC3);
+
+	QList<Edge> listEdge = edgeSeg->getEdges();
+	for (int i = 0; i < listEdge.size(); i++) {
+		Edge ed = listEdge.at(i);
+		//if (ed.getPoints().size() > 2500)
+		result = ed.drawing(result);
+	}
+
+	return result;
+}
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */

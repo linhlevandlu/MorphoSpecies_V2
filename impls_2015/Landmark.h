@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * Landmark.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 21, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,12 +19,12 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef LANDMARK_H_
+#define LANDMARK_H_
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
-#include <QtCore/qqueue.h>
+#include <QtCore/qlist.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -35,20 +35,20 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
-using namespace cv;
-using namespace std;
+#include "IDrawOperation.h"
 namespace impls_2015 {
 
-class YellowGrid {
+class Landmark: public IDrawOperation {
 private:
-	cv::Point limitPoint;
-
+	cv::Point location;
 public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
+	Landmark();
+	Landmark(cv::Point location);
+	virtual ~Landmark();
+	cv::Point getLocation();
+	void setLocation(cv::Point location);
+	cv::Mat drawing(cv::Mat outputImage);
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* LANDMARK_H_ */

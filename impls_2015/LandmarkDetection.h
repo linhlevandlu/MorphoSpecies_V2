@@ -1,7 +1,7 @@
 /*
- * YellowGrid.h
+ * LandmarkDetection.h
  *
- *  Created on: Jul 9, 2015
+ *  Created on: Aug 21, 2015
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -19,8 +19,8 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef YELLOWGRID_H_
-#define YELLOWGRID_H_
+#ifndef LANDMARKDETECTION_H_
+#define LANDMARKDETECTION_H_
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
@@ -34,21 +34,31 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
+#include <QtCore/QDebug>
+#include <QtCore/qlist.h>
+
+#include "Image.h"
+#include "Edge.h"
+#include "IExtraction.h"
 
 using namespace cv;
 using namespace std;
+
 namespace impls_2015 {
 
-class YellowGrid {
+class LandmarkDetection: public IExtraction {
 private:
-	cv::Point limitPoint;
-
+	double noise;
+	Image image;
 public:
-	YellowGrid();
-	YellowGrid(cv::Point lmPoint);
-	cv::Point getLimitPoint();
-	void setLimitPoint(cv::Point lmPoint);
+	LandmarkDetection(Image image);
+	virtual ~LandmarkDetection();
+	Image getImage();
+	void setImage(Image image);
+	void setNoise(double noise);
+	QList<Landmark> getLandmarks();
+	QList<Edge> getEdges();
 };
 
 } /* namespace impls_2015 */
-#endif /* YELLOWGRID_H_ */
+#endif /* LANDMARKDETECTION_H_ */
