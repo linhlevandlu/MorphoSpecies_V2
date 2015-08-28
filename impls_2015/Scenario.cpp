@@ -39,20 +39,31 @@ Scenario::~Scenario() {
  * Detect the landmarks on image automatically
  * @return: the image contains the landmarks
  */
-cv::Mat Scenario::landmarksAutoDetect() {
-	cv::Mat result;
+cv::Mat Scenario::landmarksAutoDetect(Image image) {
+	cv::Mat result(image.getMatImage().size(), CV_8UC3);
 
 	// detect the step edges
 
 	EdgeSegmentation* edgeSeg =
 			dynamic_cast<EdgeSegmentation *>(this->extraction);
-	result = cv::Mat(edgeSeg->getImage().getMatImage().size(), CV_8UC3);
+	//result = cv::Mat(image.getMatImage().size(), CV_8UC3);
 
-	QList<Edge> listEdge = edgeSeg->getEdges();
-	for (int i = 0; i < listEdge.size(); i++) {
+	edgeSeg->pgh();
+
+	vector<Edge> listEdge = edgeSeg->getEdges(image);
+	image.setEdges(listEdge);
+	for (size_t i = 0; i < listEdge.size(); i++) {
 		Edge ed = listEdge.at(i);
-		//if (ed.getPoints().size() > 2500)
-		result = ed.drawing(result);
+
+		if (ed.getPoints().size() > 5) {
+			// draw the break edge
+			//result = ed.drawing(result);
+			vector<cv::Point> breakPoints = ed.segment();
+			vector<Line> lines = ed.getLines(breakPoints);
+			for (size_t k = 0; k < lines.size(); k++) {
+				result = lines.at(k).drawing(result);
+			}
+		}
 	}
 
 	return result;

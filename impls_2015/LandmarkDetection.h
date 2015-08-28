@@ -57,7 +57,8 @@ public:
 	void setImage(Image image);
 	void setNoise(double noise);
 	QList<Landmark> getLandmarks();
-	QList<Edge> getEdges();
+	vector<Edge> getEdges();
+
 };
 
 } /* namespace impls_2015 */

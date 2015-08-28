@@ -27,7 +27,8 @@ HEADERS += ImageViewer.h ImageConvert.h ui/NormalBlurPanel.h \
 	impls/algorithms/MyImpl.h impls/algorithms/Ant.h impls/algorithms/Position.h \
 	ui/SurfPanel.h impls_2015/Line.h impls_2015/EdgeSegmentation.h \
 	impls_2015/IDrawOperation.h impls_2015/Edge.h impls_2015/IExtraction.h \
-	impls_2015/Image.h  impls_2015/Landmark.h  impls_2015/LandmarkDetection.h  impls_2015/Scenario.h
+	impls_2015/Image.h  impls_2015/Landmark.h  impls_2015/LandmarkDetection.h  impls_2015/Scenario.h \
+	impls_2015/GFeatures.h impls_2015/PWHistogram.h
 	
 SOURCES += Ipm.cpp ImageViewer.cpp ImageConvert.cpp ui/NormalBlurPanel.cpp \
 	ui/GaussianBlurPanel.cpp ui/MedianBlurPanel.cpp ui/BilateralFilterPanel.cpp ui/ConvolutionFilterPanel.cpp\
@@ -36,4 +37,5 @@ SOURCES += Ipm.cpp ImageViewer.cpp ImageConvert.cpp ui/NormalBlurPanel.cpp \
 	impls/algorithms/MyImpl.cpp impls/algorithms/Ant.cpp impls/algorithms/Position.cpp \
 	ui/SurfPanel.cpp impls_2015/Line.cpp impls_2015/EdgeSegmentation.cpp \
 	impls_2015/IDrawOperation.cpp impls_2015/Edge.cpp impls_2015/IExtraction.cpp \
-	impls_2015/Image.cpp  impls_2015/Landmark.cpp  impls_2015/LandmarkDetection.cpp  impls_2015/Scenario.cpp 
+	impls_2015/Image.cpp  impls_2015/Landmark.cpp  impls_2015/LandmarkDetection.cpp  impls_2015/Scenario.cpp \
+	impls_2015/GFeatures.cpp impls_2015/PWHistogram.cpp

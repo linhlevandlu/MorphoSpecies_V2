@@ -33,6 +33,7 @@
 #include <iostream>
 
 #include "IDrawOperation.h"
+#include "GFeatures.h"
 
 using namespace cv;
 using namespace std;
@@ -43,6 +44,7 @@ class Line: public QLine, IDrawOperation {
 private:
 	cv::Point p1;
 	cv::Point p2;
+	vector<double> equationOfLine();
 public:
 	Line();
 	Line(cv::Point p1, cv::Point p2);
@@ -53,9 +55,10 @@ public:
 	void setP2(cv::Point p);
 	double length();
 	double perpendicularDistance(cv::Point point);
+	cv::Point intersection(Line objectLine);
 	double angleBetweenLines(Line objectLine);
 	bool checkBelongPoint(cv::Point point);
-	void pairwiseHistogram(Line objectLine);
+	GFeatures pairwiseHistogram(Line objectLine);
 	cv::Mat drawing(cv::Mat outputImage);
 
 };

@@ -71,8 +71,8 @@ QList<Landmark> LandmarkDetection::getLandmarks() {
  * Get the edges of image
  * @return: the list of edges in image
  */
-QList<Edge> LandmarkDetection::getEdges() {
-	QList<Edge> edges;
+vector<Edge> LandmarkDetection::getEdges() {
+	vector<Edge> edges;
 	return edges;
 }
 } /* namespace impls_2015 */

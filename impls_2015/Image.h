@@ -44,8 +44,8 @@ namespace impls_2015 {
 class Image: public IDrawOperation {
 private:
 	QString fileName;
-	QList<Edge> listOfEdges;
-	QList<Landmark> listOfLandmarks;
+	vector<Edge> listOfEdges;
+	//QList<Landmark> listOfLandmarks;
 	int histogramSize;
 public:
 	enum InsectPart {
@@ -58,16 +58,16 @@ public:
 
 	QString getFileName();
 	void setFileName(QString filePath);
-	QList<Edge> getEdges();
-	void setEdges(QList<Edge> edges);
-	QList<Landmark> getLandmarks();
-	void setLandmarks(QList<Landmark> landmarks);
+	vector<Edge> getEdges();
+	void setEdges(vector<Edge> edges);
+	//QList<Landmark> getLandmarks();
+	//void setLandmarks(QList<Landmark> landmarks);
 	int getHistSize();
 	void setHistSize(int histSize);
 
 	cv::Mat getMatImage();
 	void addEdge(Edge edge);
-	void addLandmark(Landmark landmark);
+	//void addLandmark(Landmark landmark);
 
 	cv::Mat histogram();
 	double medianHistogram();

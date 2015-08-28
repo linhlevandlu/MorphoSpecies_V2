@@ -62,7 +62,7 @@ void Image::setFileName(QString filePath) {
  * Get the edges of image
  * @return: the list of edges of image
  */
-QList<Edge> Image::getEdges() {
+vector<Edge> Image::getEdges() {
 	return this->listOfEdges;
 }
 
@@ -70,7 +70,7 @@ QList<Edge> Image::getEdges() {
  * Set the edges of image
  * @parameter: edges - edges of image
  */
-void Image::setEdges(QList<Edge> edges) {
+void Image::setEdges(vector<Edge> edges) {
 	this->listOfEdges = edges;
 }
 
@@ -78,17 +78,17 @@ void Image::setEdges(QList<Edge> edges) {
  * Get the landmarks of image
  * @return: list of landmarks of image
  */
-QList<Landmark> Image::getLandmarks() {
+/*QList<Landmark> Image::getLandmarks() {
 	return this->listOfLandmarks;
-}
+}*/
 
 /**
  * Set the landmarks of image
  * @parameter: landmarks - the landmarks of image
  */
-void Image::setLandmarks(QList<Landmark> landmarks) {
+/*void Image::setLandmarks(QList<Landmark> landmarks) {
 	this->listOfLandmarks = landmarks;
-}
+}*/
 
 /**
  * Get the bins of histogram
@@ -119,16 +119,16 @@ cv::Mat Image::getMatImage() {
  * @parameter: edge - edge need to add into the list of edges
  */
 void Image::addEdge(Edge edge) {
-	this->listOfEdges.append(edge);
+	this->listOfEdges.push_back(edge);
 }
 
 /**
  * Add a landmarks into the list of landmarks
  * @parameter: landmark - the landmark need to add into the list of landmarks
  */
-void Image::addLandmark(Landmark landmark) {
+/*void Image::addLandmark(Landmark landmark) {
 	this->listOfLandmarks.append(landmark);
-}
+}*/
 
 /**
  * Compute the histogram of image
@@ -231,20 +231,11 @@ cv::Mat Image::drawing(cv::Mat outputImage) {
 	QString title;
 	if (listOfEdges.size() > 0) {
 		qDebug() << "Draw the image.";
-		for (int i = 0; i < listOfEdges.size(); i++) {
+		for (size_t i = 0; i < listOfEdges.size(); i++) {
 			Edge edgei = listOfEdges.at(i);
 			outputImage = edgei.drawing(outputImage);
 		}
 		title = "The image";
-	}
-	if (listOfLandmarks.size() > 0) {
-		qDebug() << "Draw the landmarks.";
-		for (int i = 0; i < listOfLandmarks.size(); i++) {
-			Landmark q = listOfLandmarks.at(i);
-			cv::circle(outputImage, q.getLocation(), 1, cv::Scalar(0, 255, 0),
-					1, 8);
-		}
-		title = "The image and landmarks";
 	}
 
 	return outputImage;

@@ -34,6 +34,7 @@
 
 #include "Edge.h"
 #include "Landmark.h"
+#include "Image.h"
 
 using namespace std;
 using namespace cv;
@@ -44,7 +45,7 @@ class IExtraction {
 public:
 	IExtraction();
 	virtual ~IExtraction();
-	virtual QList<Edge> getEdges() = 0;
+	virtual vector<Edge> getEdges(Image image) = 0;
 	virtual QList<Landmark> getLandmarks() = 0;
 };
 

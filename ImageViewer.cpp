@@ -70,6 +70,7 @@
 #include "impls_2015/LandmarkDetection.h"
 #include "impls_2015/EdgeSegmentation.h"
 #include "impls_2015/Scenario.h"
+#include "impls_2015/GFeatures.h"
 
 using namespace std;
 using namespace algorithms;
@@ -2553,7 +2554,7 @@ void ImageViewer::getLandmarks() {
 	qDebug() << "Identification of landmarks function ...";
 
 	// initialization a contours to test
-	vector<cv::Point> contours;
+	/*vector<cv::Point> contours;
 	contours.push_back(cv::Point(100, 100));
 	contours.push_back(cv::Point(103, 90));
 	contours.push_back(cv::Point(110, 82));
@@ -2565,17 +2566,23 @@ void ImageViewer::getLandmarks() {
 	contours.push_back(cv::Point(160, 78));
 	contours.push_back(cv::Point(162, 80));
 	contours.push_back(cv::Point(170, 90));
+*/
 
 
-	cv::Mat enddest;
+	cv::Mat enddest(matImage.size(),CV_8UC3);
 	Image image(fileName);
 	//image.setHistSize(256);
-	IExtraction *extraction = new EdgeSegmentation(image);
+	IExtraction *extraction = new EdgeSegmentation();
 	Scenario scenario(extraction);
-	enddest = scenario.landmarksAutoDetect();
+	enddest = scenario.landmarksAutoDetect(image);
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Using Histogram -- " + this->fileName);
 	other->show();
+
+	/*Line l1(cv::Point(100,100),cv::Point(140,100));
+	Line l2(cv::Point(100,100),cv::Point(130,70));
+	l1.pairwiseHistogram(l2);*/
+
 }

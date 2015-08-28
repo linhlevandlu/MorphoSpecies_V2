@@ -51,7 +51,7 @@ private:
 public:
 	Scenario(IExtraction* extraction);
 	virtual ~Scenario();
-	cv::Mat landmarksAutoDetect();
+	cv::Mat landmarksAutoDetect(Image image);
 };
 
 } /* namespace impls_2015 */

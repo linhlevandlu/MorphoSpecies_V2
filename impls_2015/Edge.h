@@ -38,6 +38,7 @@
 
 #include "Line.h"
 #include "IDrawOperation.h"
+
 using namespace cv;
 using namespace std;
 
@@ -45,28 +46,29 @@ namespace impls_2015 {
 
 class Edge: public IDrawOperation {
 private:
-	QList<Line> listOfLines;
-	QList<cv::Point> listOfPoints;
-	QList<cv::Point> breakPoints;
+	vector<Line> listOfLines;
+	vector<cv::Point> listOfPoints;
+	static vector<cv::Point> breakPoints;
 
 	bool checkPointInList(cv::Point point);
 	void breakEdge();
-	QList<Line> getLines(QList<cv::Point> listPoints);
+	vector<Point> breakEdge2(vector<Point> contour);
+
 public:
 	Edge();
-	Edge(QList<Line> lines);
-	Edge(QList<cv::Point> points);
+	Edge(vector<Line> lines);
+	Edge(vector<cv::Point> points);
 	virtual ~Edge();
 
-	QList<Line> getLines();
-	void setLines(QList<Line> lines);
-	QList<cv::Point> getPoints();
-	void setPoints(QList<cv::Point> points);
+	vector<Line> getLines();
+	vector<Line> getLines(vector<cv::Point> listPoints);
+	void setLines(vector<Line> lines);
+	vector<cv::Point> getPoints();
+	void setPoints(vector<cv::Point> points);
 	void addLine(Line line);
-	QList<cv::Point> segment();
-
-	QList<QList<Line> > pairwiseLines(QList<Line> listLines);
-
+	vector<cv::Point> segment();
+	vector<vector<Line> > pairwiseLines(vector<Line> listLines);
+	vector<Edge> splitEdge(int numOfParts);
 	cv::Mat drawing(cv::Mat outputImage);
 
 };

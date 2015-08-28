@@ -40,6 +40,8 @@
 #include "Image.h"
 #include "Edge.h"
 #include "IExtraction.h"
+#include "GFeatures.h"
+#include "PWHistogram.h"
 
 using namespace cv;
 using namespace std;
@@ -47,16 +49,17 @@ using namespace std;
 namespace impls_2015 {
 
 class EdgeSegmentation: public IExtraction {
-private:
-	Image image;
+	/*private:
+	 Image image;*/
 public:
 
-	EdgeSegmentation(Image image);
-	Image getImage();
-	void setImage(Image image);
-	QList<Edge> getEdges();
+	EdgeSegmentation();
+	//Image getImage();
+	//void setImage(Image image);
+	vector<Edge> getEdges(Image inputImage);
 	QList<Landmark> getLandmarks();
-
+	vector<PWHistogram> constructPGHs(vector<Line> prLines);
+	void pgh();
 };
 
 } /* namespace impls_2015 */
