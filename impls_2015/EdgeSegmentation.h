@@ -36,12 +36,13 @@
 #include <math.h>
 #include <QtCore/QDebug>
 #include <QtCore/qlist.h>
+#include <fstream>
 
 #include "Image.h"
 #include "Edge.h"
 #include "IExtraction.h"
 #include "GFeatures.h"
-#include "PWHistogram.h"
+#include "LocalHistogram.h"
 
 using namespace cv;
 using namespace std;
@@ -58,8 +59,10 @@ public:
 	//void setImage(Image image);
 	vector<Edge> getEdges(Image inputImage);
 	QList<Landmark> getLandmarks();
-	vector<PWHistogram> constructPGHs(vector<Line> prLines);
-	void pgh();
+	vector<Line> lineSegment(vector<Edge> listEdge);
+	cv::Mat rePresentation(cv::Mat resultImage, vector<Line> lines);
+
+	double histogramMatching();
 };
 
 } /* namespace impls_2015 */

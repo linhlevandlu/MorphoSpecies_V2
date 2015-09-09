@@ -60,17 +60,7 @@
 #include "ui/SurfPanel.h"
 
 #include "impls/algorithms/MyImpl.h"
-
-
-#include "impls_2015/Line.h"
-#include "impls_2015/Edge.h"
-#include "impls_2015/YellowGrid.h"
 #include "impls_2015/Image.h"
-#include "impls_2015/Landmark.h"
-#include "impls_2015/LandmarkDetection.h"
-#include "impls_2015/EdgeSegmentation.h"
-#include "impls_2015/Scenario.h"
-#include "impls_2015/GFeatures.h"
 
 using namespace std;
 using namespace algorithms;
@@ -158,6 +148,9 @@ void ImageViewer::activeFunction() {
 	//add by LE Van Linh
 	removeLinesAct->setEnabled(true);
 	removeLinesAct2->setEnabled(true);
+	edgeSegment->setEnabled(true);
+	pwHistogram->setEnabled(true);
+	pwhMatching->setEnabled(true);
 
 	//end
 	updateActions();
@@ -532,10 +525,24 @@ void ImageViewer::createActions() {
 
 	removeLinesAct2 = new QAction(tr("Landmarks identifying"), this);
 	removeLinesAct2->setEnabled(false);
-	removeLinesAct2->setShortcut(tr("Ctrl+E"));
-	connect(removeLinesAct2, SIGNAL(triggered()), this,
-			SLOT(getLandmarks()));
+	removeLinesAct2->setShortcut(tr("Ctrl+L"));
+	connect(removeLinesAct2, SIGNAL(triggered()), this, SLOT(getLandmarks()));
 
+	edgeSegment = new QAction(tr("Edge segmentation"), this);
+	edgeSegment->setEnabled(false);
+	edgeSegment->setShortcut(tr("Ctrl+E"));
+	connect(edgeSegment, SIGNAL(triggered()), this, SLOT(edgeSegmentation()));
+
+	pwHistogram = new QAction(tr("Pairwise histogram"), this);
+	pwHistogram->setEnabled(false);
+	pwHistogram->setShortcut(tr("Ctrl+H"));
+	connect(pwHistogram, SIGNAL(triggered()), this, SLOT(pairwiseHistogram()));
+
+	pwhMatching = new QAction(tr("Pairwise histogram matching"), this);
+	pwhMatching->setEnabled(false);
+	pwhMatching->setShortcut(tr("Ctrl+M"));
+	connect(pwhMatching, SIGNAL(triggered()), this,
+			SLOT(pwHistogramMatching()));
 	//end
 }
 
@@ -630,7 +637,10 @@ void ImageViewer::createMenus() {
 
 	other2015 = pluginsMenu->addMenu(tr("Others 2015"));
 	other2015->addAction(removeLinesAct);
-	other2015->addAction(removeLinesAct2);
+	other2015->addAction(edgeSegment);
+	other2015->addAction(pwHistogram);
+	other2015->addAction(pwhMatching);
+	other2015->addAction(removeLinesAct2); // landmarks detection
 	//end
 
 	menuBar()->addMenu(fileMenu);
@@ -2490,42 +2500,53 @@ void ImageViewer::readDirectory(QString path) {
 	QFileInfoList files = qdir.entryInfoList();
 
 	qdir.cdUp();
-	QString pathToSave = qdir.path()+"/Images_without_grid/";
+	QString pathToSave = qdir.path() + "/Images_without_grid/";
 
+	IExtraction *extraction = new EdgeSegmentation();
+	Scenario scenario(extraction);
 
 	int runNumber = (files.size() > 50) ? files.size() : 50;
 	for (int i = 0; i < runNumber; i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		loadImage(_name);
+		Image image(_name);
+		//loadImage(_name);
+		EdgeSegmentation edge;
+		qDebug() << _name;
+		cv::Mat enddest = scenario.edgeSegmentation(image);
 
-		cv::Mat enddest;// = YellowGrid::removeYellowLines(matImage, 90, _name);
 		//cv::Mat enddest = YellowGrid::act2(matImage);
 		//cv::Mat enddest = YellowGrid::histogram(matImage);
 		// display the result
 		/*ImageViewer *other = new ImageViewer;
-		other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
-				"On -- " + file.fileName());
-		other->addParameterPanel(new impls_2015::Lines(other), x() + 40,
-				y() + 40);
-		other->show();*/
+		 other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
+		 "On -- " + file.fileName());
+		 other->addParameterPanel(new impls_2015::Lines(other), x() + 40,
+		 y() + 40);
+		 other->show();*/
 
 		// save the result
-
 		QDir saveDir;
 		saveDir.setPath(pathToSave);
-		if(!saveDir.exists())
+		if (!saveDir.exists())
 			QDir().mkdir(pathToSave);
-		QString fullPath = pathToSave + (file.fileName().replace(" ",""));
+		QString fullPath = pathToSave + (file.fileName().replace(" ", ""));
 		if (fullPath.isEmpty()) {
 			return;
 		}
 		QApplication::setOverrideCursor(Qt::WaitCursor);
-		cv::imwrite(fullPath.toStdString(),enddest);
+		cv::imwrite(fullPath.toStdString(), enddest);
 		QApplication::restoreOverrideCursor();
+		enddest.release();
 	}
 }
 
+void ImageViewer::matchingDirectory(impls_2015::Image image, QString path) {
+	IExtraction *extraction = new EdgeSegmentation();
+	Scenario scenario(extraction);
+	scenario.matchingDirectory(image, path);
+
+}
 void ImageViewer::removeYLinesAction() {
 
 	// run on all directory
@@ -2540,7 +2561,7 @@ void ImageViewer::removeYLinesAction() {
 
 	// run on a image
 	Image image(fileName);
-	cv::Mat enddest = image.removingGrid(90);// = YellowGrid::removeYellowLines(matImage, 90, fileName);
+	cv::Mat enddest = image.removingGrid(90); // = YellowGrid::removeYellowLines(matImage, 90, fileName);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
@@ -2553,25 +2574,8 @@ void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
 
-	// initialization a contours to test
-	/*vector<cv::Point> contours;
-	contours.push_back(cv::Point(100, 100));
-	contours.push_back(cv::Point(103, 90));
-	contours.push_back(cv::Point(110, 82));
-	contours.push_back(cv::Point(112, 80));
-	contours.push_back(cv::Point(120, 73));
-	contours.push_back(cv::Point(130, 70));
-	contours.push_back(cv::Point(140, 72));
-	contours.push_back(cv::Point(150, 74));
-	contours.push_back(cv::Point(160, 78));
-	contours.push_back(cv::Point(162, 80));
-	contours.push_back(cv::Point(170, 90));
-*/
-
-
-	cv::Mat enddest(matImage.size(),CV_8UC3);
+	cv::Mat enddest(matImage.size(), CV_8UC3);
 	Image image(fileName);
-	//image.setHistSize(256);
 	IExtraction *extraction = new EdgeSegmentation();
 	Scenario scenario(extraction);
 	enddest = scenario.landmarksAutoDetect(image);
@@ -2580,9 +2584,50 @@ void ImageViewer::getLandmarks() {
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Using Histogram -- " + this->fileName);
 	other->show();
+}
+void ImageViewer::edgeSegmentation() {
+	qDebug() << "Edge segmentation.";
+	//readDirectory("/home/linh/Desktop/mandibule");
 
-	/*Line l1(cv::Point(100,100),cv::Point(140,100));
-	Line l2(cv::Point(100,100),cv::Point(130,70));
-	l1.pairwiseHistogram(l2);*/
+	Image image(fileName);
+	IExtraction *extraction = new EdgeSegmentation();
+	Scenario scenario(extraction);
+	cv::Mat enddest = scenario.edgeSegmentation(image);
 
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Edge segmentation");
+	other->show();
+	qDebug() << "Done";
+}
+void ImageViewer::pairwiseHistogram() {
+	qDebug() << "Calculate the pairwise histogram of an image";
+	Image image(fileName);
+	IExtraction *extraction = new EdgeSegmentation();
+	Scenario scenario(extraction);
+	cv::Mat enddest = scenario.pairwiseHistogram(image);
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Pairwise histogram");
+	other->show();
+	qDebug() << "Done";
+}
+void ImageViewer::pwHistogramMatching() {
+	qDebug() << "Pairwise histogram matching...";
+	Image image(fileName);
+
+	QString path = "/home/linh/Desktop/mandibule";
+	 matchingDirectory(image, path);
+
+	/*QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
+	IExtraction *extraction = new EdgeSegmentation();
+	Scenario scenario(extraction);
+	double matching = scenario.histogramMatching(image, image2);
+	qDebug() << "Matching metric: " << QString::number(matching, 'f', 20);*/
+	qDebug() << "Done";
 }

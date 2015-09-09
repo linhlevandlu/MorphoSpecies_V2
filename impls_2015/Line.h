@@ -60,7 +60,7 @@ public:
 	bool checkBelongPoint(cv::Point point);
 	GFeatures pairwiseHistogram(Line objectLine);
 	cv::Mat drawing(cv::Mat outputImage);
-
+	bool operator==(Line &line);
 };
 
 } /* namespace impls_2015 */

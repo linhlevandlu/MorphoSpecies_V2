@@ -27,6 +27,23 @@
 #include <opencv2/core/core.hpp>
 #include <math.h>
 
+#include <fstream>
+#include <iostream>
+#include <ostream>
+
+#include "impls_2015/Line.h"
+#include "impls_2015/Edge.h"
+#include "impls_2015/YellowGrid.h"
+#include "impls_2015/Image.h"
+#include "impls_2015/Landmark.h"
+#include "impls_2015/LandmarkDetection.h"
+#include "impls_2015/EdgeSegmentation.h"
+#include "impls_2015/Scenario.h"
+#include "impls_2015/GFeatures.h"
+#include "impls_2015/ShapeHistogram.h"
+#include "impls_2015/IExtraction.h"
+#include "impls_2015/IDrawOperation.h"
+
 class QAction;
 class QLabel;
 class QMenu;
@@ -75,6 +92,7 @@ public:
 	//add by LE Van Linh
 	//void removeYLinesAction(int minBrightness, QString pathImage);
 	void readDirectory(QString path);
+	void matchingDirectory(impls_2015::Image image, QString path);
 	//end
 
 protected:
@@ -146,6 +164,9 @@ private slots:
 
 	// add by LE Van Linh
 	void removeYLinesAction();
+	void edgeSegmentation();
+	void pairwiseHistogram();
+	void pwHistogramMatching();
 	void getLandmarks();
 
 private:
@@ -234,7 +255,10 @@ private:
 
 //add by LE Van Linh
 	QAction *removeLinesAct; // remove yellow lines using the algorithm 1
-	QAction *removeLinesAct2; // remove yellow lines using histogram
+	QAction *removeLinesAct2; // detect landmarks
+	QAction *edgeSegment; // edge segmentation (get edge and break into a set of lines)
+	QAction *pwHistogram; // compute the PGHs of an image
+	QAction *pwhMatching; // matching 2 PGH of 2 image
 
 // end
 	QMenu *fileMenu;

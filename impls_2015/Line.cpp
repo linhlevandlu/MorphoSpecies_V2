@@ -102,18 +102,28 @@ double Line::length() {
 }
 
 vector<double> Line::equationOfLine() {
-	double m = (double) (this->p2.y - this->p1.y)
-			/ (double) (this->p2.x - this->p1.x);
+	double m, a, b, c;
 
-	double a = m;
-	double b = -1;
-	double c = this->p1.y - (m * this->p1.x);
-
-	if (p1.x == p2.x) {
+	if (p1.x == p2.x) { // line x = n
 		m = 1;
 		a = m;
 		b = 0;
 		c = p2.x;
+	} else {
+		if (p1.y == p2.y) { // line y = m
+			m = 0;
+			a = m;
+			b = 1;
+			c = p2.y;
+		} else {
+			if (p1.x != p2.x && p1.y != p2.y) { // y = ax + b
+				m = (double) (this->p2.y - this->p1.y)
+						/ (double) (this->p2.x - this->p1.x);
+				a = m;
+				b = -1;
+				c = this->p1.y - (m * this->p1.x);
+			}
+		}
 	}
 	vector<double> rs;
 	rs.push_back(a);
@@ -133,12 +143,14 @@ double Line::perpendicularDistance(cv::Point point) {
 	double b = equation.at(1);
 	double c = equation.at(2);
 	double distance;
-	if (b != 0) {
+	if (b != 0 && a != 0) {
 		distance = ((a * point.x) + (b * point.y) + c)
 				/ (sqrt(pow(a, 2) + pow(b, 2)));
-	} else {
-		distance = point.x - c;
 	}
+	if (b == 0 && a == 1)
+		distance = point.x - c;
+	if (a == 0 && b == 1)
+		distance = point.y - c;
 	return distance;
 }
 
@@ -189,23 +201,18 @@ cv::Point Line::intersection(Line objectLine) {
  * @return: the angle between objectLine and this
  */
 double Line::angleBetweenLines(Line objectLine) {
-	/*	double slope1 = (double) (this->p2.y - this->p1.y)
-	 / (double) (this->p2.x - this->p1.x);
-	 double slope2 = (double) (objectLine.p2.y - objectLine.p1.y)
-	 / (double) (objectLine.p2.x - objectLine.p1.x);
-	 double angle = atan((slope1 - slope2) / (1 + (slope1 * slope2))) * 180/M_PI;*/
 
 	cv::Point inter = intersection(objectLine);
 	if (inter.x == -1 && inter.y == -1)
 		return 0;
 	cv::Point ref2, obj2;
 
-	if ((Line(inter, p1)).length() < (Line(inter, p2)).length()) // this->p1.x == inter.x && this->p1.y == inter.y)
+	if ((Line(inter, p1)).length() < (Line(inter, p2)).length())
 		ref2 = p2;
 	else
 		ref2 = p1;
 	if ((Line(inter, objectLine.getP1())).length()
-			< (Line(inter, objectLine.getP2())).length()) //(objectLine.getP1().x == inter.x && objectLine.getP1().y == inter.y)
+			< (Line(inter, objectLine.getP2())).length())
 		obj2 = objectLine.getP2();
 	else
 		obj2 = objectLine.getP1();
@@ -238,7 +245,6 @@ bool Line::checkBelongPoint(cv::Point point) {
 GFeatures Line::pairwiseHistogram(Line objectLine) {
 	GFeatures pgh = GFeatures();
 	pgh.setAngle(this->angleBetweenLines(objectLine));
-
 	double distance1 = abs(this->perpendicularDistance(objectLine.p1));
 	double distance2 = abs(this->perpendicularDistance(objectLine.p2));
 	pgh.setDmin((distance1 < distance2 ? distance1 : distance2));
@@ -257,5 +263,14 @@ cv::Mat Line::drawing(cv::Mat outputImage) {
 	cv::line(outputImage, this->p1, this->p2, cv::Scalar(255, 255, 0), 1, 8);
 	return outputImage;
 }
-
+bool Line::operator==(Line &line) {
+	cv::Point lp1 = line.p1;
+	cv::Point lp2 = line.p2;
+	if ((this->p1.x == lp1.x && this->p1.y == lp1.y && this->p2.x == lp2.x
+			&& this->p2.y == lp2.y)
+			|| (this->p1.x == lp2.x && this->p1.y == lp2.y
+					&& this->p2.x == lp1.x && this->p2.y == lp1.y))
+		return true;
+	return false;
+}
 } /* namespace impls_2015 */

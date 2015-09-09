@@ -25,6 +25,8 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
 #include <QtCore/qlist.h>
+#include <QtGui/QFileDialog>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -39,6 +41,7 @@
 #include "Edge.h"
 #include "EdgeSegmentation.h"
 #include "IExtraction.h"
+#include "ShapeHistogram.h"
 
 using namespace cv;
 using namespace std;
@@ -48,10 +51,17 @@ namespace impls_2015 {
 class Scenario {
 private:
 	IExtraction* extraction;
+	vector<Line> segment(Image image);
+	//ShapeHistogram pwHistogram(Image image);
 public:
 	Scenario(IExtraction* extraction);
 	virtual ~Scenario();
+	cv::Mat edgeSegmentation(Image image);
+	cv::Mat pairwiseHistogram(Image image);
 	cv::Mat landmarksAutoDetect(Image image);
+	double histogramMatching(Image refImage, Image sceneImage);
+	double histogramMatching(ShapeHistogram refImage, Image sceneImage) ;
+	void matchingDirectory(Image refImage, QString directoryPath);
 };
 
 } /* namespace impls_2015 */

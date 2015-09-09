@@ -120,33 +120,21 @@ void Edge::breakEdge() {
 				}
 			}
 
-			double lamda = maxDistance / length;
+			//double lamda = maxDistance / length;
 
-			Line stepLine(p0, listOfPoints.at(imax));
-			double l1 = stepLine.length();
-			double ratio = (maxDistance / l1);
-			if (ratio > lamda) {
+			//Line stepLine(p0, listOfPoints.at(imax));
+			//double l1 = stepLine.length();
+			//double ratio = (maxDistance / l1);
+			if (maxDistance > 3) {
 				vector<cv::Point> part1(this->listOfPoints.begin(),
 						this->listOfPoints.begin() + imax + 1);
 				vector<cv::Point> part2(this->listOfPoints.begin() + imax,
 						this->listOfPoints.end());
-				//QList<Point> part1 = this->listOfPoints.mid(0, sindex);
-				//QList<Point> part2 = this->listOfPoints.mid(imax,
-				//		listOfPoints.size() - imax - 1);
-
 				Edge edge1(part1);
 				Edge edge2(part2);
 				edge1.breakEdge();
 				edge2.breakEdge();
 			}
-			/*if (imax != -1) {
-			 if (!checkPointInList(p0))
-			 breakPoints.append(p0);
-			 //if (!checkPointInList(listOfPoints.at(imax)))
-			 //	breakPoints.append(listOfPoints.at(imax));
-			 if (!checkPointInList(pend))
-			 breakPoints.append(pend);
-			 }*/
 		}
 
 		if (!checkPointInList(p0))
