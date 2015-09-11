@@ -9,22 +9,19 @@
 
 namespace impls_2015 {
 
-ShapeHistogram::ShapeHistogram() {
-	max_distance = 0;
+/*ShapeHistogram::ShapeHistogram() {
+ max_distance = 0;
 
-}
-
+ }*/
 ShapeHistogram::ShapeHistogram(vector<Line> lines) {
+	this->max_distance = 0;
 	this->lines = lines;
-	max_distance = 0;
-}
 
+}
 ShapeHistogram::~ShapeHistogram() {
 	// TODO Auto-generated destructor stub
 }
-void ShapeHistogram::setLines(vector<Line> lines) {
-	this->lines = lines;
-}
+
 double ShapeHistogram::getTotalEntries() {
 	return this->totalEntries;
 }
@@ -34,14 +31,12 @@ void ShapeHistogram::setTotalEntries(double entries) {
 double ShapeHistogram::getMaxDistance() {
 	return this->max_distance;
 }
-
 void ShapeHistogram::setMatrix(vector<vector<int> > matrix) {
 	this->matrix = matrix;
 }
 vector<vector<int> > ShapeHistogram::getMatrix() {
 	return this->matrix;
 }
-
 void ShapeHistogram::createSquare() {
 	qDebug() << "Create square";
 	Line l1(cv::Point(500, 250), cv::Point(1250, 250));
@@ -89,8 +84,11 @@ void ShapeHistogram::createSquare() {
 	cv::namedWindow("Histogram", CV_WINDOW_AUTOSIZE);
 	cv::imshow("Histogram", mat);
 	ShapeHistogram hist1(set1);
+	hist1.savePGH(hist1.shapePGH());
 	ShapeHistogram hist2(set2);
+	hist2.savePGH(hist2.shapePGH());
 	ShapeHistogram hist3(set3);
+	hist3.savePGH(hist3.shapePGH());
 	qDebug() << "Metric 1 - 1: " << hist1.bhattacharyaMetric(hist1);
 	qDebug() << "Metric 2 - 2: " << hist2.bhattacharyaMetric(hist2);
 	qDebug() << "Metric 3 - 3: " << hist3.bhattacharyaMetric(hist3);
@@ -109,11 +107,13 @@ void ShapeHistogram::createTriangle() {
 	sett1.push_back(t2);
 	sett1.push_back(t3);
 
-	Line t11(cv::Point(250, 250), cv::Point(550, 250));
+	Line t11(cv::Point(250, 250), cv::Point(400, 250));
+	Line t12(cv::Point(400, 250), cv::Point(550, 250));
 	Line t22(cv::Point(550, 250), cv::Point(400, 500));
 	Line t33(cv::Point(400, 500), cv::Point(250, 250));
 	vector<Line> sett2;
 	sett2.push_back(t11);
+	sett2.push_back(t12);
 	sett2.push_back(t22);
 	sett2.push_back(t33);
 
@@ -141,8 +141,11 @@ void ShapeHistogram::createTriangle() {
 	cv::namedWindow("Histogram", CV_WINDOW_AUTOSIZE);
 	cv::imshow("Histogram", mat);
 	ShapeHistogram hist1(sett1);
+	hist1.savePGH(hist1.shapePGH());
 	ShapeHistogram hist2(sett2);
+	hist2.savePGH(hist2.shapePGH());
 	ShapeHistogram hist3(sett3);
+	hist3.savePGH(hist3.shapePGH());
 	qDebug() << "Metric 1 - 1: " << hist1.bhattacharyaMetric(hist1);
 	qDebug() << "Metric 2 - 2: " << hist2.bhattacharyaMetric(hist2);
 	qDebug() << "Metric 3 - 3: " << hist3.bhattacharyaMetric(hist3);
@@ -199,6 +202,9 @@ void ShapeHistogram::createTrapezoid() {
 	ShapeHistogram hist1(set1);
 	ShapeHistogram hist2(set2);
 	ShapeHistogram hist3(set3);
+	hist1.savePGH(hist1.shapePGH());
+	hist2.savePGH(hist2.shapePGH());
+	hist3.savePGH(hist3.shapePGH());
 	qDebug() << "Metric 1 - 1: " << hist1.bhattacharyaMetric(hist1);
 	qDebug() << "Metric 2 - 2: " << hist2.bhattacharyaMetric(hist2);
 	qDebug() << "Metric 3 - 3: " << hist3.bhattacharyaMetric(hist3);
@@ -241,11 +247,15 @@ void ShapeHistogram::createShape() {
 	cv::imshow("Histogram", mat);
 	ShapeHistogram hist1(set1);
 	ShapeHistogram hist2(set2);
+	hist1.savePGH(hist1.shapePGH());
+	hist2.savePGH(hist2.shapePGH());
 	qDebug() << "Metric 1 - 1: " << hist1.bhattacharyaMetric(hist1);
 	qDebug() << "Metric 2 - 2: " << hist2.bhattacharyaMetric(hist2);
 	qDebug() << "Metric 1 - 2: " << hist1.bhattacharyaMetric(hist2);
 }
-vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
+vector<LocalHistogram> ShapeHistogram::constructPGH() {
+	vector<Line> prLines = this->lines;
+	qDebug()<<"total lines: " << prLines.size();
 	vector<LocalHistogram> pwh;
 	for (size_t t = 0; t < prLines.size(); t++) {
 		Line refLine = prLines.at(t);
@@ -266,8 +276,8 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
 	}
 	return pwh;
 }
-vector<LocalHistogram> ShapeHistogram::shapePGH(vector<Line> prLines) {
-	return constructPGH(prLines);
+vector<LocalHistogram> ShapeHistogram::shapePGH() {
+	return constructPGH();
 }
 vector<vector<int> > ShapeHistogram::savePGH(
 		vector<LocalHistogram> pghHistograms) {
@@ -277,16 +287,14 @@ vector<vector<int> > ShapeHistogram::savePGH(
 	int t_width = 0;
 	int height = 180;
 	double entries = 0;
-	//vector<LocalHistogram> pghHistograms = shapePGH();
 	// get the maximal distance
-
 	t_width = this->max_distance;
 
-	qDebug()<<"matrix size: " <<t_width<<", "<< height;
+	qDebug() << "matrix size: " << t_width << ", " << height;
 	vector<vector<int> > vcResult;
 	vcResult.resize(height + 1);
 	for (int i = 0; i <= height; ++i) {
-		vcResult[i].resize(t_width + 10, 0);
+		vcResult[i].resize(t_width + 1, 0);
 	}
 
 	for (size_t t = 0; t < pghHistograms.size(); t++) {
@@ -299,7 +307,11 @@ vector<vector<int> > ShapeHistogram::savePGH(
 			if (!isnan(y)) {
 				for (int k = x1; k <= x2; k++) {
 					if (y >= 0) {
-						vcResult[y][k] += 1;
+						if (k >= t_width + 1) {
+							vcResult[y][t_width] += 1;
+						} else {
+							vcResult[y][k] += 1;
+						}
 						entries++;
 					}
 				}
@@ -316,25 +328,16 @@ vector<vector<int> > ShapeHistogram::savePGH(
 }
 
 double ShapeHistogram::bhattacharyaMetric(ShapeHistogram sceneHist) {
-	vector<vector<int> > pointer_ref; //= this->savePGH();
-	if (this->matrix.size() > 0) {
-		pointer_ref = this->matrix;
-	} else {
-		pointer_ref = this->savePGH(constructPGH(this->lines));
-	}
-	vector<vector<int> > pointer_scene = sceneHist.savePGH(
-			sceneHist.constructPGH(sceneHist.lines));
+	vector<vector<int> > pointer_ref = this->matrix;
+
+	vector<LocalHistogram> sceneLocalH = sceneHist.shapePGH();
+	sceneHist.max_distance = this->max_distance;
+	vector<vector<int> > pointer_scene = sceneHist.savePGH(sceneLocalH);
+
 	double size1 = this->totalEntries;
 	double size2 = sceneHist.totalEntries;
-
-	int max1 = pointer_ref[0].size();
-	int max2 = pointer_scene[0].size();
-	int distance_size = (max1 > max2) ? max1 : max2;
-	if (max1 > max2) {
-		pointer_scene = resizeMatrix(pointer_scene, pointer_ref);
-	} else {
-		pointer_ref = resizeMatrix(pointer_ref, pointer_scene);
-	}
+	qDebug()<<"entries: "<<size1 <<", "<< size2;
+	int distance_size = pointer_ref[0].size();
 
 	double distance = 0;
 	for (int i = 0; i < 181; i++) {
@@ -346,17 +349,6 @@ double ShapeHistogram::bhattacharyaMetric(ShapeHistogram sceneHist) {
 	}
 
 	return distance;
-}
-/**
- * Resize the matrix 1 follows the size of matrix2
- */
-vector<vector<int> > ShapeHistogram::resizeMatrix(vector<vector<int> > matrix1,
-		vector<vector<int> > matrix2) {
-	int new_cols = matrix2[0].size();
-	for (int i = 0; i <= 180; ++i) {
-		matrix1[i].resize(new_cols, 0);
-	}
-	return matrix1;
 }
 vector<Edge> ShapeHistogram::getEdges(Image image) {
 	vector<Edge> edges;

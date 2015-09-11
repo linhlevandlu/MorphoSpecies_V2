@@ -41,12 +41,11 @@ class ShapeHistogram: public IExtraction {
 private:
 	double totalEntries;
 	vector<Line> lines;
-	vector<LocalHistogram> constructPGH(vector<Line> lines);
+	vector<LocalHistogram> constructPGH();
 	double max_distance;
 	vector<vector<int> > matrix;
-	vector<vector<int> > resizeMatrix(vector<vector<int> > matrix1,vector<vector<int> > matrix2);
 public:
-	ShapeHistogram();
+	//ShapeHistogram();
 	ShapeHistogram(vector<Line> lines);
 	virtual ~ShapeHistogram();
 	double getTotalEntries();
@@ -57,7 +56,7 @@ public:
 	vector<vector<int> > getMatrix();
 
 
-	vector<LocalHistogram> shapePGH(vector<Line> prLines);
+	vector<LocalHistogram> shapePGH();
 	vector<vector<int> > savePGH(vector<LocalHistogram> pghHistograms);
 	double bhattacharyaMetric(ShapeHistogram scenHist);
 

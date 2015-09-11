@@ -55,12 +55,12 @@ cv::Mat Scenario::edgeSegmentation(Image image) {
 
 cv::Mat Scenario::pairwiseHistogram(Image image) {
 	vector<Line> appLines = this->segment(image);
-	ShapeHistogram shapeHist;
+	ShapeHistogram shapeHist(appLines);
 
-	shapeHist.createSquare();
+	//shapeHist.createSquare();
 	shapeHist.createTriangle();
-	shapeHist.createTrapezoid();
-	shapeHist.createShape();
+	//shapeHist.createTrapezoid();
+	//shapeHist.createShape();
 	//vector<LocalHistogram> pghHistograms = shapeHist.shapePGH(appLines);
 	int t_width = shapeHist.getMaxDistance();
 	int height = 180;
@@ -84,8 +84,8 @@ double Scenario::histogramMatching(Image refImage, Image sceneImage) {
 	vector<Line> refLines = this->segment(refImage);
 	vector<Line> sceneLines = this->segment(sceneImage);
 	ShapeHistogram refHist(refLines);
+	refHist.savePGH(refHist.shapePGH());
 	ShapeHistogram sceneHist(sceneLines);
-
 	return refHist.bhattacharyaMetric(sceneHist);
 }
 double Scenario::histogramMatching(ShapeHistogram refImage, Image sceneImage) {
@@ -114,7 +114,7 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath) {
 	qDebug() << refname;
 	vector<Line> lines = segment(refImage);
 	ShapeHistogram refShape(lines);
-	refShape.savePGH(refShape.shapePGH(lines));
+	refShape.savePGH(refShape.shapePGH());
 
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
@@ -131,8 +131,8 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath) {
 		double matching = refShape.bhattacharyaMetric(sceneHist);
 		of << matching << "\n";
 		qDebug() << "Metric: " << QString::number(matching, 'f', 20);
-		if(i == 99)
-			break;
+		/*if(i == 199)
+			break;*/
 
 	}
 	of.close();

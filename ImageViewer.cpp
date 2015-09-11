@@ -2500,7 +2500,7 @@ void ImageViewer::readDirectory(QString path) {
 	QFileInfoList files = qdir.entryInfoList();
 
 	qdir.cdUp();
-	QString pathToSave = qdir.path() + "/Images_without_grid/";
+	QString pathToSave = qdir.path() + "/Mandibule_gauche/";
 
 	IExtraction *extraction = new EdgeSegmentation();
 	Scenario scenario(extraction);
@@ -2588,6 +2588,7 @@ void ImageViewer::getLandmarks() {
 void ImageViewer::edgeSegmentation() {
 	qDebug() << "Edge segmentation.";
 	//readDirectory("/home/linh/Desktop/mandibule");
+	//readDirectory("/home/linh/Desktop/Mg");
 
 	Image image(fileName);
 	IExtraction *extraction = new EdgeSegmentation();
@@ -2617,7 +2618,7 @@ void ImageViewer::pwHistogramMatching() {
 	qDebug() << "Pairwise histogram matching...";
 	Image image(fileName);
 
-	QString path = "/home/linh/Desktop/mandibule";
+	QString path = "/home/linh/Desktop/Mg";
 	 matchingDirectory(image, path);
 
 	/*QString fileName2 = QFileDialog::getOpenFileName(this);
