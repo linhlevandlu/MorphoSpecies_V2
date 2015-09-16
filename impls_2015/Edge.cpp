@@ -106,8 +106,6 @@ void Edge::breakEdge() {
 
 		if (listOfPoints.size() > 2) {
 			Line line(p0, pend);
-			double length = line.length();
-
 			double distance = 0;
 			double maxDistance = 0; // ??????????????????
 			double imax = 0;
@@ -120,11 +118,6 @@ void Edge::breakEdge() {
 				}
 			}
 
-			//double lamda = maxDistance / length;
-
-			//Line stepLine(p0, listOfPoints.at(imax));
-			//double l1 = stepLine.length();
-			//double ratio = (maxDistance / l1);
 			if (maxDistance > 3) {
 				vector<cv::Point> part1(this->listOfPoints.begin(),
 						this->listOfPoints.begin() + imax + 1);
@@ -139,8 +132,6 @@ void Edge::breakEdge() {
 
 		if (!checkPointInList(p0))
 			breakPoints.push_back(p0);
-		//if (!checkPointInList(listOfPoints.at(imax)))
-		//	breakPoints.append(listOfPoints.at(imax));
 		if (!checkPointInList(pend))
 			breakPoints.push_back(pend);
 

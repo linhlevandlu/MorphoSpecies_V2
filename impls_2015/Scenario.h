@@ -36,6 +36,8 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
+#include <time.h>
+
 
 #include "Image.h"
 #include "Edge.h"
@@ -43,25 +45,33 @@
 #include "IExtraction.h"
 #include "ShapeHistogram.h"
 
+
 using namespace cv;
 using namespace std;
 
 namespace impls_2015 {
 
 class Scenario {
+
 private:
 	IExtraction* extraction;
 	vector<Line> segment(Image image);
 	//ShapeHistogram pwHistogram(Image image);
 public:
+	enum MatchingMethod{
+				Bhattacharyya,
+				Chisquared,
+				Intersection
+			};
 	Scenario(IExtraction* extraction);
 	virtual ~Scenario();
 	cv::Mat edgeSegmentation(Image image);
 	cv::Mat pairwiseHistogram(Image image);
 	cv::Mat landmarksAutoDetect(Image image);
-	double histogramMatching(Image refImage, Image sceneImage);
-	double histogramMatching(ShapeHistogram refImage, Image sceneImage) ;
-	void matchingDirectory(Image refImage, QString directoryPath);
+	double histogramMatching(Image refImage, Image sceneImage, MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc);
+	double histogramMatching(ShapeHistogram refImage, Image sceneImage,MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) ;
+	void matchingDirectory(Image refImage, QString directoryPath, MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc);
+	double getDistanceMetric(ShapeHistogram refHist, ShapeHistogram sceneHist, MatchingMethod matching);
 };
 
 } /* namespace impls_2015 */

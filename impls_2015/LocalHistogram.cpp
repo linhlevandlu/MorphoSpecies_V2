@@ -51,7 +51,7 @@ vector<vector<int> > LocalHistogram::presentation() {
 		GFeatures feature = pwHistogram[t];
 		int x1 = round(feature.getDmin());
 		int x2 = round(feature.getDmax());
-		int y = convertAngle(feature.getAngle());
+		int y = accuracyToTimeDegree(feature.getAngle(),0);
 		for (int k = x1; k <= x2; k++) {
 			if (y >= 0)
 				matrixP[y][k] += 1;
@@ -87,13 +87,47 @@ double LocalHistogram::matching(vector<vector<int> > sceneHist) {
 	return distance;
 }
 
-int LocalHistogram::convertAngle(double angle) {
-
-	double intpart, fracpart;
-	fracpart = modf(angle, &intpart);
-	if(fracpart <= 0.5)
-		return intpart;
-	return intpart + 1;
+int LocalHistogram::accuracyToTimeDegree(double angle,int angleAcc){
+	int m = 60;
+	switch(angleAcc){
+		case 1:
+			m = 60;
+			break;
+		case 2:
+			m = 30;
+			break;
+		case 4:
+			m = 15;
+			break;
+		case 6:
+			m = 10;
+			break;
+		case 12:
+			m = 5;
+			break;
+		case 60:
+			m = 1;
+			break;
+		default:
+			m = 60;
+			break;
+	}
+	int minute = convertAngleToMinute(angle);
+	double bins = minute / m;
+	double bin;
+	double mod = modf(bins,&bin);
+	if(mod >0)
+		bin+=1;
+	return bin;
 }
+int LocalHistogram::convertAngleToMinute(double angle){
+	double degree;
+	modf(angle,&degree);
+	int minute = (angle - degree)* 60;
+	int second = (angle - degree - minute/60) * 3600;
+	if(second >= 30)
+		minute += 1;
+	return (degree * 60) + minute;
 
+}
 } /* namespace impls_2015 */

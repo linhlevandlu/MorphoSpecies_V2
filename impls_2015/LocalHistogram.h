@@ -42,8 +42,8 @@ public:
 	double matching(vector<vector<int> > sceneHist);
 	//double bhattacharyaMetric(PWHistogram sceneHist);
 
-
-	static int convertAngle(double angle);
+	static int accuracyToTimeDegree(double angle, int angleAcc);
+	static int convertAngleToMinute(double angle);
 };
 
 } /* namespace impls_2015 */

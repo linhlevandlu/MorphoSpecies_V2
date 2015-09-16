@@ -151,6 +151,8 @@ void ImageViewer::activeFunction() {
 	edgeSegment->setEnabled(true);
 	pwHistogram->setEnabled(true);
 	pwhMatching->setEnabled(true);
+	pwhChisquared->setEnabled(true);
+	pwhIntersection->setEnabled(true);
 
 	//end
 	updateActions();
@@ -538,11 +540,24 @@ void ImageViewer::createActions() {
 	pwHistogram->setShortcut(tr("Ctrl+H"));
 	connect(pwHistogram, SIGNAL(triggered()), this, SLOT(pairwiseHistogram()));
 
-	pwhMatching = new QAction(tr("Pairwise histogram matching"), this);
+	pwhMatching = new QAction(tr("PGH matching - Bhattacharyya metric"), this);
 	pwhMatching->setEnabled(false);
 	pwhMatching->setShortcut(tr("Ctrl+M"));
 	connect(pwhMatching, SIGNAL(triggered()), this,
-			SLOT(pwHistogramMatching()));
+			SLOT(pwBhattacharyyaMatching()));
+
+	pwhChisquared = new QAction(tr("PGH matching - Chi-squared metric"), this);
+	pwhChisquared->setEnabled(false);
+	pwhChisquared->setShortcut(tr("Ctrl+Q"));
+	connect(pwhChisquared, SIGNAL(triggered()), this,
+			SLOT(pwChiSquaredMatching()));
+
+	pwhIntersection = new QAction(tr("PGH matching - Intersection metric"),
+			this);
+	pwhIntersection->setEnabled(false);
+	pwhIntersection->setShortcut(tr("Ctrl+I"));
+	connect(pwhIntersection, SIGNAL(triggered()), this,
+			SLOT(pwIntersectionMatching()));
 	//end
 }
 
@@ -640,6 +655,8 @@ void ImageViewer::createMenus() {
 	other2015->addAction(edgeSegment);
 	other2015->addAction(pwHistogram);
 	other2015->addAction(pwhMatching);
+	other2015->addAction(pwhChisquared);
+	other2015->addAction(pwhIntersection);
 	other2015->addAction(removeLinesAct2); // landmarks detection
 	//end
 
@@ -2544,7 +2561,8 @@ void ImageViewer::readDirectory(QString path) {
 void ImageViewer::matchingDirectory(impls_2015::Image image, QString path) {
 	IExtraction *extraction = new EdgeSegmentation();
 	Scenario scenario(extraction);
-	scenario.matchingDirectory(image, path);
+	scenario.matchingDirectory(image, path, Scenario::Bhattacharyya ,
+			ShapeHistogram::SixTimeDegree);
 
 }
 void ImageViewer::removeYLinesAction() {
@@ -2614,21 +2632,53 @@ void ImageViewer::pairwiseHistogram() {
 	other->show();
 	qDebug() << "Done";
 }
-void ImageViewer::pwHistogramMatching() {
-	qDebug() << "Pairwise histogram matching...";
+void ImageViewer::pwBhattacharyyaMatching() {
+	qDebug() << "Pairwise histogram matching using Bhattacharyya metric...";
 	Image image(fileName);
 
-	QString path = "/home/linh/Desktop/Mg";
-	 matchingDirectory(image, path);
+	QString path = "/home/linh/Desktop/mandibule";
+	matchingDirectory(image, path);
 
 	/*QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 qDebug() << fileName2;
+	 Image image2(fileName2);
+	 IExtraction *extraction = new EdgeSegmentation();
+	 Scenario scenario(extraction);
+	 double matching = scenario.histogramMatching(image, image2,
+	 Scenario::Bhattacharyya, ShapeHistogram::Degree);
+	 qDebug() << "Matching metric: " << QString::number(matching, 'f', 20);*/
+	qDebug() << "Done";
+}
+void ImageViewer::pwChiSquaredMatching() {
+	qDebug() << "Pairwise histogram matching using Chi-squared metric...";
+	Image image(fileName);
+	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	IExtraction *extraction = new EdgeSegmentation();
 	Scenario scenario(extraction);
-	double matching = scenario.histogramMatching(image, image2);
-	qDebug() << "Matching metric: " << QString::number(matching, 'f', 20);*/
+	double matching = scenario.histogramMatching(image, image2,
+			Scenario::Chisquared, ShapeHistogram::TwoTimeDegree);
+	qDebug() << "Chi-squared metric: " << QString::number(matching, 'f', 20);
+	qDebug() << "Done";
+}
+void ImageViewer::pwIntersectionMatching() {
+	qDebug() << "Pairwise histogram matching using Intersection metric...";
+	Image image(fileName);
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
+	IExtraction *extraction = new EdgeSegmentation();
+	Scenario scenario(extraction);
+	double matching = scenario.histogramMatching(image, image2,
+			Scenario::Intersection, ShapeHistogram::TwoTimeDegree);
+	qDebug() << "Intersection metric: " << QString::number(matching, 'f', 20);
+
 	qDebug() << "Done";
 }

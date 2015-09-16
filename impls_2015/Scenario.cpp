@@ -22,7 +22,6 @@
 #include "Scenario.h"
 
 namespace impls_2015 {
-
 /**
  * Constructor
  */
@@ -57,44 +56,40 @@ cv::Mat Scenario::pairwiseHistogram(Image image) {
 	vector<Line> appLines = this->segment(image);
 	ShapeHistogram shapeHist(appLines);
 
-	//shapeHist.createSquare();
 	shapeHist.createTriangle();
-	//shapeHist.createTrapezoid();
-	//shapeHist.createShape();
-	//vector<LocalHistogram> pghHistograms = shapeHist.shapePGH(appLines);
-	int t_width = shapeHist.getMaxDistance();
-	int height = 180;
-	cv::Mat result(cv::Size(t_width + 10, height + 1), CV_8UC3,
-			cv::Scalar(0, 0, 0));
-	/*for (size_t t = 0; t < pghHistograms.size(); t++) {
-		LocalHistogram pwh = pghHistograms[t];
-		for (size_t i = 0; i < pwh.getPWHistgoram().size(); i++) {
-			GFeatures gfeature = pwh.getPWHistgoram().at(i);
-			int x1 = round(gfeature.getDmin());
-			int x2 = round(gfeature.getDmax());
-			int y = LocalHistogram::convertAngle(gfeature.getAngle());
-			cv::line(result, cv::Point(x1, y), cv::Point(x2, y),
-					cv::Scalar(255, 255, 255), 1, 8);
-		}
-	}*/
-	return result;
+	shapeHist.createShape();
+	return shapeHist.presentation(ShapeHistogram::TwoTimeDegree);
 }
-double Scenario::histogramMatching(Image refImage, Image sceneImage) {
+double Scenario::histogramMatching(Image refImage, Image sceneImage,
+		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {
 
 	vector<Line> refLines = this->segment(refImage);
 	vector<Line> sceneLines = this->segment(sceneImage);
+
+	clock_t t1, t2;
+	t1 = clock();
 	ShapeHistogram refHist(refLines);
-	refHist.savePGH(refHist.shapePGH());
+	refHist.constructPGH(angleAcc,0);
+
 	ShapeHistogram sceneHist(sceneLines);
-	return refHist.bhattacharyaMetric(sceneHist);
+	sceneHist.constructPGH(angleAcc,refHist.getMaxDistance());
+	double distance = getDistanceMetric(refHist, sceneHist, matching);
+	t2 = clock();
+	qDebug() << "time save PGH: " << ((float) t2 - (float) t1) / CLOCKS_PER_SEC
+			<< " seconds";
+	return distance;
 }
-double Scenario::histogramMatching(ShapeHistogram refImage, Image sceneImage) {
+double Scenario::histogramMatching(ShapeHistogram refHist, Image sceneImage,
+		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {
 	vector<Line> refLines = this->segment(sceneImage);
-	ShapeHistogram shapeHist2(refLines);
-	return refImage.bhattacharyaMetric(shapeHist2);
+	ShapeHistogram sceneHist(refLines);
+	sceneHist.constructPGH(angleAcc,refHist.getMaxDistance());
+	double distance = getDistanceMetric(refHist, sceneHist, matching);
+	return distance;
 }
 
-void Scenario::matchingDirectory(Image refImage, QString directoryPath) {
+void Scenario::matchingDirectory(Image refImage, QString directoryPath,
+		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {
 	QDir qdir;
 	qdir.setPath(directoryPath);
 	qdir.setFilter(QDir::Files);
@@ -105,6 +100,8 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath) {
 
 	ofstream of("matching_result.txt");
 
+	qDebug() << "Matching method: " << matching << ", angle accuracy: "
+			<< angleAcc << " * 180.";
 	//IExtraction *extraction = new EdgeSegmentation();
 	//Scenario scenario(extraction);
 	QString imgpath = refImage.getFileName();
@@ -113,8 +110,8 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath) {
 			" ", "");
 	qDebug() << refname;
 	vector<Line> lines = segment(refImage);
-	ShapeHistogram refShape(lines);
-	refShape.savePGH(refShape.shapePGH());
+	ShapeHistogram refHist(lines);
+	refHist.constructPGH(angleAcc,0);
 
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
@@ -128,16 +125,34 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath) {
 		Image sceneImage(_name);
 		vector<Line> sceneLines = segment(sceneImage);
 		ShapeHistogram sceneHist(sceneLines);
-		double matching = refShape.bhattacharyaMetric(sceneHist);
-		of << matching << "\n";
-		qDebug() << "Metric: " << QString::number(matching, 'f', 20);
-		/*if(i == 199)
-			break;*/
+		sceneHist.constructPGH(angleAcc,refHist.getMaxDistance());
+
+		double distance = getDistanceMetric(refHist, sceneHist, matching);
+		of << distance << "\n";
+		qDebug() << "Metric: " << QString::number(distance, 'f', 20);
 
 	}
 	of.close();
 }
-
+double Scenario::getDistanceMetric(ShapeHistogram refHist,
+		ShapeHistogram sceneHist, MatchingMethod matching) {
+	double distance = 0;
+	switch (matching) {
+	case Bhattacharyya:
+		distance = refHist.bhattacharyaMetric(sceneHist);
+		break;
+	case Chisquared:
+		distance = refHist.chiSquaredMetric(sceneHist);
+		break;
+	case Intersection:
+		distance = refHist.intersectionMetric(sceneHist);
+		break;
+	default:
+		distance = refHist.bhattacharyaMetric(sceneHist);
+		break;
+	}
+	return distance;
+}
 /**
  * Detect the landmarks on image automatically
  * @return: the image contains the landmarks
