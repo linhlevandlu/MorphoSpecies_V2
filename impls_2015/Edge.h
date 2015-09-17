@@ -52,7 +52,7 @@ private:
 
 	bool checkPointInList(cv::Point point);
 	void breakEdge();
-	vector<Point> breakEdge2(vector<Point> contour);
+	vector<Point> breakEdge(vector<Point> contour);
 
 public:
 	Edge();
@@ -67,8 +67,6 @@ public:
 	void setPoints(vector<cv::Point> points);
 	void addLine(Line line);
 	vector<cv::Point> segment();
-	vector<vector<Line> > pairwiseLines(vector<Line> listLines);
-	vector<Edge> splitEdge(int numOfParts);
 	cv::Mat drawing(cv::Mat outputImage);
 
 };

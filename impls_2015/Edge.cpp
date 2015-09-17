@@ -140,7 +140,7 @@ void Edge::breakEdge() {
 	}
 }
 
-vector<Point> Edge::breakEdge2(vector<Point> contours){
+vector<Point> Edge::breakEdge(vector<Point> contours){
 	vector<Point> appContour;
 	approxPolyDP(contours,appContour,3,false);
 	return appContour;
@@ -192,85 +192,8 @@ vector<cv::Point> Edge::segment() {
 	/*breakPoints.clear();
 	breakEdge();
 	return breakPoints;*/
-	return breakEdge2(this->listOfPoints);
+	return breakEdge(this->listOfPoints);
 }
-
-/**
- * Get the pairwise lines from a list of lines
- * @parameter: listLines - list of lines
- * @return: list of pairwise lines.
- */
-vector<vector<Line> > Edge::pairwiseLines(vector<Line> listLines) {
-	vector<vector<Line> > pairwiseLines;
-	Line line1; // reference line
-	Line line2; // object line
-
-	if (!listLines.size()> 0)
-		line1 = listLines.at(0);
-	for (size_t i = 1; i < listLines.size(); i++) {
-		line2 = listLines.at(i);
-		if (!line1.isNull() && !line2.isNull()) {
-			vector<Line> pairwise;
-			pairwise.push_back(line1);
-			pairwise.push_back(line2);
-			pairwiseLines.push_back(pairwise);
-		}
-		line1 = line2;
-	}
-
-	return pairwiseLines;
-}
-
-vector<Edge> Edge::splitEdge(int numOfParts) {
-	vector<Edge> edges;
-	if (listOfPoints.size() > 0) {
-		int splitSize = listOfPoints.size() / numOfParts;
-		int indexSplit = 0;
-		while (indexSplit < numOfParts) {
-			int begin = indexSplit * splitSize;
-			int end = ((indexSplit + 1) * splitSize) - 1;
-			if (indexSplit == numOfParts - 1) {
-				end = listOfPoints.size() - 1;
-			}
-			cv::Point p0 = listOfPoints.at(begin);
-			cv::Point pend = listOfPoints.at(end);
-			Line line(p0, pend);
-			double distance = line.perpendicularDistance(
-					listOfPoints.at(begin + 1));
-			bool negative = false;
-			if (distance > 0)
-				negative = false;
-			else
-				negative = true;
-			QQueue<int> cutPoints;
-			for (int j = begin + 1; j < end; j++) {
-				distance = line.perpendicularDistance(listOfPoints.at(j));
-				if ((distance > 0 && negative) || (distance < 0 && !negative)) {
-					cutPoints.enqueue(j - 1);
-					if (distance < 0)
-						negative = true;
-					else
-						negative = false;
-				}
-			}
-			int k0 = begin;
-			int k1 = 0;
-			while (!cutPoints.isEmpty()) {
-				k1 = cutPoints.dequeue();
-				vector<Point> vp(listOfPoints.begin() + k0,listOfPoints.begin() + k1);
-				Edge ed(vp);
-				edges.push_back(ed);
-				k0 = k1;
-			}
-			vector<Point> vp2(listOfPoints.begin() + k0,listOfPoints.begin() + end);
-			Edge ed2(vp2);
-			edges.push_back(ed2);
-			indexSplit++;
-		}
-	}
-	return edges;
-}
-
 /**
  * Drawing an edge
  * @parameter: outputImage - image contains the result

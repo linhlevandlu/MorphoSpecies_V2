@@ -56,9 +56,9 @@ cv::Mat Scenario::pairwiseHistogram(Image image) {
 	vector<Line> appLines = this->segment(image);
 	ShapeHistogram shapeHist(appLines);
 
-	shapeHist.createTriangle();
-	shapeHist.createShape();
-	return shapeHist.presentation(ShapeHistogram::TwoTimeDegree);
+	//shapeHist.createTriangle();
+	//shapeHist.createShape();
+	return shapeHist.presentation(ShapeHistogram::FourTimeDegree);
 }
 double Scenario::histogramMatching(Image refImage, Image sceneImage,
 		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {

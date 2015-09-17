@@ -542,7 +542,7 @@ void ImageViewer::createActions() {
 
 	pwhMatching = new QAction(tr("PGH matching - Bhattacharyya metric"), this);
 	pwhMatching->setEnabled(false);
-	pwhMatching->setShortcut(tr("Ctrl+M"));
+	pwhMatching->setShortcut(tr("Ctrl+B"));
 	connect(pwhMatching, SIGNAL(triggered()), this,
 			SLOT(pwBhattacharyyaMatching()));
 
@@ -2561,8 +2561,8 @@ void ImageViewer::readDirectory(QString path) {
 void ImageViewer::matchingDirectory(impls_2015::Image image, QString path) {
 	IExtraction *extraction = new EdgeSegmentation();
 	Scenario scenario(extraction);
-	scenario.matchingDirectory(image, path, Scenario::Bhattacharyya ,
-			ShapeHistogram::SixTimeDegree);
+	scenario.matchingDirectory(image, path, Scenario::Chisquared ,
+			ShapeHistogram::TwelveTimeDegree);
 
 }
 void ImageViewer::removeYLinesAction() {
@@ -2647,7 +2647,7 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	 IExtraction *extraction = new EdgeSegmentation();
 	 Scenario scenario(extraction);
 	 double matching = scenario.histogramMatching(image, image2,
-	 Scenario::Bhattacharyya, ShapeHistogram::Degree);
+	 Scenario::Bhattacharyya, ShapeHistogram::TwoTimeDegree);
 	 qDebug() << "Matching metric: " << QString::number(matching, 'f', 20);*/
 	qDebug() << "Done";
 }
