@@ -36,13 +36,15 @@
 #include "impls_2015/YellowGrid.h"
 #include "impls_2015/Image.h"
 #include "impls_2015/Landmark.h"
-#include "impls_2015/LandmarkDetection.h"
-#include "impls_2015/EdgeSegmentation.h"
+#include "impls_2015/landmarks/LandmarkDetection.h"
+#include "impls_2015/segmentation/EdgeSegmentation.h"
 #include "impls_2015/Scenario.h"
 #include "impls_2015/GFeatures.h"
 #include "impls_2015/ShapeHistogram.h"
 #include "impls_2015/IExtraction.h"
 #include "impls_2015/IDrawOperation.h"
+#include "impls_2015/LocalHistogram.h"
+#include "impls_2015/pht/PHoughTransform.h"
 
 class QAction;
 class QLabel;
@@ -91,7 +93,7 @@ public:
 
 	//add by LE Van Linh
 	//void removeYLinesAction(int minBrightness, QString pathImage);
-	void readDirectory(QString path);
+	void edgeSegementDirectory(QString path);
 	void matchingDirectory(impls_2015::Image image, QString path);
 	//end
 

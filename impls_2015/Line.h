@@ -48,7 +48,6 @@ private:
 public:
 	Line();
 	Line(cv::Point p1, cv::Point p2);
-	Line(QPoint p1, QPoint p2);
 	cv::Point getP1();
 	void setP1(cv::Point p);
 	cv::Point getP2();

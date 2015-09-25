@@ -36,6 +36,8 @@ Image::Image() {
 Image::Image(QString filePath) {
 	this->fileName = filePath;
 	this->histogramSize = 256;
+	this->matrixImage = getMatImage();
+	getEdges();
 }
 
 Image::~Image() {
@@ -63,7 +65,62 @@ void Image::setFileName(QString filePath) {
  * @return: the list of edges of image
  */
 vector<Edge> Image::getEdges() {
-	return this->listOfEdges;
+	cv::Mat grayImg;
+	cv::cvtColor(this->matrixImage, grayImg, CV_BGR2GRAY);
+
+	cv::Mat histImg = histogram();
+	// calculate the median
+	double median = medianHistogram();
+	float mean = meanHistogram();
+	// find the first maximal point
+	int limit = (mean > median ? median : mean);
+	limit = (limit >= 120 ? (limit - 25) : (limit - 5));
+	int imax = -1, max = -1;
+	for (int i = 0; i < limit; i++) {
+		if (histImg.at<float>(i) > max) {
+			max = histImg.at<float>(i);
+			imax = i;
+		}
+	}
+
+	int limit2 = (mean > median ? mean : median);
+	int imin = -1, min = max;
+	for (int k = imax; k < limit2; k++) {
+		if (histImg.at<float>(k) < min) {
+			min = histImg.at<float>(k);
+			imin = k;
+		}
+	}
+
+	int max2 = -1, imax2 = -1;
+	for (int j = limit2; j < 256; j++) {
+		if (histImg.at<float>(j) > max2) {
+			max2 = histImg.at<float>(j);
+			imax2 = j;
+		}
+	}
+
+	int mid1 = (imin + imax) / 2;
+	int mid2 = (imin + imax2) / 2;
+	int mid = (mid1 + mid2) / 2;
+	cv::threshold(grayImg, grayImg, mid, 255, CV_THRESH_BINARY);
+
+	//qDebug() << "middle value: " << mid;
+	Mat cannyImage;
+	cv::Canny(grayImg, cannyImage, mid, 3 * mid, 5);
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	RNG rng(12345);
+	findContours(cannyImage, contours, hierarchy, RETR_CCOMP,
+			CHAIN_APPROX_NONE, Point(0, 0));
+	vector<Edge> edges;
+
+	for (size_t i = 0; i < contours.size(); i++) {
+		Edge edge(contours[i]);
+		edges.push_back(edge);
+	}
+	this->listOfEdges = edges;
+	return edges;
 }
 
 /**
@@ -79,16 +136,16 @@ void Image::setEdges(vector<Edge> edges) {
  * @return: list of landmarks of image
  */
 /*QList<Landmark> Image::getLandmarks() {
-	return this->listOfLandmarks;
-}*/
+ return this->listOfLandmarks;
+ }*/
 
 /**
  * Set the landmarks of image
  * @parameter: landmarks - the landmarks of image
  */
 /*void Image::setLandmarks(QList<Landmark> landmarks) {
-	this->listOfLandmarks = landmarks;
-}*/
+ this->listOfLandmarks = landmarks;
+ }*/
 
 /**
  * Get the bins of histogram
@@ -105,7 +162,9 @@ int Image::getHistSize() {
 void Image::setHistSize(int histSize) {
 	this->histogramSize = histSize;
 }
-
+cv::Mat Image::getMatrixImage() {
+	return this->matrixImage;
+}
 /**
  * Get the image in Matrix
  * @return: the matrix represented the image
@@ -127,8 +186,8 @@ void Image::addEdge(Edge edge) {
  * @parameter: landmark - the landmark need to add into the list of landmarks
  */
 /*void Image::addLandmark(Landmark landmark) {
-	this->listOfLandmarks.append(landmark);
-}*/
+ this->listOfLandmarks.append(landmark);
+ }*/
 
 /**
  * Compute the histogram of image
@@ -136,7 +195,7 @@ void Image::addEdge(Edge edge) {
  */
 cv::Mat Image::histogram() {
 	cv::Mat inputImage, grayImage;
-	inputImage = getMatImage();
+	inputImage = this->matrixImage;
 
 	if (inputImage.channels() == 3)
 		cv::cvtColor(inputImage, grayImage, CV_BGR2GRAY);
@@ -246,7 +305,6 @@ cv::Mat Image::drawing(cv::Mat outputImage) {
  * @return: the limit point of grid
  */
 cv::Point Image::findLimitPoint() {
-	//cv::Mat inputImage = this->getMatImage();
 	vector<cv::Mat> hsv_planes = splitChannels();
 
 	cv::Point limit_point = cv::Point(0, 0);
@@ -287,13 +345,13 @@ cv::Point Image::findLimitPoint() {
  * @return: the coordinate of point where we use the value to replace the yellow point
  */
 cv::Point Image::findReplacePoint() {
-	cv::Mat inputImage = this->getMatImage();
+	cv::Mat inputImage = this->matrixImage;
 	cv::Mat gray_img, hist_img;
 	if (inputImage.channels() == 3)
 		cv::cvtColor(inputImage, gray_img, CV_BGR2GRAY);
 	else
 		gray_img = inputImage;
-	hist_img = this->histogram(); // HistogramImp::calcHistogram(gray_img);
+	hist_img = this->histogram();
 	float avg = meanHistogram();
 
 	vector<cv::Mat> hsv_planes = splitChannels();
@@ -355,7 +413,7 @@ cv::Mat Image::removingGrid(int minBrightness) {
 	cv::Point limit_point = findLimitPoint();
 	cv::Point bg = findReplacePoint();
 
-	cv::Mat inputImage = this->getMatImage();
+	cv::Mat inputImage = this->matrixImage;
 	vector<cv::Mat> hsv_planes;
 	hsv_planes = splitChannels();
 	// replace the points
@@ -453,8 +511,25 @@ cv::Mat Image::removingGrid(int minBrightness) {
 vector<cv::Mat> Image::splitChannels() {
 	cv::Mat hsvImage;
 	vector<cv::Mat> hsv_planes;
-	cv::cvtColor(this->getMatImage(), hsvImage, cv::COLOR_BGR2HSV);
+	cv::cvtColor(this->matrixImage, hsvImage, cv::COLOR_BGR2HSV);
 	cv::split(hsvImage, hsv_planes);
 	return hsv_planes;
+}
+vector<Line> Image::lineSegment() {
+	vector<Line> totalLines;
+	for (size_t i = 0; i < this->listOfEdges.size(); i++) {
+		Edge ed = this->listOfEdges.at(i);
+		vector<cv::Point> breakPoints = ed.segment();
+		vector<Line> lines = ed.getLines(breakPoints);
+		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
+	}
+	qDebug()<<"Total lines: " << totalLines.size();
+	return totalLines;
+}
+void Image::setShapeHistogram(ShapeHistogram shapeHistogram) {
+	this->pghHistogram = shapeHistogram;
+}
+ShapeHistogram Image::getShapeHistogram() {
+	return this->pghHistogram;
 }
 } /* namespace impls_2015 */

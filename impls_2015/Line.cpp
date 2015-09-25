@@ -49,16 +49,6 @@ Line::Line(cv::Point p1, cv::Point p2) {
 }
 
 /**
- * Constructor of a line with 2 points
- * @parameter: p1 - the first point
- * @parameter: p2 - the second point
- */
-Line::Line(QPoint p1, QPoint p2) {
-	this->p1 = cv::Point(p1.x(), p1.y());
-	this->p2 = cv::Point(p2.x(), p2.y());
-}
-
-/**
  * Get the first point of line
  * @return: the first point of line
  */

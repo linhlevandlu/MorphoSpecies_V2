@@ -38,6 +38,10 @@
 
 #include "Edge.h"
 #include "Landmark.h"
+#include "ShapeHistogram.h"
+
+using namespace std;
+using namespace cv;
 
 namespace impls_2015 {
 
@@ -45,8 +49,11 @@ class Image: public IDrawOperation {
 private:
 	QString fileName;
 	vector<Edge> listOfEdges;
-	//QList<Landmark> listOfLandmarks;
+	vector<Landmark> listOfLandmarks;
 	int histogramSize;
+	cv::Mat matrixImage;
+	ShapeHistogram pghHistogram;
+	cv::Mat getMatImage();
 public:
 	enum InsectPart {
 		ELYTRE, MDROITE, MGAUCHE, PRONOTUM, TETE
@@ -60,12 +67,11 @@ public:
 	void setFileName(QString filePath);
 	vector<Edge> getEdges();
 	void setEdges(vector<Edge> edges);
-	//QList<Landmark> getLandmarks();
+	//vector<Landmark> getLandmarks();
 	//void setLandmarks(QList<Landmark> landmarks);
 	int getHistSize();
 	void setHistSize(int histSize);
-
-	cv::Mat getMatImage();
+	cv::Mat getMatrixImage();
 	void addEdge(Edge edge);
 	//void addLandmark(Landmark landmark);
 
@@ -81,6 +87,10 @@ public:
 	cv::Point findLimitPoint();
 	cv::Point findReplacePoint();
 	cv::Mat removingGrid(int minBrightness);
+
+	vector<Line> lineSegment();
+	void setShapeHistogram(ShapeHistogram shapeHistogram);
+	ShapeHistogram getShapeHistogram();
 };
 
 } /* namespace impls_2015 */

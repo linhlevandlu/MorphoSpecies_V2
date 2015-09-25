@@ -10,18 +10,12 @@
 namespace impls_2015 {
 
 LocalHistogram::LocalHistogram() {
-	// TODO Auto-generated constructor stub
+	maxDistance = 0;
 
 }
 
 LocalHistogram::~LocalHistogram() {
 	// TODO Auto-generated destructor stub
-}
-void LocalHistogram::setLine(Line refLine) {
-	this->refLine = refLine;
-}
-Line LocalHistogram::getLine() {
-	return this->refLine;
 }
 vector<GFeatures> LocalHistogram::getPWHistgoram() {
 	return this->pwHistogram;
@@ -29,105 +23,121 @@ vector<GFeatures> LocalHistogram::getPWHistgoram() {
 void LocalHistogram::setpwHistogram(vector<GFeatures> gfeatures) {
 	this->pwHistogram = gfeatures;
 }
+double LocalHistogram::getMaxDistance(){
+	return this->maxDistance;
+}
 void LocalHistogram::addGFeatures(GFeatures features) {
 	pwHistogram.push_back(features);
+	if(features.getDmax() > maxDistance)
+		maxDistance = features.getDmax();
 }
-vector<vector<int> > LocalHistogram::presentation() {
-	int t_width = 0;
-	int height = 180;
-	// get the maximal distance
-	for (size_t i = 0; i < this->pwHistogram.size(); i++) {
-		GFeatures feature = pwHistogram[i];
-		if (feature.getDmax() > t_width)
-			t_width = round(feature.getDmax());
-	}
-	vector<vector<int> > matrixP;
-	matrixP.resize(height + 1);
-	for (int i = 0; i <= height; i++) {
-		matrixP[i].resize(t_width + 11, 0);
-	}
-
-	for (size_t t = 0; t < pwHistogram.size(); t++) {
-		GFeatures feature = pwHistogram[t];
-		int x1 = round(feature.getDmin());
-		int x2 = round(feature.getDmax());
-		int y = accuracyToTimeDegree(feature.getAngle(),0);
-		for (int k = x1; k <= x2; k++) {
-			if (y >= 0)
-				matrixP[y][k] += 1;
-		}
-	}
-	return matrixP;
-}
-double LocalHistogram::matching(vector<vector<int> > sceneHist) {
-	vector<vector<int> > pointer_ref = presentation();
-	vector<vector<int> > pointer_scene = sceneHist;
-	int max1 = pointer_ref[0].size();
-	int max2 = pointer_scene[0].size();
-	int distance_size = (max1 > max2) ? max1 : max2;
-	if (max2 > max1) {
-		for (int i = 0; i < 181; i++) {
-			pointer_ref[i].resize(pointer_scene[0].size(), 0);
-		}
-	} else {
-		for (int i = 0; i < 181; i++) {
-			pointer_scene[i].resize(pointer_ref[0].size(), 0);
-		}
-	}
-
-	double distance = 0;
-	for (int i = 0; i < 181; i++) {
-		for (int j = 0; j < distance_size; j++) {
-			int value1 = pointer_ref[i][j];
-			int value2 = pointer_scene[i][j];
-			distance += sqrt(value1 * value2);
-		}
-	}
-
-	return distance;
-}
-
-int LocalHistogram::accuracyToTimeDegree(double angle,int angleAcc){
+int LocalHistogram::accuracyToTimeDegree(double angle, AccuracyPGH angleAcc) {
 	int m = 60;
-	switch(angleAcc){
-		case 1:
-			m = 60;
-			break;
-		case 2:
-			m = 30;
-			break;
-		case 4:
-			m = 15;
-			break;
-		case 6:
-			m = 10;
-			break;
-		case 12:
-			m = 5;
-			break;
-		case 60:
-			m = 1;
-			break;
-		default:
-			m = 60;
-			break;
+	switch (angleAcc) {
+	case HaftDegree:
+		m = 120;
+		break;
+	case Degree:
+		m = 60;
+		break;
+	case TwoTimeDegree:
+		m = 30;
+		break;
+	case FourTimeDegree:
+		m = 15;
+		break;
+	case SixTimeDegree:
+		m = 10;
+		break;
+	case TwelveTimeDegree:
+		m = 5;
+		break;
+	case SixtyTimeDegree:
+		m = 1;
+		break;
+	default:
+		m = 60;
+		break;
 	}
 	int minute = convertAngleToMinute(angle);
 	double bins = minute / m;
 	double bin;
-	double mod = modf(bins,&bin);
-	if(mod >0)
-		bin+=1;
+	double mod = modf(bins, &bin);
+	if (mod > 0)
+		bin += 1;
 	return bin;
 }
-int LocalHistogram::convertAngleToMinute(double angle){
+int LocalHistogram::heightOfAngleAxis(AccuracyPGH angleAcc) {
+	if(angleAcc == HaftDegree)
+		return 90;
+	return angleAcc * 180;
+}
+int LocalHistogram::convertAngleToMinute(double angle) {
 	double degree;
-	modf(angle,&degree);
-	int minute = (angle - degree)* 60;
-	int second = (angle - degree - minute/60) * 3600;
-	if(second >= 30)
+	modf(angle, &degree);
+	int minute = (angle - degree) * 60;
+	int second = (angle - degree - minute / 60) * 3600;
+	if (second >= 30)
 		minute += 1;
 	return (degree * 60) + minute;
 
+}
+vector<vector<int> > LocalHistogram::constructorMatrix(AccuracyPGH angleAcc,
+		int distanceAxis, int &totalEntries) {
+	int height = heightOfAngleAxis(angleAcc);
+	int width = 0;
+	if (distanceAxis != 0)
+		width = distanceAxis;
+	vector<vector<int> > matrix;
+	matrix.resize(height + 1);
+	for (int i = 0; i <= height; ++i) {
+		matrix[i].resize(width + 1, 0);
+	}
+	for (size_t j = 0; j < pwHistogram.size(); j++) {
+		GFeatures features = pwHistogram.at(j);
+		int dmin = round(features.getDmin());
+		int dmax = round(features.getDmax());
+		int angle = accuracyToTimeDegree(features.getAngle(), angleAcc);
+		if (dmax > width && distanceAxis == 0) {
+			width = dmax;
+			// resize the size of matrix
+			for (int i = 0; i <= height; ++i) {
+				matrix[i].resize(width + 1, 0);
+			}
+		}
+		if (!isnan(angle)) {
+			for (int k = dmin; k <= dmax; k++) {
+				if (angle >= 0) {
+					if (k >= width + 1) {
+						matrix[angle][width] += 1;
+					} else {
+						matrix[angle][k] += 1;
+					}
+					totalEntries++;
+				}
+			}
+		}
+	}
+	return matrix;
+}
+double LocalHistogram::bhattacharyyaMetric(LocalHistogram sceneHistogram,
+		AccuracyPGH angleAcc) {
+	double result = 0;
+	int refTotalEntries = 0;
+	int sceneTotalEntries = 0;
+	vector<vector<int> > refMatrix = this->constructorMatrix(angleAcc, 0,
+			refTotalEntries);
+	int w_Matrix = refMatrix[0].size();
+	int h_Matrix = refMatrix.size();
+	vector<vector<int> > sceneMatrix = sceneHistogram.constructorMatrix(
+			angleAcc, w_Matrix, sceneTotalEntries);
+	for (size_t i = 0; i < h_Matrix; i++) {
+		for (int j = 0; j < w_Matrix; j++) {
+			double value1 = sqrt((double)refMatrix[i][j] / (double)refTotalEntries);
+			double value2 = sqrt((double)sceneMatrix[i][j] / (double)sceneTotalEntries);
+			result += value1 * value2;
+		}
+	}
+	return result;
 }
 } /* namespace impls_2015 */

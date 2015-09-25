@@ -25,143 +25,93 @@ namespace impls_2015 {
 /**
  * Constructor
  */
-Scenario::Scenario(IExtraction* extraction) {
-	this->extraction = extraction;
+Scenario::Scenario() {
 
 }
 
 Scenario::~Scenario() {
 
 }
-vector<Line> Scenario::segment(Image image) {
-	EdgeSegmentation* edSegment =
-			dynamic_cast<EdgeSegmentation *>(this->extraction);
-	vector<Edge> listEdges = edSegment->getEdges(image); // get step edges from image
-	vector<Line> appLines = edSegment->lineSegment(listEdges);
+/*vector<Line> Scenario::segment(Image image) {
+ EdgeSegmentation* edSegment =
+ dynamic_cast<EdgeSegmentation *>(this->extraction);
+ vector<Edge> listEdges = edSegment->getEdges(image); // get step edges from image
+ vector<Line> appLines = edSegment->lineSegment(listEdges);
+ return appLines;
+ }*/
+vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
+	vector<Line> appLines;
+	EdgeSegmentation sgMethod;
+	appLines = sgMethod.lineSegment(image);
+
+	Mat temp(image.getMatrixImage().size(), CV_8UC3, cv::Scalar(0, 0, 0));
+	temp.copyTo(result);
+	result = sgMethod.rePresentation(result, appLines);
 	return appLines;
 }
-cv::Mat Scenario::edgeSegmentation(Image image) {
 
-	cv::Mat result(image.getMatImage().size(), CV_8UC3, cv::Scalar(0, 0, 0));
-	// detect the step edges
-	EdgeSegmentation* edSegment =
-			dynamic_cast<EdgeSegmentation *>(this->extraction);
-	vector<Line> appLines = this->segment(image);
-	result = edSegment->rePresentation(result, appLines);
-	return result;
+void Scenario::edgeSegmentationDirectory(QString inputFolder,QString saveFolder){
+	EdgeSegmentation edgeSegment;
+	edgeSegment.segmentDirectory(inputFolder,saveFolder);
+}
+vector<LocalHistogram> Scenario::pairwiseHistogram(Image image,
+		LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result) {
+	GeometricHistogram geomHistogram;
+	vector<LocalHistogram> pghHist = geomHistogram.shapeHistogram(image,
+			angleAcc,columns, result);
 
+	return pghHist;
+}
+void Scenario::pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums){
+	qDebug()<<"Pairwise for directory: ";
+	GeometricHistogram geomHistogram;
+
+	vector<LocalHistogram::AccuracyPGH> angleAccs;
+	angleAccs.push_back(LocalHistogram::HaftDegree);
+	angleAccs.push_back(LocalHistogram::Degree);
+	angleAccs.push_back(LocalHistogram::TwoTimeDegree);
+	angleAccs.push_back(LocalHistogram::FourTimeDegree);
+	angleAccs.push_back(LocalHistogram::SixTimeDegree);
+
+	vector<int> columns;
+	columns.push_back(250);
+	columns.push_back(500);
+	columns.push_back(1000);
+	for(size_t t=0;t<angleAccs.size();t++){
+		LocalHistogram::AccuracyPGH acc = angleAccs.at(t);
+		for(size_t k=0;k < columns.size();k++){
+			int cl = columns.at(k);
+			geomHistogram.pairwiseHistogramDirectory(folderPath,acc,cl);
+		}
+	}
 }
 
-cv::Mat Scenario::pairwiseHistogram(Image image) {
-	vector<Line> appLines = this->segment(image);
-	ShapeHistogram shapeHist(appLines);
-
-	//shapeHist.createTriangle();
-	//shapeHist.createShape();
-	return shapeHist.presentation(ShapeHistogram::FourTimeDegree);
-}
-double Scenario::histogramMatching(Image refImage, Image sceneImage,
-		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {
-
-	vector<Line> refLines = this->segment(refImage);
-	vector<Line> sceneLines = this->segment(sceneImage);
-
-	clock_t t1, t2;
-	t1 = clock();
-	ShapeHistogram refHist(refLines);
-	refHist.constructPGH(angleAcc,0);
-
-	ShapeHistogram sceneHist(sceneLines);
-	sceneHist.constructPGH(angleAcc,refHist.getMaxDistance());
-	double distance = getDistanceMetric(refHist, sceneHist, matching);
-	t2 = clock();
-	qDebug() << "time save PGH: " << ((float) t2 - (float) t1) / CLOCKS_PER_SEC
-			<< " seconds";
-	return distance;
-}
-double Scenario::histogramMatching(ShapeHistogram refHist, Image sceneImage,
-		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {
-	vector<Line> refLines = this->segment(sceneImage);
-	ShapeHistogram sceneHist(refLines);
-	sceneHist.constructPGH(angleAcc,refHist.getMaxDistance());
-	double distance = getDistanceMetric(refHist, sceneHist, matching);
-	return distance;
+double Scenario::pghMatching(Image refImage, Image sceneImage,
+		GeometricHistogram::MatchingMethod matching,
+		LocalHistogram::AccuracyPGH angleAcc) {
+	GeometricHistogram geomHistogram;
+	return geomHistogram.pghHistogramMatching(refImage, sceneImage, matching,
+			angleAcc);
 }
 
 void Scenario::matchingDirectory(Image refImage, QString directoryPath,
-		MatchingMethod matching, ShapeHistogram::AccuracyPGH angleAcc) {
-	QDir qdir;
-	qdir.setPath(directoryPath);
-	qdir.setFilter(QDir::Files);
-	QStringList filterNames;
-	filterNames << "*.JPG";
-	qdir.setNameFilters(QStringList("*.JPG"));
-	QFileInfoList files = qdir.entryInfoList();
-
-	ofstream of("matching_result.txt");
-
-	qDebug() << "Matching method: " << matching << ", angle accuracy: "
-			<< angleAcc << " * 180.";
-	//IExtraction *extraction = new EdgeSegmentation();
-	//Scenario scenario(extraction);
-	QString imgpath = refImage.getFileName();
-	int index = imgpath.lastIndexOf("/");
-	QString refname = imgpath.mid(index + 1, imgpath.length() - index).replace(
-			" ", "");
-	qDebug() << refname;
-	vector<Line> lines = segment(refImage);
-	ShapeHistogram refHist(lines);
-	refHist.constructPGH(angleAcc,0);
-
-	for (int i = 0; i < files.size(); i++) {
-		QFileInfo file = files.at(i);
-		QString _name = file.absoluteFilePath();
-		int index2 = _name.lastIndexOf("/");
-		QString scenename =
-				_name.mid(index2 + 1, _name.length() - index2).replace(" ", "");
-		of << refname.toStdString() << "\t" << scenename.toStdString() << "\t";
-		qDebug() << scenename;
-
-		Image sceneImage(_name);
-		vector<Line> sceneLines = segment(sceneImage);
-		ShapeHistogram sceneHist(sceneLines);
-		sceneHist.constructPGH(angleAcc,refHist.getMaxDistance());
-
-		double distance = getDistanceMetric(refHist, sceneHist, matching);
-		of << distance << "\n";
-		qDebug() << "Metric: " << QString::number(distance, 'f', 20);
-
-	}
-	of.close();
+		GeometricHistogram::MatchingMethod matching,
+		LocalHistogram::AccuracyPGH angleAcc) {
+	qDebug() << "Matching directory";
+	GeometricHistogram geomHistogram;
+	geomHistogram.pghHistogramDirectoryMatching(refImage, directoryPath, matching,
+			angleAcc);
 }
-double Scenario::getDistanceMetric(ShapeHistogram refHist,
-		ShapeHistogram sceneHist, MatchingMethod matching) {
-	double distance = 0;
-	switch (matching) {
-	case Bhattacharyya:
-		distance = refHist.bhattacharyaMetric(sceneHist);
-		break;
-	case Chisquared:
-		distance = refHist.chiSquaredMetric(sceneHist);
-		break;
-	case Intersection:
-		distance = refHist.intersectionMetric(sceneHist);
-		break;
-	default:
-		distance = refHist.bhattacharyaMetric(sceneHist);
-		break;
-	}
-	return distance;
-}
+
 /**
  * Detect the landmarks on image automatically
  * @return: the image contains the landmarks
  */
-cv::Mat Scenario::landmarksAutoDetect(Image image) {
-	cv::Mat result(image.getMatImage().size(), CV_8UC3);
+vector<Landmark> Scenario::landmarksAutoDetect(Image image) {
+	//cv::Mat result(image.getMatImage().size(), CV_8UC3);
 
 	// detect the step edges
-
-	return result;
+	vector<Landmark> landmarks;
+	return landmarks;
 }
 } /* namespace impls_2015 */

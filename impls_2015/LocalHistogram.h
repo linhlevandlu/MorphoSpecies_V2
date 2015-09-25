@@ -17,6 +17,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <math.h>
 
 #include "GFeatures.h"
 #include "Line.h"
@@ -27,23 +28,34 @@ using namespace std;
 namespace impls_2015 {
 
 class LocalHistogram {
+public:
+	enum AccuracyPGH {
+		HaftDegree = 0,
+		Degree = 1,
+		TwoTimeDegree = 2,
+		FourTimeDegree = 4,
+		SixTimeDegree = 6,
+		TwelveTimeDegree = 12,
+		SixtyTimeDegree = 60
+	};
 private:
-	Line refLine;
 	vector<GFeatures> pwHistogram;
+	static int convertAngleToMinute(double angle);
+	double maxDistance;
 public:
 	LocalHistogram();
 	virtual ~LocalHistogram();
-	void setLine(Line refLine);
-	Line getLine();
 	vector<GFeatures> getPWHistgoram();
 	void setpwHistogram(vector<GFeatures> gfeatures);
+	double getMaxDistance();
 	void addGFeatures(GFeatures features);
-	vector<vector<int> > presentation();
-	double matching(vector<vector<int> > sceneHist);
-	//double bhattacharyaMetric(PWHistogram sceneHist);
+	vector<vector<int> > constructorMatrix(AccuracyPGH angleAcc, int distanceAxis,int &totalEntries);
+	double bhattacharyyaMetric(LocalHistogram sceneHistogram,AccuracyPGH angleAcc);
 
-	static int accuracyToTimeDegree(double angle, int angleAcc);
-	static int convertAngleToMinute(double angle);
+	static int accuracyToTimeDegree(double angle,
+			AccuracyPGH angleAcc);
+	static int heightOfAngleAxis(AccuracyPGH angleAcc);
+
 };
 
 } /* namespace impls_2015 */

@@ -1,5 +1,5 @@
 /*
- * Scenario.h
+ * LandmarkDetection.h
  *
  *  Created on: Aug 21, 2015
  *  Image processing for morphometrics (IPM) Version 2
@@ -19,14 +19,12 @@
  *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef SCENARIO_H_
-#define SCENARIO_H_
+#ifndef LANDMARKDETECTION_H_
+#define LANDMARKDETECTION_H_
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
-#include <QtCore/qlist.h>
-#include <QtGui/QFileDialog>
-
+#include <QtCore/qqueue.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -36,15 +34,12 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
-#include <time.h>
+#include <QtCore/QDebug>
+#include <QtCore/qlist.h>
 
-#include "Line.h"
-#include "Image.h"
-#include "Edge.h"
-#include "segmentation/EdgeSegmentation.h"
-#include "histograms/GeometricHistogram.h"
-#include "IExtraction.h"
-#include "ShapeHistogram.h"
+#include "LandmarkMethod.h"
+#include "../Image.h"
+#include "../Landmark.h"
 
 
 using namespace cv;
@@ -52,24 +47,16 @@ using namespace std;
 
 namespace impls_2015 {
 
-class Scenario {
-
+class LandmarkDetection: public LandmarkMethod {
 private:
-	//IExtraction* extraction;
-	//vector<Line> segment(Image image);
-	//ShapeHistogram pwHistogram(Image image);
+	double noise;
 public:
+	LandmarkDetection();
+	virtual ~LandmarkDetection();
+	void setNoise(double noise);
+	vector<Landmark> getLandmarks(Image image);
 
-	Scenario();
-	virtual ~Scenario();
-	static vector<Line> edgeSegmentation(Image image,cv::Mat &result);
-	static void edgeSegmentationDirectory(QString inputFolder,QString saveFolder);
-	static vector<LocalHistogram> pairwiseHistogram(Image image,LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
-	static vector<Landmark> landmarksAutoDetect(Image image);
-	static double pghMatching(Image refImage, Image sceneImage, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
-	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
-	static void pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums);
 };
 
 } /* namespace impls_2015 */
-#endif /* SCENARIO_H_ */
+#endif /* LANDMARKDETECTION_H_ */

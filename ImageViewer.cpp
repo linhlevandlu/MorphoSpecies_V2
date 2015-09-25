@@ -548,7 +548,7 @@ void ImageViewer::createActions() {
 
 	pwhChisquared = new QAction(tr("PGH matching - Chi-squared metric"), this);
 	pwhChisquared->setEnabled(false);
-	pwhChisquared->setShortcut(tr("Ctrl+Q"));
+	pwhChisquared->setShortcut(tr("Ctrl+C"));
 	connect(pwhChisquared, SIGNAL(triggered()), this,
 			SLOT(pwChiSquaredMatching()));
 
@@ -2506,63 +2506,15 @@ void ImageViewer::correctMorphAction() {
 }
 
 // ====== add by LE Van Linh
-void ImageViewer::readDirectory(QString path) {
-	qDebug() << "Read directory";
-	QDir qdir;
-	qdir.setPath(path);
-	qdir.setFilter(QDir::Files);
-	QStringList filterNames;
-	filterNames << "*.JPG";
-	qdir.setNameFilters(QStringList("*.JPG"));
-	QFileInfoList files = qdir.entryInfoList();
-
-	qdir.cdUp();
-	QString pathToSave = qdir.path() + "/Mandibule_gauche/";
-
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-
-	int runNumber = (files.size() > 50) ? files.size() : 50;
-	for (int i = 0; i < runNumber; i++) {
-		QFileInfo file = files.at(i);
-		QString _name = file.absoluteFilePath();
-		Image image(_name);
-		//loadImage(_name);
-		EdgeSegmentation edge;
-		qDebug() << _name;
-		cv::Mat enddest = scenario.edgeSegmentation(image);
-
-		//cv::Mat enddest = YellowGrid::act2(matImage);
-		//cv::Mat enddest = YellowGrid::histogram(matImage);
-		// display the result
-		/*ImageViewer *other = new ImageViewer;
-		 other->loadImage(enddest, ImageConvert::cvMatToQImage(enddest),
-		 "On -- " + file.fileName());
-		 other->addParameterPanel(new impls_2015::Lines(other), x() + 40,
-		 y() + 40);
-		 other->show();*/
-
-		// save the result
-		QDir saveDir;
-		saveDir.setPath(pathToSave);
-		if (!saveDir.exists())
-			QDir().mkdir(pathToSave);
-		QString fullPath = pathToSave + (file.fileName().replace(" ", ""));
-		if (fullPath.isEmpty()) {
-			return;
-		}
-		QApplication::setOverrideCursor(Qt::WaitCursor);
-		cv::imwrite(fullPath.toStdString(), enddest);
-		QApplication::restoreOverrideCursor();
-		enddest.release();
-	}
+void ImageViewer::edgeSegementDirectory(QString path) {
+	qDebug() << "Edge segmentation in directory";
+	QString outputPath = "test/segmentation_translate200/";
+	Scenario::edgeSegmentationDirectory(path,outputPath);
 }
 
-void ImageViewer::matchingDirectory(impls_2015::Image image, QString path) {
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-	scenario.matchingDirectory(image, path, Scenario::Chisquared ,
-			ShapeHistogram::TwelveTimeDegree);
+void ImageViewer::matchingDirectory(Image image, QString path) {
+	Scenario::matchingDirectory(image, path, GeometricHistogram::Bhattacharyya,
+			LocalHistogram::HaftDegree);
 
 }
 void ImageViewer::removeYLinesAction() {
@@ -2592,26 +2544,27 @@ void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
 
-	cv::Mat enddest(matImage.size(), CV_8UC3);
 	Image image(fileName);
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-	enddest = scenario.landmarksAutoDetect(image);
 
-	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-			"Using Histogram -- " + this->fileName);
-	other->show();
+	/*cv::Mat enddest(matImage.size(), CV_8UC3);
+	 Image image(fileName);
+	 IExtraction *extraction = new EdgeSegmentation();
+	 Scenario scenario(extraction);
+	 enddest = scenario.landmarksAutoDetect(image);
+
+	 ImageViewer *other = new ImageViewer;
+	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+	 "Landmark -- " + this->fileName);
+	 other->show();*/
+	qDebug() << "Done";
 }
 void ImageViewer::edgeSegmentation() {
 	qDebug() << "Edge segmentation.";
-	//readDirectory("/home/linh/Desktop/mandibule");
-	//readDirectory("/home/linh/Desktop/Mg");
+	//edgeSegementDirectory("/home/linh/Desktop/mandibule");
 
 	Image image(fileName);
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-	cv::Mat enddest = scenario.edgeSegmentation(image);
+	cv::Mat enddest;
+	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest);
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
@@ -2621,11 +2574,16 @@ void ImageViewer::edgeSegmentation() {
 }
 void ImageViewer::pairwiseHistogram() {
 	qDebug() << "Calculate the pairwise histogram of an image";
-	Image image(fileName);
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-	cv::Mat enddest = scenario.pairwiseHistogram(image);
 
+	Image image(fileName);
+	cv::Mat enddest;
+
+	Scenario::pairwiseHistogram(image, LocalHistogram::Degree,250, enddest);
+
+	// compute PGH on set of image in a folder and save the result into PGH file
+	/*QString folderPath = "/home/linh/Desktop/mandibule";
+	 Scenario::pairwiseHistogramDirectory(folderPath,LocalHistogram::Degree,250);
+*/
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Pairwise histogram");
@@ -2636,19 +2594,18 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	qDebug() << "Pairwise histogram matching using Bhattacharyya metric...";
 	Image image(fileName);
 
-	QString path = "/home/linh/Desktop/mandibule";
-	matchingDirectory(image, path);
+	/*QString path = "/home/linh/Desktop/mandibule";
+	 matchingDirectory(image, path);*/
 
-	/*QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 qDebug() << fileName2;
-	 Image image2(fileName2);
-	 IExtraction *extraction = new EdgeSegmentation();
-	 Scenario scenario(extraction);
-	 double matching = scenario.histogramMatching(image, image2,
-	 Scenario::Bhattacharyya, ShapeHistogram::TwoTimeDegree);
-	 qDebug() << "Matching metric: " << QString::number(matching, 'f', 20);*/
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
+	double matching = Scenario::pghMatching(image, image2,
+			GeometricHistogram::Bhattacharyya, LocalHistogram::Degree);
+	qDebug() << "Matching Bhattacharyya metric: "
+			<< QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
 void ImageViewer::pwChiSquaredMatching() {
@@ -2659,10 +2616,8 @@ void ImageViewer::pwChiSquaredMatching() {
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-	double matching = scenario.histogramMatching(image, image2,
-			Scenario::Chisquared, ShapeHistogram::TwoTimeDegree);
+	double matching = Scenario::pghMatching(image, image2,
+			GeometricHistogram::Chisquared, LocalHistogram::TwoTimeDegree);
 	qDebug() << "Chi-squared metric: " << QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
@@ -2674,10 +2629,8 @@ void ImageViewer::pwIntersectionMatching() {
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
-	IExtraction *extraction = new EdgeSegmentation();
-	Scenario scenario(extraction);
-	double matching = scenario.histogramMatching(image, image2,
-			Scenario::Intersection, ShapeHistogram::TwoTimeDegree);
+	double matching = Scenario::pghMatching(image, image2,
+			GeometricHistogram::Intersection, LocalHistogram::TwoTimeDegree);
 	qDebug() << "Intersection metric: " << QString::number(matching, 'f', 20);
 
 	qDebug() << "Done";

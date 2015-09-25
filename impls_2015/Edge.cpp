@@ -180,7 +180,6 @@ vector<Line> Edge::getLines(vector<cv::Point> listPoints) {
 			p0 = p1;
 		}
 	}
-
 	return listLines;
 }
 
@@ -189,10 +188,10 @@ vector<Line> Edge::getLines(vector<cv::Point> listPoints) {
  * @return: list of points, which are intersection between straight lines construct edge
  */
 vector<cv::Point> Edge::segment() {
-	/*breakPoints.clear();
+	breakPoints.clear();
 	breakEdge();
-	return breakPoints;*/
-	return breakEdge(this->listOfPoints);
+	return breakPoints;
+	//return breakEdge(this->listOfPoints);
 }
 /**
  * Drawing an edge
