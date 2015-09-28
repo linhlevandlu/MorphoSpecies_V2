@@ -42,6 +42,8 @@ public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
 	static cv::Mat pHoughTransform(cv::Mat inputImage);
+	static void test(vector<Line> refLines, vector<Line> sceneLines);
+
 
 	PHTEntry findHoughSpace(vector<PHTEntry> entryTable,
 			Line line1, Line line2);
@@ -49,7 +51,6 @@ public:
 	vector<PHTEntry> constructTable(vector<Line> lines);
 	vector<vector<int> > accumulator(Image refimage, Image sceneImage);
 	int maxOfAccumulator(vector<vector<int> > accumulator);
-	/*vector<Line> drawAccumulator(vector<vector<int> > accumulator, int threshold);*/
 };
 
 } /* namespace impls_2015 */

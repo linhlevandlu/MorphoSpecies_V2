@@ -153,6 +153,7 @@ void ImageViewer::activeFunction() {
 	pwhMatching->setEnabled(true);
 	pwhChisquared->setEnabled(true);
 	pwhIntersection->setEnabled(true);
+	phTransform->setEnabled(true);
 
 	//end
 	updateActions();
@@ -558,6 +559,14 @@ void ImageViewer::createActions() {
 	pwhIntersection->setShortcut(tr("Ctrl+I"));
 	connect(pwhIntersection, SIGNAL(triggered()), this,
 			SLOT(pwIntersectionMatching()));
+
+	phTransform = new QAction(tr("Probabilistic Hough Transform"),
+			this);
+	phTransform->setEnabled(false);
+	phTransform->setShortcut(tr("Ctrl+T"));
+	connect(phTransform, SIGNAL(triggered()), this,
+			SLOT(pHoughTransform()));
+
 	//end
 }
 
@@ -657,6 +666,7 @@ void ImageViewer::createMenus() {
 	other2015->addAction(pwhMatching);
 	other2015->addAction(pwhChisquared);
 	other2015->addAction(pwhIntersection);
+	other2015->addAction(phTransform);
 	other2015->addAction(removeLinesAct2); // landmarks detection
 	//end
 
@@ -2634,4 +2644,9 @@ void ImageViewer::pwIntersectionMatching() {
 	qDebug() << "Intersection metric: " << QString::number(matching, 'f', 20);
 
 	qDebug() << "Done";
+}
+
+void ImageViewer::pHoughTransform(){
+	qDebug()<<"Probabilistic Hough Transform...";
+
 }

@@ -172,6 +172,7 @@ private slots:
 	void pwChiSquaredMatching();
 	void pwIntersectionMatching();
 	void getLandmarks();
+	void pHoughTransform();
 
 private:
 	void createActions();
@@ -265,6 +266,7 @@ private:
 	QAction *pwhMatching; // matching 2 PGH of 2 image using Bhattachyya metric
 	QAction *pwhChisquared; // matching 2 PGH using chi-squared metric
 	QAction *pwhIntersection; // matching 2 PGH using intersection
+	QAction *phTransform;
 
 // end
 	QMenu *fileMenu;

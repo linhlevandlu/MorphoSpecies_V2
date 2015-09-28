@@ -31,6 +31,10 @@ cv::Mat PHoughTransform::pHoughTransform(cv::Mat inputImage) {
 	return inputImage;
 }
 
+void PHoughTransform::test(vector<Line> refLines, vector<Line> sceneLines){
+
+}
+
 void PHoughTransform::addPHTEntry(PHTEntry entry) {
 	this->accTable.push_back(entry);
 }
@@ -106,6 +110,8 @@ PHTEntry PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
 	}
 	return entry;
 }
+
+
 vector<vector<int> > PHoughTransform::accumulator(Image refimage,
 		Image sceneImage) {
 	int x = refimage.getMatrixImage().cols / 2;
@@ -158,29 +164,5 @@ int PHoughTransform::maxOfAccumulator(vector<vector<int> > accumulator) {
 	}
 	return max;
 }
-/* vector<Line> PHoughTransform::drawAccumulator(vector<vector<int> > accumulator,
- int threshold) {
- cv::Mat mat(cv::Size(accumulator[0].size(), accumulator.size()), CV_8UC3,
- cv::Scalar(0, 0, 0));
- vector<Line> lines;
- for (size_t i = 0; i < accumulator.size(); i++) { // theta
- for (size_t j = 0; j < accumulator[i].size(); j++) { // r
- if (accumulator[i][j] > threshold) {
- Point p1, p2;
- p1.x = 0;
- p1.y = (j - p1.x * cos(double(i * M_PI / 180)))
- / sin(double(i * M_PI / 180));
- p2.x = image_height - 0;
- p2.y = (j - p2.x * cos(double(i * M_PI / 180)))
- / sin(double(i * M_PI / 180));
- lines.push_back(Line(p1,p2));
 
- qDebug() << "position (theta, r): " << i << ", " << j
- << ", value: " << accumulator[i][j];
- } else
- accumulator[i][j] = 0;
- }
- }
- return lines;
- }*/
 } /* namespace impls_2015 */
