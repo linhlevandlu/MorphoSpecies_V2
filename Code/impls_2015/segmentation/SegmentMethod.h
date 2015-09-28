@@ -21,7 +21,7 @@ class SegmentMethod {
 public:
 	SegmentMethod();
 	virtual ~SegmentMethod();
-	vector<Line> lineSegment(Image image);
+	virtual vector<Line> lineSegment(Image image) = 0;
 };
 
 } /* namespace impls_2015 */

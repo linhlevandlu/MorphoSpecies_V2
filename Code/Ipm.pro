@@ -32,7 +32,8 @@ HEADERS += ImageViewer.h ImageConvert.h ui/NormalBlurPanel.h \
 	impls_2015/histograms/HistogramMethod.h impls_2015/histograms/GeometricHistogram.h \
 	impls_2015/landmarks/LandmarkMethod.h impls_2015/landmarks/LandmarkDetection.h \
 	impls_2015/segmentation/SegmentMethod.h impls_2015/segmentation/EdgeSegmentation.h \
-	impls_2015/pht/PHoughTransform.h
+	impls_2015/pht/PHoughTransform.h impls_2015/pht/HoughMethod.h impls_2015/pht/HoughSpace.h \
+	impls_2015/pht/PHTEntry.h
 	
 SOURCES += Ipm.cpp ImageViewer.cpp ImageConvert.cpp ui/NormalBlurPanel.cpp \
 	ui/GaussianBlurPanel.cpp ui/MedianBlurPanel.cpp ui/BilateralFilterPanel.cpp ui/ConvolutionFilterPanel.cpp\
@@ -46,4 +47,5 @@ SOURCES += Ipm.cpp ImageViewer.cpp ImageConvert.cpp ui/NormalBlurPanel.cpp \
 	impls_2015/histograms/HistogramMethod.cpp impls_2015/histograms/GeometricHistogram.cpp \
 	impls_2015/landmarks/LandmarkMethod.cpp impls_2015/landmarks/LandmarkDetection.cpp \
 	impls_2015/segmentation/SegmentMethod.cpp impls_2015/segmentation/EdgeSegmentation.cpp \
-	impls_2015/pht/PHoughTransform.cpp
+	impls_2015/pht/PHoughTransform.cpp  impls_2015/pht/HoughMethod.cpp impls_2015/pht/HoughSpace.cpp \
+	impls_2015/pht/PHTEntry.cpp

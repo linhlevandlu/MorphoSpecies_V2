@@ -25,27 +25,31 @@
 
 
 #include "../Line.h"
+#include "../Image.h"
+#include "HoughMethod.h"
+#include "PHTEntry.h"
 
 using namespace std;
 using namespace cv;
 
 namespace impls_2015 {
 
-class PHoughTransform {
+class PHoughTransform: public HoughMethod {
 private:
-	int image_width;
-	int image_height;
-	vector<vector<int> > accumulator;
+	Point refPoint;
+	vector<PHTEntry> accTable;
 public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
 	static cv::Mat pHoughTransform(cv::Mat inputImage);
 
-
-
-	vector<vector<int> > createAccumulator(vector<Line> lines, int width,int height);
+	PHTEntry findHoughSpace(vector<PHTEntry> entryTable,
+			Line line1, Line line2);
+	void addPHTEntry(PHTEntry entry);
+	vector<PHTEntry> constructTable(vector<Line> lines);
+	vector<vector<int> > accumulator(Image refimage, Image sceneImage);
 	int maxOfAccumulator(vector<vector<int> > accumulator);
-	vector<Line> drawAccumulator(vector<vector<int> > accumulator, int threshold);
+	/*vector<Line> drawAccumulator(vector<vector<int> > accumulator, int threshold);*/
 };
 
 } /* namespace impls_2015 */

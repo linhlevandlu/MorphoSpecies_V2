@@ -31,6 +31,7 @@ vector<LocalHistogram> GeometricHistogram::shapeHistogram(Image image,
 	pghHistogram.constructMatPGH(angleAcc, columns);
 
 	result = pghHistogram.presentation(listLocalPGH, angleAcc, columns);
+
 	return listLocalPGH;
 }
 
