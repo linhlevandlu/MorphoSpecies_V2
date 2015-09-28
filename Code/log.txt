@@ -1,0 +1,16 @@
+The process to calculate the histogram:
+- Compute the histogram of image to get the threshold value
+- Apply with threshold value, canny algorithm with threshold value
+- Get the edges after using canny
+- Break the edges into approximate lines.
+- Calculate the pairwise geometric histogram of pair lines.
+The shape geometric histogram is consist all PGH of all approximate lines.
+We develop 2 version for PGH:
+Version 1:(before 11 - 09 - 2015)
+ -- Angle axis: 180 bins (a bin for each degree)
+ -- Perpendicular distance: use width of reference for all images, if image have
+	the perpendicular distance greater than width, adding to the largest entries in 
+	histogram.
+Version 2: (11 - 09 - 2015)
+ -- Angle axis: accuracy to minutes 
+ -- Perpendicular distance: keep same with version 1
