@@ -103,6 +103,12 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 			angleAcc);
 }
 
+void Scenario::probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines, int width, int height){
+	PHoughTransform pht;
+
+	pht.test(refLines,sceneLines,width, height);
+}
+
 /**
  * Detect the landmarks on image automatically
  * @return: the image contains the landmarks

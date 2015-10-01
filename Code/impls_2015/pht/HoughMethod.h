@@ -23,7 +23,7 @@
 #include <fstream>
 #include <time.h>
 
-#include "../Image.h"
+//#include "../Image.h"
 
 
 using namespace std;
@@ -36,7 +36,7 @@ class HoughMethod {
 public:
 	HoughMethod();
 	virtual ~HoughMethod();
-	virtual vector<vector<int> > accumulator(Image refimage, Image sceneImage) = 0;
+	//virtual vector<vector<int> > createAccumulator(Image refimage, Image sceneImage) = 0;
 };
 
 } /* namespace impls_2015 */

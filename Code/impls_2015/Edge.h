@@ -35,6 +35,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 #include <QtCore/QDebug>
+#include <iostream>
+#include <istream>
+#include <fstream>
 
 #include "Line.h"
 #include "IDrawOperation.h"
@@ -68,6 +71,8 @@ public:
 	void addLine(Line line);
 	vector<cv::Point> segment();
 	cv::Mat drawing(cv::Mat outputImage);
+
+	static vector<Line> readFile(QString filePath);
 
 };
 

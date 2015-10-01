@@ -17,24 +17,51 @@ HoughSpace::HoughSpace() {
 HoughSpace::~HoughSpace() {
 	// TODO Auto-generated destructor stub
 }
-void HoughSpace::setDistance(Line objectLine, Point refPoint) {
-	this->distance = abs(objectLine.perpendicularDistance(refPoint));
-}
-void HoughSpace::setAngle(Line objectLine, Point refPoint) {
-	Line oX(refPoint, cv::Point(refPoint.x + 10, refPoint.y));
-	double temp = oX.angleBetweenLines(objectLine);
-	double theta;
-	if (temp <= 90) {
-		theta = 90 - temp;
+cv::Point HoughSpace::closestPoint(Line objectLine, Point origin) {
+	vector<double> equation = objectLine.equationOfLine();
+	double a = equation.at(0);
+	double b = equation.at(1);
+	double c = equation.at(2);
+	double x, y;
+	if (a == 0 && b == 1) {
+		x = origin.x;
+		y = c;
 	} else {
-		theta = temp - 90;
+		if (a == 1 && b == 0) {
+			x = c;
+			y = origin.y;
+		} else {
+			x = (b * (b * origin.x - a * origin.y) - (a * c)) / (a * a + b * b);
+			y = (a * (-b * origin.x + a * origin.y) - (b * c))
+					/ (a * a + b * b);
+		}
 	}
-	this->angle = theta;
+	//qDebug()<<"closet point: "<<x<<", "<<y;
+	return Point(x, y);
+}
+void HoughSpace::setDistance(double distance) {
+	this->distance = distance;
+}
+void HoughSpace::setAngle(double angle) {
+	this->angle = angle;
 }
 double HoughSpace::getDistance() {
 	return this->distance;
 }
 double HoughSpace::getAngle() {
 	return this->angle;
+}
+
+double HoughSpace::computeDistance(Line objectLine, Point refPoint) {
+	return abs(objectLine.perpendicularDistance(refPoint));
+}
+double HoughSpace::computeAngle(Line objectLine, Point refPoint) {
+	Line oX(refPoint, cv::Point(refPoint.x + 100, refPoint.y));
+	cv::Point pCloset = closestPoint(objectLine, refPoint);
+	Line distanceLine(refPoint, pCloset);
+	double theta = oX.angleBetweenLines(distanceLine);
+	if (pCloset.y > refPoint.y)
+		return (360 - theta);
+	return theta;
 }
 } /* namespace impls_2015 */

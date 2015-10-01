@@ -8,7 +8,13 @@
 #ifndef HOUGHSPACE_H_
 #define HOUGHSPACE_H_
 
-
+#include <QtGui/QMainWindow>
+#include <QtGui/QPrinter>
+#include <QtGui/QDialog>
+#include <QtGui/QWidget>
+#include <QtGui/QSlider>
+#include <QtCore/qqueue.h>
+#include <QtCore/QDebug>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -31,10 +37,13 @@ private:
 public:
 	HoughSpace();
 	virtual ~HoughSpace();
-	void setDistance(Line objectLine, Point refPoint);
-	void setAngle(Line objectLine, Point refPoint);
+	void setDistance(double distance);
+	void setAngle(double angle);
 	double getDistance();
 	double getAngle();
+	double computeDistance(Line objectLine, Point refPoint);
+	double computeAngle(Line objectLine, Point refPoint);
+	cv::Point closestPoint(Line objectLine, Point origin);
 };
 
 } /* namespace impls_2015 */

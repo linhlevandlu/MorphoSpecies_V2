@@ -48,7 +48,7 @@ public:
 			LocalHistogram::AccuracyPGH angleAcc, int columns);
 
 	void copyFile(QString folderPath, QString savePath);
-	vector<Line> readFile(QString filePath);
+
 };
 
 } /* namespace impls_2015 */

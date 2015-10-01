@@ -147,13 +147,12 @@ double Line::perpendicularDistance(cv::Point point) {
 /**
  * Find the intersection between two lines
  */
-cv::Point Line::intersection(Line objectLine) {
-	vector<double> equation1 = this->equationOfLine();
+cv::Point Line::intersection(vector<double> equation1,
+		vector<double> equation2) {
 	double a1 = equation1.at(0);
 	double b1 = equation1.at(1);
 	double c1 = equation1.at(2);
 
-	vector<double> equation2 = objectLine.equationOfLine();
 	double a2 = equation2.at(0);
 	double b2 = equation2.at(1);
 	double c2 = equation2.at(2);
@@ -181,8 +180,14 @@ cv::Point Line::intersection(Line objectLine) {
 		x = c / a;
 		y = (a1 * x) + c1;
 	}
-	//qDebug() << x << " dddd " << y;
 	return cv::Point(round(x), round(y));
+
+}
+cv::Point Line::intersection(Line objectLine) {
+	vector<double> equation1 = this->equationOfLine();
+
+	vector<double> equation2 = objectLine.equationOfLine();
+	return intersection(equation1, equation2);
 
 }
 /**
@@ -193,7 +198,7 @@ cv::Point Line::intersection(Line objectLine) {
 double Line::angleBetweenLines(Line objectLine) {
 
 	cv::Point inter = intersection(objectLine);
-	if (inter.x == -1 && inter.y == -1)
+	if (inter.x == -1 && inter.y == -1) // parallel line
 		return 0;
 	cv::Point ref2, obj2;
 
@@ -262,5 +267,35 @@ bool Line::operator==(Line &line) {
 					&& this->p2.x == lp1.x && this->p2.y == lp1.y))
 		return true;
 	return false;
+}
+vector<double> Line::parallelLine(double distance) {
+	int x0 = (this->p1.x + this->p2.x) / 2;
+	vector<double> eq = this->equationOfLine();
+	double a, b, c;
+	if (eq[0] == 0) { //a = 0
+		b = 1;
+		a = 0;
+		c = eq[2] + distance;
+	} else {
+		if (eq[1] == 0) { // b = 0
+			b = 0;
+			a = 1;
+			c = eq[2] + distance;
+		} else {
+			a = eq[0];
+			b = eq[1];
+			int y0 = a * x0 + eq[2];
+			c = (distance * (sqrt(a * a + b * b))) - (a * x0 + b * y0);
+		}
+	}
+	vector<double> equation;
+	equation.push_back(a);
+	equation.push_back(b);
+	equation.push_back(c);
+	return equation;
+}
+void Line::toString() {
+	qDebug() << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y
+			<< "))";
 }
 } /* namespace impls_2015 */

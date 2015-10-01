@@ -23,7 +23,6 @@
 #include <fstream>
 #include <time.h>
 
-
 #include "../Line.h"
 #include "../Image.h"
 #include "HoughMethod.h"
@@ -36,21 +35,27 @@ namespace impls_2015 {
 
 class PHoughTransform: public HoughMethod {
 private:
-	Point refPoint;
+	//Point refPoint;
 	vector<PHTEntry> accTable;
 public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
 	static cv::Mat pHoughTransform(cv::Mat inputImage);
-	static void test(vector<Line> refLines, vector<Line> sceneLines);
+	static void test(vector<Line> refLines, vector<Line> sceneLines,int width, int height);
 
-
-	PHTEntry findHoughSpace(vector<PHTEntry> entryTable,
-			Line line1, Line line2);
+	bool similarPairLines(Line ref1, Line ref2, Line scene1, Line scene2);
+	PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1,
+			Line line2);
 	void addPHTEntry(PHTEntry entry);
-	vector<PHTEntry> constructTable(vector<Line> lines);
-	vector<vector<int> > accumulator(Image refimage, Image sceneImage);
-	int maxOfAccumulator(vector<vector<int> > accumulator);
+	vector<PHTEntry> constructTable(vector<Line> lines, Point refPoint);
+	vector<vector<int> > createAccumulator(Point refPoint, vector<Line> sceneLines,int width, int height, int &maxValue);
+	vector<vector<int> > createAccumulator2(Point refPoint,
+			vector<Line> sceneLines, int width, int height, int &maxValue);
+
+	Point refPointInScene(vector<PHTEntry> tableEntry, vector<Line> sceneLines,
+			int width, int height);
+	Point refPointInScene(Image modelImage, Image sceneImage);
+	vector<HoughSpace> peaksOfAccumulator(vector<vector<int> > accumulator,int maxValue);
 };
 
 } /* namespace impls_2015 */

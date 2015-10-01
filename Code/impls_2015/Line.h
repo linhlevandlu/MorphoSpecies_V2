@@ -44,22 +44,27 @@ class Line: public QLine, IDrawOperation {
 private:
 	cv::Point p1;
 	cv::Point p2;
-	vector<double> equationOfLine();
+
 public:
+	vector<double> equationOfLine();
 	Line();
 	Line(cv::Point p1, cv::Point p2);
+
 	cv::Point getP1();
 	void setP1(cv::Point p);
 	cv::Point getP2();
 	void setP2(cv::Point p);
 	double length();
 	double perpendicularDistance(cv::Point point);
+	cv::Point intersection(vector<double> equation1, vector<double> equation2);
 	cv::Point intersection(Line objectLine);
 	double angleBetweenLines(Line objectLine);
 	bool checkBelongPoint(cv::Point point);
 	GFeatures pairwiseHistogram(Line objectLine);
 	cv::Mat drawing(cv::Mat outputImage);
 	bool operator==(Line &line);
+	void toString();
+	vector<double> parallelLine(double distance);
 };
 
 } /* namespace impls_2015 */

@@ -45,7 +45,7 @@
 #include "histograms/GeometricHistogram.h"
 #include "IExtraction.h"
 #include "ShapeHistogram.h"
-
+#include "pht/PHoughTransform.h"
 
 using namespace cv;
 using namespace std;
@@ -69,6 +69,7 @@ public:
 	static double pghMatching(Image refImage, Image sceneImage, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
 	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
 	static void pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums);
+	static void probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines,int width, int height);
 };
 
 } /* namespace impls_2015 */

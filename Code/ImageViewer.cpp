@@ -560,12 +560,10 @@ void ImageViewer::createActions() {
 	connect(pwhIntersection, SIGNAL(triggered()), this,
 			SLOT(pwIntersectionMatching()));
 
-	phTransform = new QAction(tr("Probabilistic Hough Transform"),
-			this);
+	phTransform = new QAction(tr("Probabilistic Hough Transform"), this);
 	phTransform->setEnabled(false);
 	phTransform->setShortcut(tr("Ctrl+T"));
-	connect(phTransform, SIGNAL(triggered()), this,
-			SLOT(pHoughTransform()));
+	connect(phTransform, SIGNAL(triggered()), this, SLOT(pHoughTransform()));
 
 	//end
 }
@@ -2519,7 +2517,7 @@ void ImageViewer::correctMorphAction() {
 void ImageViewer::edgeSegementDirectory(QString path) {
 	qDebug() << "Edge segmentation in directory";
 	QString outputPath = "test/segmentation_translate200/";
-	Scenario::edgeSegmentationDirectory(path,outputPath);
+	Scenario::edgeSegmentationDirectory(path, outputPath);
 }
 
 void ImageViewer::matchingDirectory(Image image, QString path) {
@@ -2588,12 +2586,12 @@ void ImageViewer::pairwiseHistogram() {
 	Image image(fileName);
 	cv::Mat enddest;
 
-	Scenario::pairwiseHistogram(image, LocalHistogram::Degree,250, enddest);
+	Scenario::pairwiseHistogram(image, LocalHistogram::Degree, 250, enddest);
 
 	// compute PGH on set of image in a folder and save the result into PGH file
 	/*QString folderPath = "/home/linh/Desktop/mandibule";
 	 Scenario::pairwiseHistogramDirectory(folderPath,LocalHistogram::Degree,250);
-*/
+	 */
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Pairwise histogram");
@@ -2646,7 +2644,23 @@ void ImageViewer::pwIntersectionMatching() {
 	qDebug() << "Done";
 }
 
-void ImageViewer::pHoughTransform(){
-	qDebug()<<"Probabilistic Hough Transform...";
+void ImageViewer::pHoughTransform() {
+	qDebug() << "Probabilistic Hough Transform...";
+	/*Image image(fileName);
+	 QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 qDebug() << fileName2;
+	 Image image2(fileName2);
+	Scenario::probabilisticHoughTransform(image.lineSegment(),
+				image2.lineSegment());*/
+	vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
+	vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test2.PGH");
+	//vector<Line> set3 = Edge::readFile("/home/linh/Desktop/test/test3.PGH");
+	//vector<Line> set4 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
+	Scenario::probabilisticHoughTransform(set1,set2,2000,2000);
+	//Scenario::probabilisticHoughTransform(set1,set3);
+	//Scenario::probabilisticHoughTransform(set1,set4);
 
+	qDebug() << "Done";
 }

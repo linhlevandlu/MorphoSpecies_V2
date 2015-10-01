@@ -87,18 +87,18 @@ void ShapeHistogram::createShape() {
 		Line l = set1.at(i);
 		mat = l.drawing(mat);
 	}
-	for (size_t i = 0; i < set2.size(); i++) {
+	/*for (size_t i = 0; i < set2.size(); i++) {
 		Line l = set2.at(i);
 		mat = l.drawing(mat);
-	}
+	}*/
 	for (size_t i = 0; i < set3.size(); i++) {
 		Line l = set3.at(i);
 		mat = l.drawing(mat);
 	}
-	for (size_t i = 0; i < set4.size(); i++) {
+	/*for (size_t i = 0; i < set4.size(); i++) {
 		Line l = set4.at(i);
 		mat = l.drawing(mat);
-	}
+	}*/
 
 	cv::namedWindow("Histogram", CV_WINDOW_AUTOSIZE);
 	cv::imshow("Histogram", mat);

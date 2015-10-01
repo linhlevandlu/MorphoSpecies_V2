@@ -185,24 +185,4 @@ void GeometricHistogram::copyFile(QString folderPath, QString savePath) {
 	}
 }
 
-vector<Line> GeometricHistogram::readFile(QString filePath) {
-	ifstream openFile(filePath.toStdString().c_str());
-	string lineText;
-	vector<Line> lines;
-	if (openFile.is_open()) {
-		while (getline(openFile, lineText)) {
-			QString sline = lineText.c_str();
-			sline = sline.replace("(", "").replace(")", "").replace(" ", ",");
-			QStringList listString = sline.split(",");
-			cv::Point point1(listString.at(0).toInt(),
-					listString.at(1).toInt());
-			cv::Point point2(listString.at(2).toInt(),
-					listString.at(3).toInt());
-			Line line(point1, point2);
-			lines.push_back(line);
-		}
-		openFile.close();
-	}
-	return lines;
-}
 } /* namespace impls_2015 */
