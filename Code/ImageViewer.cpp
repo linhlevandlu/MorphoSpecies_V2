@@ -2611,7 +2611,7 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Bhattacharyya, LocalHistogram::Degree);
+			GeometricHistogram::Bhattacharyya, LocalHistogram::Degree,250);
 	qDebug() << "Matching Bhattacharyya metric: "
 			<< QString::number(matching, 'f', 20);
 	qDebug() << "Done";
@@ -2625,7 +2625,7 @@ void ImageViewer::pwChiSquaredMatching() {
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Chisquared, LocalHistogram::TwoTimeDegree);
+			GeometricHistogram::Chisquared, LocalHistogram::Degree,250);
 	qDebug() << "Chi-squared metric: " << QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
@@ -2638,7 +2638,7 @@ void ImageViewer::pwIntersectionMatching() {
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Intersection, LocalHistogram::TwoTimeDegree);
+			GeometricHistogram::Intersection, LocalHistogram::Degree,250);
 	qDebug() << "Intersection metric: " << QString::number(matching, 'f', 20);
 
 	qDebug() << "Done";
@@ -2655,7 +2655,7 @@ void ImageViewer::pHoughTransform() {
 	Scenario::probabilisticHoughTransform(image.lineSegment(),
 				image2.lineSegment());*/
 	vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
-	vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test2.PGH");
+	vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
 	//vector<Line> set3 = Edge::readFile("/home/linh/Desktop/test/test3.PGH");
 	//vector<Line> set4 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
 	Scenario::probabilisticHoughTransform(set1,set2,2000,2000);

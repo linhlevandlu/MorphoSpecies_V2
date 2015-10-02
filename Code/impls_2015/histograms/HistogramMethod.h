@@ -19,7 +19,7 @@ class HistogramMethod {
 public:
 	HistogramMethod();
 	virtual ~HistogramMethod();
-	virtual vector<LocalHistogram> shapeHistogram(Image image, LocalHistogram::AccuracyPGH angleAcc, int columns,cv::Mat &result) = 0;
+	virtual vector<LocalHistogram> shapeHistogram(Image image, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,cv::Mat &result) = 0;
 };
 
 } /* namespace impls_2015 */

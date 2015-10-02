@@ -36,11 +36,11 @@ public:
 	GeometricHistogram();
 	virtual ~GeometricHistogram();
 	vector<LocalHistogram> shapeHistogram(Image image,
-			LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc, cv::Mat &result);
 	//cv::Mat representShapeHistogram(ShapeHistogram shapeHistogram, ShapeHistogram::AccuracyPGH angleAcc);
 	double pghHistogramMatching(Image refImage, Image sceneImage,
 			MatchingMethod matchingMethod,
-			LocalHistogram::AccuracyPGH angleAcc);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	void pghHistogramDirectoryMatching(Image refImage, QString folderPath,
 			MatchingMethod matchingMethod,
 			LocalHistogram::AccuracyPGH angleAcc);

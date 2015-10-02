@@ -88,10 +88,10 @@ void Scenario::pairwiseHistogramDirectory(QString folderPath,LocalHistogram::Acc
 
 double Scenario::pghMatching(Image refImage, Image sceneImage,
 		GeometricHistogram::MatchingMethod matching,
-		LocalHistogram::AccuracyPGH angleAcc) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	GeometricHistogram geomHistogram;
 	return geomHistogram.pghHistogramMatching(refImage, sceneImage, matching,
-			angleAcc);
+			angleAcc, distanceAcc);
 }
 
 void Scenario::matchingDirectory(Image refImage, QString directoryPath,

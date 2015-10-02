@@ -29,7 +29,6 @@ public:
 	Line getLine1();
 	Line getLine2();
 	vector<HoughSpace> getHoughSpaces();
-
 	void addHoughSpace(HoughSpace houghSpace);
 
 

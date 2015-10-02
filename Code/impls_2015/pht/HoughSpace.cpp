@@ -17,6 +17,10 @@ HoughSpace::HoughSpace() {
 HoughSpace::~HoughSpace() {
 	// TODO Auto-generated destructor stub
 }
+
+/**
+ * Tim giao diem cua objectLine va duong thang di qua diem origin, vuong goc voi objectLine
+ */
 cv::Point HoughSpace::closestPoint(Line objectLine, Point origin) {
 	vector<double> equation = objectLine.equationOfLine();
 	double a = equation.at(0);
@@ -55,6 +59,10 @@ double HoughSpace::getAngle() {
 double HoughSpace::computeDistance(Line objectLine, Point refPoint) {
 	return abs(objectLine.perpendicularDistance(refPoint));
 }
+
+/**
+ * Tinh goc tu refPoint toi objectLine (Ox la di qua refPoint)
+ */
 double HoughSpace::computeAngle(Line objectLine, Point refPoint) {
 	Line oX(refPoint, cv::Point(refPoint.x + 100, refPoint.y));
 	cv::Point pCloset = closestPoint(objectLine, refPoint);

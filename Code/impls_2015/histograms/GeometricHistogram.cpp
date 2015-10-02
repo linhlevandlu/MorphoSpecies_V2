@@ -37,7 +37,7 @@ vector<LocalHistogram> GeometricHistogram::shapeHistogram(Image image,
 
 double GeometricHistogram::pghHistogramMatching(Image refImage,
 		Image sceneImage, MatchingMethod matchingMethod,
-		LocalHistogram::AccuracyPGH angleAcc) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	clock_t t1, t2;
 	t1 = clock();
 
@@ -46,7 +46,7 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 	//refHist.constructPGH(refImage.lineSegment(), angleAcc, 0);
 
 	refHist.constructPGH(refImage.lineSegment());
-	refHist.constructMatPGH(angleAcc, 250);
+	refHist.constructMatPGH(angleAcc, distanceAcc);
 
 	/*vector<Line> set1 = readFile("test/segmentation/Md028.PGH");
 	refHist.constructPGH(set1);
@@ -58,7 +58,7 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 	//		refHist.getMaxDistance());
 
 	sceneHist.constructPGH(sceneImage.lineSegment());
-	sceneHist.constructMatPGH(angleAcc, 250);
+	sceneHist.constructMatPGH(angleAcc, distanceAcc);
 
 	/*vector<Line> set2 = readFile("test/segmentation_translate200/Md028.PGH");
 	sceneHist.constructPGH(set2);

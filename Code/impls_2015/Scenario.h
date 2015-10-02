@@ -66,7 +66,7 @@ public:
 	static void edgeSegmentationDirectory(QString inputFolder,QString saveFolder);
 	static vector<LocalHistogram> pairwiseHistogram(Image image,LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
 	static vector<Landmark> landmarksAutoDetect(Image image);
-	static double pghMatching(Image refImage, Image sceneImage, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
+	static double pghMatching(Image refImage, Image sceneImage, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
 	static void pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums);
 	static void probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines,int width, int height);
