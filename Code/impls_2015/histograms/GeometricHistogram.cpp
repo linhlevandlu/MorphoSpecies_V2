@@ -49,8 +49,8 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 	refHist.constructMatPGH(angleAcc, distanceAcc);
 
 	/*vector<Line> set1 = readFile("test/segmentation/Md028.PGH");
-	refHist.constructPGH(set1);
-	refHist.constructMatPGH(angleAcc, 250);*/
+	 refHist.constructPGH(set1);
+	 refHist.constructMatPGH(angleAcc, 250);*/
 
 	ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
 
@@ -61,8 +61,8 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 	sceneHist.constructMatPGH(angleAcc, distanceAcc);
 
 	/*vector<Line> set2 = readFile("test/segmentation_translate200/Md028.PGH");
-	sceneHist.constructPGH(set2);
-	sceneHist.constructMatPGH(angleAcc, 250);*/
+	 sceneHist.constructPGH(set2);
+	 sceneHist.constructMatPGH(angleAcc, 250);*/
 
 	double distance = getDistanceMetric(refHist, sceneHist, matchingMethod);
 	t2 = clock();
@@ -88,6 +88,69 @@ double GeometricHistogram::getDistanceMetric(ShapeHistogram refHist,
 		break;
 	}
 	return distance;
+}
+
+void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
+		MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
+		int distanceAcc) {
+	QDir qdir;
+	qdir.setPath(folderPath);
+	qdir.setFilter(QDir::Files);
+	qdir.setNameFilters(QStringList("*.JPG"));
+	QFileInfoList files = qdir.entryInfoList();
+
+	QString refName;
+	QString sceneName;
+	ofstream of("matching_result.txt");
+	/*of<<"\t";
+	for (int k = 0; k < files.size(); k++) {
+		QFileInfo file = files.at(k);
+		QString _name = file.absoluteFilePath();
+		int index2 = _name.lastIndexOf("/");
+		refName = _name.mid(index2 + 1, _name.length() - index2).replace(" ",
+				"");
+
+		of << "\t" << refName.toStdString();
+	}
+	of << "\n";*/
+
+	for (int i = 59; i < files.size(); i++) {
+		QFileInfo reffile = files.at(i);
+		QString _name = reffile.absoluteFilePath();
+		int index2 = _name.lastIndexOf("/");
+		refName = _name.mid(index2 + 1, _name.length() - index2).replace(" ",
+				"");
+		Image refImage(_name);
+		ShapeHistogram refHist = refImage.getShapeHistogram();
+		refHist.constructPGH(refImage.lineSegment());
+		refHist.constructMatPGH(angleAcc, distanceAcc);
+		of << refName.toStdString() << "\t";
+		for (int j = 0; j < files.size(); j++) {
+			if (j >= i) {
+				QFileInfo scenefile = files.at(j);
+				QString _name2 = scenefile.absoluteFilePath();
+				int index2 = _name2.lastIndexOf("/");
+				sceneName =
+						_name2.mid(index2 + 1, _name2.length() - index2).replace(
+								" ", "");
+				Image sceneImage(_name2);
+				ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
+				sceneHist.constructPGH(sceneImage.lineSegment());
+				sceneHist.constructMatPGH(angleAcc, distanceAcc);
+				double distance = getDistanceMetric(refHist, sceneHist, method);
+
+				of << distance << "\t";
+				qDebug()<<refName <<"\t"<< sceneName;
+				qDebug() << "Metric: " << QString::number(distance, 'f', 20);
+			}else{
+				of << "\t";
+			}
+
+		}
+		of << "\n";
+	}
+	of.close();
+
 }
 
 void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,

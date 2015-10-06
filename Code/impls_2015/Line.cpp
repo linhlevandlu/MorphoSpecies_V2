@@ -268,10 +268,10 @@ bool Line::operator==(Line &line) {
 		return true;
 	return false;
 }
-vector<double> Line::parallelLine(double distance) {
+vector<vector<double> > Line::parallelLine(double distance) {
 	int x0 = (this->p1.x + this->p2.x) / 2;
 	vector<double> eq = this->equationOfLine();
-	double a, b, c;
+	double a, b, c, c1;
 	if (eq[0] == 0) { //a = 0
 		b = 1;
 		a = 0;
@@ -285,14 +285,32 @@ vector<double> Line::parallelLine(double distance) {
 			a = eq[0];
 			b = eq[1];
 			int y0 = a * x0 + eq[2];
-			c = (distance * (sqrt(a * a + b * b))) - (a * x0 + b * y0);
+			double k = a * x0 + b * y0;
+			double m = distance * (sqrt(a * a + b * b));
+			double delta = 4 * m * m;
+			if (delta > 0) {
+				c = m - k;
+				c1 = -m - k;
+				qDebug() << "Nghiem cua phuong trinh: " << c << ", " << c1;
+			}
+			//c = (distance * (sqrt(a * a + b * b))) - (a * x0 + b * y0);
+			qDebug() << c;
 		}
 	}
-	vector<double> equation;
-	equation.push_back(a);
-	equation.push_back(b);
-	equation.push_back(c);
-	return equation;
+	vector<vector<double> > equations;
+	vector<double> equation1;
+	equation1.push_back(a);
+	equation1.push_back(b);
+	equation1.push_back(c);
+
+	vector<double> equation2;
+	equation2.push_back(a);
+	equation2.push_back(b);
+	equation2.push_back(c1);
+
+	equations.push_back(equation1);
+	equations.push_back(equation2);
+	return equations;
 }
 void Line::toString() {
 	qDebug() << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y

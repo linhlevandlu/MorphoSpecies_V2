@@ -64,7 +64,7 @@ public:
 	cv::Mat drawing(cv::Mat outputImage);
 	bool operator==(Line &line);
 	void toString();
-	vector<double> parallelLine(double distance);
+	vector<vector<double> > parallelLine(double distance);
 };
 
 } /* namespace impls_2015 */

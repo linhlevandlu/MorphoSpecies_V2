@@ -41,6 +41,7 @@ public:
 	static void test(vector<Line> refLines, vector<Line> sceneLines, int width,
 			int height);
 
+	bool closetLine(Line line1, Line line2);
 	vector<PHTEntry> constructTable(vector<Line> lines, Point refPoint);
 	bool similarPairLines(Line ref1, Line ref2, Line scene1, Line scene2);
 	PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1,
@@ -51,6 +52,9 @@ public:
 	Point refPointInScene(Image modelImage, Image sceneImage);
 	Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 			double &angleDiff);
+	vector<Point> readLandmarksFile(QString filePath);
+
+
 
 	vector<vector<int> > createAccumulator(Point refPoint,
 			vector<Line> sceneLines, int width, int height, int &maxValue);

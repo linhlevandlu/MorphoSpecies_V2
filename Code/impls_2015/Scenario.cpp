@@ -103,6 +103,15 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 			angleAcc);
 }
 
+void Scenario::matchingDirectory(QString directoryPath,
+		GeometricHistogram::MatchingMethod matching,
+		LocalHistogram::AccuracyPGH angleAcc,int distanceAcc) {
+	qDebug() << "Matching directory";
+	GeometricHistogram geomHistogram;
+	geomHistogram.phgHistogramDirMatching(directoryPath, matching,
+			angleAcc,distanceAcc);
+}
+
 void Scenario::probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines, int width, int height){
 	PHoughTransform pht;
 
