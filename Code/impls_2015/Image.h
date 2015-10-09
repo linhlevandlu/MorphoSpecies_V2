@@ -49,7 +49,7 @@ class Image: public IDrawOperation {
 private:
 	QString fileName;
 	vector<Edge> listOfEdges;
-	vector<Landmark> listOfLandmarks;
+	vector<Point> listOfLandmarks;
 	int histogramSize;
 	cv::Mat matrixImage;
 	ShapeHistogram pghHistogram;
@@ -91,6 +91,7 @@ public:
 	vector<Line> lineSegment();
 	void setShapeHistogram(ShapeHistogram shapeHistogram);
 	ShapeHistogram getShapeHistogram();
+	vector<Point> readLandmarksFile(QString filePath);
 };
 
 } /* namespace impls_2015 */

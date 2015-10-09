@@ -111,8 +111,8 @@ vector<Edge> Image::getEdges() {
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 	RNG rng(12345);
-	findContours(cannyImage, contours, hierarchy, RETR_CCOMP,
-			CHAIN_APPROX_NONE, Point(0, 0));
+	findContours(cannyImage, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_NONE,
+			Point(0, 0));
 	vector<Edge> edges;
 
 	for (size_t i = 0; i < contours.size(); i++) {
@@ -523,7 +523,7 @@ vector<Line> Image::lineSegment() {
 		vector<Line> lines = ed.getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
-	qDebug()<<"Total lines: " << totalLines.size();
+	qDebug() << "Total lines: " << totalLines.size();
 	return totalLines;
 }
 void Image::setShapeHistogram(ShapeHistogram shapeHistogram) {
@@ -531,5 +531,27 @@ void Image::setShapeHistogram(ShapeHistogram shapeHistogram) {
 }
 ShapeHistogram Image::getShapeHistogram() {
 	return this->pghHistogram;
+}
+vector<Point> Image::readLandmarksFile(QString filePath) {
+	ifstream openFile(filePath.toStdString().c_str());
+	string lineText;
+	vector<Point> landmarks;
+	if (openFile.is_open()) {
+		getline(openFile, lineText);
+		QString firsLine = (lineText.c_str());
+		int numOfLandmarks = firsLine.split("=").at(1).toInt();
+		int i = 0;
+		while (i < numOfLandmarks) {
+			getline(openFile, lineText);
+			QString line = lineText.c_str();
+			QStringList listString = line.split(" ");
+			cv::Point point1(listString.at(0).toDouble(),
+					listString.at(1).toDouble());
+			landmarks.push_back(point1);
+			i++;
+		}
+		openFile.close();
+	}
+	return landmarks;
 }
 } /* namespace impls_2015 */

@@ -43,7 +43,7 @@ public:
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	void pghHistogramDirectoryMatching(Image refImage, QString folderPath,
 			MatchingMethod matchingMethod,
-			LocalHistogram::AccuracyPGH angleAcc);
+			LocalHistogram::AccuracyPGH angleAcc,int distanceAcc);
 	void phgHistogramDirMatching(QString folderPath,
 			MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
 			int distanceAcc);

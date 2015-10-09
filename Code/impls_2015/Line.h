@@ -63,8 +63,10 @@ public:
 	GFeatures pairwiseHistogram(Line objectLine);
 	cv::Mat drawing(cv::Mat outputImage);
 	bool operator==(Line &line);
+	bool operator<(const Line& l2) const;
 	void toString();
 	vector<vector<double> > parallelLine(double distance);
+	bool isNull();
 };
 
 } /* namespace impls_2015 */

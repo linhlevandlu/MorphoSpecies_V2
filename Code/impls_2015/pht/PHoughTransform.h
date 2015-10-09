@@ -27,6 +27,7 @@
 #include "../Image.h"
 #include "HoughMethod.h"
 #include "PHTEntry.h"
+#include "TableEntry.h"
 
 using namespace std;
 using namespace cv;
@@ -37,7 +38,7 @@ class PHoughTransform: public HoughMethod {
 public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
-	static cv::Mat pHoughTransform(cv::Mat inputImage);
+
 	static void test(vector<Line> refLines, vector<Line> sceneLines, int width,
 			int height);
 
@@ -51,17 +52,19 @@ public:
 			vector<Line> &maxVector);
 	Point refPointInScene(Image modelImage, Image sceneImage);
 	Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
-			double &angleDiff);
+			double &angleDiff, int width, int height);
 	vector<Point> readLandmarksFile(QString filePath);
-
-
 
 	vector<vector<int> > createAccumulator(Point refPoint,
 			vector<Line> sceneLines, int width, int height, int &maxValue);
-	vector<vector<int> > createAccumulator2(Point refPoint,
-			vector<Line> sceneLines, int width, int height, int &maxValue);
 	vector<HoughSpace> peaksOfAccumulator(vector<vector<int> > accumulator,
 			int maxValue);
+
+	vector<TableEntry> referenceTable(vector<Line> refLines, Point refPoint);
+	bool similarLine(Line line1, Line line2, double &diff);
+	TableEntry matchingEntry(vector<TableEntry> entryTable, Line sceneLine);
+	vector<TableEntry> matchingInScene(vector<TableEntry> entryTable,
+			vector<Line> sceneLines, int width, int height);
 };
 
 } /* namespace impls_2015 */

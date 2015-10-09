@@ -291,10 +291,10 @@ vector<vector<double> > Line::parallelLine(double distance) {
 			if (delta > 0) {
 				c = m - k;
 				c1 = -m - k;
-				qDebug() << "Nghiem cua phuong trinh: " << c << ", " << c1;
+				//qDebug() << "Nghiem cua phuong trinh: " << c << ", " << c1;
 			}
-			//c = (distance * (sqrt(a * a + b * b))) - (a * x0 + b * y0);
-			qDebug() << c;
+			//double c2 = (distance * (sqrt(a * a + b * b))) - (a * x0 + b * y0);
+			//qDebug() << c2;
 		}
 	}
 	vector<vector<double> > equations;
@@ -315,5 +315,16 @@ vector<vector<double> > Line::parallelLine(double distance) {
 void Line::toString() {
 	qDebug() << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y
 			<< "))";
+}
+
+bool Line::operator<(const Line& l2) const{
+	if(p1.x < l2.p1.x)
+		return true;
+	return false;
+}
+bool Line::isNull(){
+	if(p1.x == p2.x && p1.y == p2.y)
+		return true;
+	return false;
 }
 } /* namespace impls_2015 */

@@ -40,7 +40,6 @@ cv::Point HoughSpace::closestPoint(Line objectLine, Point origin) {
 					/ (a * a + b * b);
 		}
 	}
-	//qDebug()<<"closet point: "<<x<<", "<<y;
 	return Point(x, y);
 }
 void HoughSpace::setDistance(double distance) {

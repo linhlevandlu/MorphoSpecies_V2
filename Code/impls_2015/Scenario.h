@@ -46,6 +46,8 @@
 #include "IExtraction.h"
 #include "ShapeHistogram.h"
 #include "pht/PHoughTransform.h"
+#include "landmarks/LandmarkDetection.h"
+
 
 using namespace cv;
 using namespace std;
@@ -65,9 +67,10 @@ public:
 	static vector<Line> edgeSegmentation(Image image,cv::Mat &result);
 	static void edgeSegmentationDirectory(QString inputFolder,QString saveFolder);
 	static vector<LocalHistogram> pairwiseHistogram(Image image,LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
-	static vector<Landmark> landmarksAutoDetect(Image image);
+	static vector<Point> landmarksAutoDetect(Image image,QString lpath,Image sceneImage);
+	static void landmarksDirectory(Image refImage, QString path,QString savePath, QString lmPath);
 	static double pghMatching(Image refImage, Image sceneImage, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
-	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc);
+	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc,int distanceAcc);
 	static void matchingDirectory(QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	static void pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums);
 	static void probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines,int width, int height);

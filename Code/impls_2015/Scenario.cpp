@@ -50,20 +50,22 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
 	return appLines;
 }
 
-void Scenario::edgeSegmentationDirectory(QString inputFolder,QString saveFolder){
+void Scenario::edgeSegmentationDirectory(QString inputFolder,
+		QString saveFolder) {
 	EdgeSegmentation edgeSegment;
-	edgeSegment.segmentDirectory(inputFolder,saveFolder);
+	edgeSegment.segmentDirectory(inputFolder, saveFolder);
 }
 vector<LocalHistogram> Scenario::pairwiseHistogram(Image image,
 		LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result) {
 	GeometricHistogram geomHistogram;
 	vector<LocalHistogram> pghHist = geomHistogram.shapeHistogram(image,
-			angleAcc,columns, result);
+			angleAcc, columns, result);
 
 	return pghHist;
 }
-void Scenario::pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums){
-	qDebug()<<"Pairwise for directory: ";
+void Scenario::pairwiseHistogramDirectory(QString folderPath,
+		LocalHistogram::AccuracyPGH angleAcc, int colums) {
+	qDebug() << "Pairwise for directory: ";
 	GeometricHistogram geomHistogram;
 
 	vector<LocalHistogram::AccuracyPGH> angleAccs;
@@ -77,11 +79,11 @@ void Scenario::pairwiseHistogramDirectory(QString folderPath,LocalHistogram::Acc
 	columns.push_back(250);
 	columns.push_back(500);
 	columns.push_back(1000);
-	for(size_t t=0;t<angleAccs.size();t++){
+	for (size_t t = 0; t < angleAccs.size(); t++) {
 		LocalHistogram::AccuracyPGH acc = angleAccs.at(t);
-		for(size_t k=0;k < columns.size();k++){
+		for (size_t k = 0; k < columns.size(); k++) {
 			int cl = columns.at(k);
-			geomHistogram.pairwiseHistogramDirectory(folderPath,acc,cl);
+			geomHistogram.pairwiseHistogramDirectory(folderPath, acc, cl);
 		}
 	}
 }
@@ -96,37 +98,44 @@ double Scenario::pghMatching(Image refImage, Image sceneImage,
 
 void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 		GeometricHistogram::MatchingMethod matching,
-		LocalHistogram::AccuracyPGH angleAcc) {
+		LocalHistogram::AccuracyPGH angleAcc,int distanceAcc) {
 	qDebug() << "Matching directory";
 	GeometricHistogram geomHistogram;
-	geomHistogram.pghHistogramDirectoryMatching(refImage, directoryPath, matching,
-			angleAcc);
+	geomHistogram.pghHistogramDirectoryMatching(refImage, directoryPath,
+			matching, angleAcc,distanceAcc);
 }
 
 void Scenario::matchingDirectory(QString directoryPath,
 		GeometricHistogram::MatchingMethod matching,
-		LocalHistogram::AccuracyPGH angleAcc,int distanceAcc) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	qDebug() << "Matching directory";
 	GeometricHistogram geomHistogram;
-	geomHistogram.phgHistogramDirMatching(directoryPath, matching,
-			angleAcc,distanceAcc);
+	geomHistogram.phgHistogramDirMatching(directoryPath, matching, angleAcc,
+			distanceAcc);
 }
 
-void Scenario::probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines, int width, int height){
+void Scenario::probabilisticHoughTransform(vector<Line> refLines,
+		vector<Line> sceneLines, int width, int height) {
 	PHoughTransform pht;
 
-	pht.test(refLines,sceneLines,width, height);
+	pht.test(refLines, sceneLines, width, height);
 }
 
 /**
  * Detect the landmarks on image automatically
  * @return: the image contains the landmarks
  */
-vector<Landmark> Scenario::landmarksAutoDetect(Image image) {
-	//cv::Mat result(image.getMatImage().size(), CV_8UC3);
+vector<Point> Scenario::landmarksAutoDetect(Image image, QString lpath,
+		Image sceneImage) {
 
-	// detect the step edges
-	vector<Landmark> landmarks;
+	vector<Point> landmarks;
+	LandmarkDetection lmdetection;
+	landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath);
 	return landmarks;
+}
+void Scenario::landmarksDirectory(Image refImage, QString path,
+		QString savePath, QString lmPath) {
+	LandmarkDetection lmdetection;
+	lmdetection.landmarksByDirectory(refImage, path,savePath,lmPath);
 }
 } /* namespace impls_2015 */

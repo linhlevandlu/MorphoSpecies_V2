@@ -2522,9 +2522,9 @@ void ImageViewer::edgeSegementDirectory(QString path) {
 
 void ImageViewer::matchingDirectory(Image image, QString path) {
 	/*Scenario::matchingDirectory(image, path, GeometricHistogram::Bhattacharyya,
-			LocalHistogram::HaftDegree);*/
+	 LocalHistogram::TwoTimeDegree,250);*/
 	Scenario::matchingDirectory(path, GeometricHistogram::Bhattacharyya,
-				LocalHistogram::HaftDegree,250);
+			LocalHistogram::HaftDegree, 250);
 
 }
 void ImageViewer::removeYLinesAction() {
@@ -2548,24 +2548,41 @@ void ImageViewer::removeYLinesAction() {
 	//other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
 	other->show();
 }
-
+void ImageViewer::landmarksByDirectory(Image refImage, QString path,
+		QString savePath, QString lmPath) {
+	qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	Scenario::landmarksDirectory(refImage, path, savePath, lmPath);
+}
 // remove yellow grid by using Histogram
 void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
 
 	Image image(fileName);
+	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 
-	/*cv::Mat enddest(matImage.size(), CV_8UC3);
-	 Image image(fileName);
-	 IExtraction *extraction = new EdgeSegmentation();
-	 Scenario scenario(extraction);
-	 enddest = scenario.landmarksAutoDetect(image);
+	/*QString folder = "/home/linh/Desktop/mandibule";
+	 QString saveFolder = "/home/linh/Desktop/correlation";
+	 landmarksByDirectory(image, folder, saveFolder, lpath);*/
 
-	 ImageViewer *other = new ImageViewer;
-	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-	 "Landmark -- " + this->fileName);
-	 other->show();*/
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	vector<Point> landmarks = Scenario::landmarksAutoDetect(image, lpath,
+			sceneImage);
+
+	Mat enddest(sceneImage.getMatrixImage().clone());
+	for (size_t i = 0; i < landmarks.size(); i++) {
+		Point lm = landmarks.at(i);
+		qDebug() << lm.x << ", " << (enddest.rows - lm.y);
+		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 0, 255), 2, 4);
+	}
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Landmark -- " + this->fileName);
+	other->show();
 	qDebug() << "Done";
 }
 void ImageViewer::edgeSegmentation() {
@@ -2605,17 +2622,17 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	Image image(fileName);
 
 	QString path = "/home/linh/Desktop/mandibule";
-	 matchingDirectory(image, path);
+	matchingDirectory(image, path);
 
 	/*QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	qDebug() << fileName2;
-	Image image2(fileName2);
-	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Bhattacharyya, LocalHistogram::Degree,250);
-	qDebug() << "Matching Bhattacharyya metric: "
-			<< QString::number(matching, 'f', 20);*/
+	 if (fileName2.isEmpty())
+	 return;
+	 qDebug() << fileName2;
+	 Image image2(fileName2);
+	 double matching = Scenario::pghMatching(image, image2,
+	 GeometricHistogram::Bhattacharyya, LocalHistogram::Degree,250);
+	 qDebug() << "Matching Bhattacharyya metric: "
+	 << QString::number(matching, 'f', 20);*/
 	qDebug() << "Done";
 }
 void ImageViewer::pwChiSquaredMatching() {
@@ -2627,7 +2644,7 @@ void ImageViewer::pwChiSquaredMatching() {
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Chisquared, LocalHistogram::Degree,250);
+			GeometricHistogram::Chisquared, LocalHistogram::Degree, 250);
 	qDebug() << "Chi-squared metric: " << QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
@@ -2640,7 +2657,7 @@ void ImageViewer::pwIntersectionMatching() {
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Intersection, LocalHistogram::Degree,250);
+			GeometricHistogram::Intersection, LocalHistogram::Degree, 250);
 	qDebug() << "Intersection metric: " << QString::number(matching, 'f', 20);
 
 	qDebug() << "Done";
@@ -2654,13 +2671,13 @@ void ImageViewer::pHoughTransform() {
 	 return;
 	 qDebug() << fileName2;
 	 Image image2(fileName2);
-	Scenario::probabilisticHoughTransform(image.lineSegment(),
-				image2.lineSegment());*/
-	//vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
-	//vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
-	vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
-	vector<Line> set4 = Edge::readFile("test/segmentation/Md029.PGH");
-	Scenario::probabilisticHoughTransform(set3,set4, 3264, 2448);
+	 Scenario::probabilisticHoughTransform(image.lineSegment(),
+	 image2.lineSegment());*/
+	vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
+	vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test2.PGH");
+	//vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
+	//vector<Line> set4 = Edge::readFile("test/segmentation/Md028.PGH");
+	Scenario::probabilisticHoughTransform(set1, set2, 2000, 2000); // 3264, 2448);
 	//Scenario::probabilisticHoughTransform(set1,set3);
 	//Scenario::probabilisticHoughTransform(set1,set4);
 

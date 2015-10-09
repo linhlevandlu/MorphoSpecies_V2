@@ -36,6 +36,9 @@
 #include <math.h>
 #include <QtCore/QDebug>
 #include <QtCore/qlist.h>
+#include <fstream>
+#include <QtGui/QFileDialog>
+#include <QtCore/qdir.h>
 
 #include "LandmarkMethod.h"
 #include "../Image.h"
@@ -55,7 +58,9 @@ public:
 	virtual ~LandmarkDetection();
 	void setNoise(double noise);
 	vector<Landmark> getLandmarks(Image image);
-
+	Mat createTemplate(Image image, Point landmark,int tsize, Point &location,Point &distance);
+	vector<Point> crossCorrelation(Image refImage,Image sceneImage, QString lmPath);
+	void landmarksByDirectory(Image refImage, QString path,QString savepath,QString lmPath);
 };
 
 } /* namespace impls_2015 */
