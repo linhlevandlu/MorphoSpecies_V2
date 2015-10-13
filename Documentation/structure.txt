@@ -1,0 +1,27 @@
+Contents
+- Introduction
+-- context of the internship
+--- PUF
+--- LaBRI
+-- The Internship
+--- Objectives
+--- Contributions
+--- Origanization of the document
+- Background
+-- Image processing
+-- Smooth image
+-- Image Transformation
+-- Histogram
+-- Segmentation
+-- Color processing (Color space base segmentation)
+-- Classification methods
+--- Detect the structure
+--- Pairwise geometric histogram (PGH)
+--- Probabilistic Hough Transform
+- The project
+-- Software architecture
+-- Image preprocessing: clear the yellow grid
+-- Program the classification methods
+-- Result
+- Conclusion 
+- References
