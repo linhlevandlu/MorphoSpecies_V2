@@ -98,11 +98,11 @@ double Scenario::pghMatching(Image refImage, Image sceneImage,
 
 void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 		GeometricHistogram::MatchingMethod matching,
-		LocalHistogram::AccuracyPGH angleAcc,int distanceAcc) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	qDebug() << "Matching directory";
 	GeometricHistogram geomHistogram;
 	geomHistogram.pghHistogramDirectoryMatching(refImage, directoryPath,
-			matching, angleAcc,distanceAcc);
+			matching, angleAcc, distanceAcc);
 }
 
 void Scenario::matchingDirectory(QString directoryPath,
@@ -130,12 +130,26 @@ vector<Point> Scenario::landmarksAutoDetect(Image image, QString lpath,
 
 	vector<Point> landmarks;
 	LandmarkDetection lmdetection;
-	landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath);
+	//landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath);
+
+	Point point;
+	int index2 = sceneImage.getFileName().lastIndexOf("/");
+	QString scenename = sceneImage.getFileName().mid(index2 + 1,
+			sceneImage.getFileName().length() - index2 - 5);
+	qDebug() << scenename;
+	QString slmPath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
+	double rs = lmdetection.centroid(image, sceneImage, lpath, slmPath, point);
+	qDebug() << "Point: " << point.x << ", " << point.y << ", centroid:  "
+			<< rs;
+
+	/*QString folder = "/home/linh/Desktop/mandibule";
+	QString lmfolder ="/home/linh/Desktop/landmarks";
+	lmdetection.centroidFolder(image,lpath,folder,lmfolder);*/
 	return landmarks;
 }
 void Scenario::landmarksDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {
 	LandmarkDetection lmdetection;
-	lmdetection.landmarksByDirectory(refImage, path,savePath,lmPath);
+	lmdetection.landmarksByDirectory(refImage, path, savePath, lmPath);
 }
 } /* namespace impls_2015 */

@@ -2562,7 +2562,7 @@ void ImageViewer::getLandmarks() {
 	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 
 	/*QString folder = "/home/linh/Desktop/mandibule";
-	 QString saveFolder = "/home/linh/Desktop/correlation";
+	 QString saveFolder = "/home/linh/Desktop/cross";
 	 landmarksByDirectory(image, folder, saveFolder, lpath);*/
 
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -2572,17 +2572,51 @@ void ImageViewer::getLandmarks() {
 	vector<Point> landmarks = Scenario::landmarksAutoDetect(image, lpath,
 			sceneImage);
 
+	int index2 = sceneImage.getFileName().lastIndexOf("/");
+	QString scenename = sceneImage.getFileName().mid(index2 + 1,
+			sceneImage.getFileName().length() - index2 - 5);
+	qDebug() << scenename;
+	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
+	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(spath);
+
 	Mat enddest(sceneImage.getMatrixImage().clone());
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		Point lm = landmarks.at(i);
-		qDebug() << lm.x << ", " << (enddest.rows - lm.y);
+		//qDebug() << lm.x << ", " << (enddest.rows - lm.y);
 		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 0, 255), 2, 4);
+		stringstream ss;
+		ss << i;
+		cv::putText(enddest, ss.str(), Point(lm.x, lm.y), FONT_HERSHEY_COMPLEX,
+				1, Scalar(0, 0, 255), 1, 8);
+		Point orglm = sceneLandmarks.at(i);
+		circle(enddest,
+				Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
+				Scalar(0, 255, 0), 2, 4);
+		cv::putText(enddest, ss.str(),
+				Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y),
+				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
+
+		Line diff(orglm, Point(lm.x, enddest.rows - lm.y));
+		qDebug() << "(" << orglm.x << "," << orglm.y << ")" << "\t" << "("
+				<< lm.x << "," << enddest.rows - lm.y << ")" << "\t"
+				<< diff.length();
+
+	}
+	QString segmentFile = "test/segmentation/" + scenename.replace(" ", "")
+			+ ".PGH";
+	vector<Line> setLines = Edge::readFile(segmentFile);
+
+	for (size_t i = 0; i < setLines.size(); i++) {
+		Line line = setLines.at(i);
+		cv::line(enddest, line.getP1(), line.getP2(), Scalar(255, 255, 0), 1,
+				8);
 	}
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
 	other->show();
+	//Scenario::landmarksAutoDetect(image, lpath, image);
 	qDebug() << "Done";
 }
 void ImageViewer::edgeSegmentation() {
@@ -2621,18 +2655,18 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	qDebug() << "Pairwise histogram matching using Bhattacharyya metric...";
 	Image image(fileName);
 
-	QString path = "/home/linh/Desktop/mandibule";
-	matchingDirectory(image, path);
+	/*QString path = "/home/linh/Desktop/mandibule";
+	 matchingDirectory(image, path);*/
 
-	/*QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 qDebug() << fileName2;
-	 Image image2(fileName2);
-	 double matching = Scenario::pghMatching(image, image2,
-	 GeometricHistogram::Bhattacharyya, LocalHistogram::Degree,250);
-	 qDebug() << "Matching Bhattacharyya metric: "
-	 << QString::number(matching, 'f', 20);*/
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
+	double matching = Scenario::pghMatching(image, image2,
+			GeometricHistogram::Bhattacharyya, LocalHistogram::Degree, 250);
+	qDebug() << "Matching Bhattacharyya metric: "
+			<< QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
 void ImageViewer::pwChiSquaredMatching() {
@@ -2673,11 +2707,11 @@ void ImageViewer::pHoughTransform() {
 	 Image image2(fileName2);
 	 Scenario::probabilisticHoughTransform(image.lineSegment(),
 	 image2.lineSegment());*/
-	vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
-	vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test2.PGH");
-	//vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
-	//vector<Line> set4 = Edge::readFile("test/segmentation/Md028.PGH");
-	Scenario::probabilisticHoughTransform(set1, set2, 2000, 2000); // 3264, 2448);
+	//vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
+	//vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
+	vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
+	vector<Line> set4 = Edge::readFile("test/segmentation/Md028.PGH");
+	Scenario::probabilisticHoughTransform(set3, set4, 3264, 2448);
 	//Scenario::probabilisticHoughTransform(set1,set3);
 	//Scenario::probabilisticHoughTransform(set1,set4);
 

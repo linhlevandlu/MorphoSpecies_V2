@@ -554,4 +554,14 @@ vector<Point> Image::readLandmarksFile(QString filePath) {
 	}
 	return landmarks;
 }
+QFileInfoList Image::readFolder(QString folderPath) {
+	QDir qdir;
+	qdir.setPath(folderPath);
+	qdir.setFilter(QDir::Files);
+	QStringList filterNames;
+	filterNames << "*.JPG";
+	qdir.setNameFilters(QStringList("*.JPG"));
+	QFileInfoList files = qdir.entryInfoList();
+	return files;
+}
 } /* namespace impls_2015 */

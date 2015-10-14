@@ -41,22 +41,15 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 	clock_t t1, t2;
 	t1 = clock();
 
+
+
 	ShapeHistogram refHist = refImage.getShapeHistogram();
-
-	//refHist.constructPGH(refImage.lineSegment(), angleAcc, 0);
-
 	refHist.constructPGH(refImage.lineSegment());
 	refHist.constructMatPGH(angleAcc, distanceAcc);
 
-	/*vector<Line> set1 = readFile("test/segmentation/Md028.PGH");
-	 refHist.constructPGH(set1);
-	 refHist.constructMatPGH(angleAcc, 250);*/
+	refHist.createShape();
 
 	ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
-
-	//sceneHist.constructPGH(sceneImage.lineSegment(), angleAcc,
-	//		refHist.getMaxDistance());
-
 	sceneHist.constructPGH(sceneImage.lineSegment());
 	sceneHist.constructMatPGH(angleAcc, distanceAcc);
 
@@ -93,11 +86,7 @@ double GeometricHistogram::getDistanceMetric(ShapeHistogram refHist,
 void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 		MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
 		int distanceAcc) {
-	QDir qdir;
-	qdir.setPath(folderPath);
-	qdir.setFilter(QDir::Files);
-	qdir.setNameFilters(QStringList("*.JPG"));
-	QFileInfoList files = qdir.entryInfoList();
+	QFileInfoList files = Image::readFolder(folderPath);
 
 	QString refName;
 	QString sceneName;
@@ -156,11 +145,7 @@ void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
 		QString folderPath, MatchingMethod matchingMethod,
 		LocalHistogram::AccuracyPGH angleAcc,int distanceAcc) {
-	QDir qdir;
-	qdir.setPath(folderPath);
-	qdir.setFilter(QDir::Files);
-	qdir.setNameFilters(QStringList("*.JPG"));
-	QFileInfoList files = qdir.entryInfoList();
+	QFileInfoList files = Image::readFolder(folderPath);
 
 	ofstream of("matching_result.txt");
 

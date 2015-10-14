@@ -39,6 +39,7 @@
 #include <fstream>
 #include <QtGui/QFileDialog>
 #include <QtCore/qdir.h>
+#include <ostream>
 
 #include "LandmarkMethod.h"
 #include "../Image.h"
@@ -61,6 +62,9 @@ public:
 	Mat createTemplate(Image image, Point landmark,int tsize, Point &location,Point &distance);
 	vector<Point> crossCorrelation(Image refImage,Image sceneImage, QString lmPath);
 	void landmarksByDirectory(Image refImage, QString path,QString savepath,QString lmPath);
+	double centroid(Image refImage, Image sceneImage, QString lmPath, QString slmPath, Point &center);
+	void centroidFolder(Image refImage, QString lmPath,
+			QString folderImages, QString folderlandmarks);
 };
 
 } /* namespace impls_2015 */

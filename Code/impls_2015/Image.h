@@ -26,6 +26,7 @@
 #include <QtGui/QPrinter>
 #include <QtCore/qlist.h>
 #include <QtCore/qstring.h>
+#include <QtCore/qdir.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -92,6 +93,9 @@ public:
 	void setShapeHistogram(ShapeHistogram shapeHistogram);
 	ShapeHistogram getShapeHistogram();
 	vector<Point> readLandmarksFile(QString filePath);
+
+
+	static QFileInfoList readFolder(QString folderPath);
 };
 
 } /* namespace impls_2015 */

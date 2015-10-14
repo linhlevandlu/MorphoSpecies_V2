@@ -59,12 +59,15 @@ public:
 			vector<Line> sceneLines, int width, int height, int &maxValue);
 	vector<HoughSpace> peaksOfAccumulator(vector<vector<int> > accumulator,
 			int maxValue);
-
-	vector<TableEntry> referenceTable(vector<Line> refLines, Point refPoint);
-	bool similarLine(Line line1, Line line2, double &diff);
-	TableEntry matchingEntry(vector<TableEntry> entryTable, Line sceneLine);
-	vector<TableEntry> matchingInScene(vector<TableEntry> entryTable,
-			vector<Line> sceneLines, int width, int height);
+	vector<TableEntry> referenceTable(vector<Line> refLines,
+			Point refPoint);
+	TableEntry matchingEntry(vector<TableEntry> entryTable,
+			Line sceneLine);
+	vector<TableEntry> matchingInScene(
+			vector<Line> modelLines, vector<Line> sceneLines, int width,
+			int height,Point refPoint);
+	Point refPointInScene(vector<TableEntry> matchLines,
+			double &angleDiff, int width, int height);
 };
 
 } /* namespace impls_2015 */

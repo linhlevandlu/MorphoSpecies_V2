@@ -71,6 +71,10 @@ public:
 	int distanceOffset(double distance, int cols);
 	void constructMatPGH(LocalHistogram::AccuracyPGH angleAcc, int cols);
 	void writeMatrix(QString fileName);
+
+	int lineLabel(LocalHistogram sceneHist, vector<LocalHistogram> modelHists);
+	vector<vector<Line> > sceneLinesLabel(vector<Line> sceneLines, vector<Line> modelLines);
+	Line getModelHypothesis(vector<vector<Line> > labelLines, Line sceneLine);
 };
 
 } /* namespace impls_2015 */

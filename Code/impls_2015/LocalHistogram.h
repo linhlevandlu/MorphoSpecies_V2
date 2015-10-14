@@ -50,12 +50,12 @@ public:
 	double getMaxDistance();
 	void addGFeatures(GFeatures features);
 	vector<vector<int> > constructorMatrix(AccuracyPGH angleAcc, int distanceAxis,int &totalEntries);
-	double bhattacharyyaMetric(LocalHistogram sceneHistogram,AccuracyPGH angleAcc);
+	double bhattacharyyaMetric(LocalHistogram sceneHistogram, int distanceAxis, AccuracyPGH angleAcc);
 
 	static int accuracyToTimeDegree(double angle,
 			AccuracyPGH angleAcc);
 	static int heightOfAngleAxis(AccuracyPGH angleAcc);
-
+	static int distanceOffset(double maxDistance, double distance, int cols);
 };
 
 } /* namespace impls_2015 */

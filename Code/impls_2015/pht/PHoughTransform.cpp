@@ -20,8 +20,8 @@ PHoughTransform::~PHoughTransform() {
 void PHoughTransform::test(vector<Line> refLines, vector<Line> sceneLines,
 		int width, int height) {
 
-	std::sort(refLines.begin(), refLines.end());
-	std::sort(sceneLines.begin(), sceneLines.end());
+	//std::sort(refLines.begin(), refLines.end());
+	//std::sort(sceneLines.begin(), sceneLines.end());
 	qDebug() << "test accumulator";
 	PHoughTransform pht;
 	Point hPoint(width / 2, height / 2);
@@ -38,26 +38,37 @@ void PHoughTransform::test(vector<Line> refLines, vector<Line> sceneLines,
 	Point refPoint = pht.refPointInScene(entry, maxVector, angleDiff, width,
 			height);
 
+	//===========================
+	/*vector<TableEntry> tableEntries = pht.matchingInScene(refLines,sceneLines,width,height,hPoint);
+	 qDebug() << "finished table";
+	 double angleDiff = 0;
+	 Point refPoint = pht.refPointInScene(tableEntries,angleDiff,width,height);*/
+	//===================
+	qDebug() << "Reference scene point: (" << refPoint.x << ", " << refPoint.y
+			<< ")";
+
 	cv::Mat mat(cv::Size(width, height), CV_8UC3, cv::Scalar(0, 0, 0));
 	for (size_t t = 0; t < sceneLines.size(); t++) {
 		Line l = sceneLines.at(t);
-		if (l.length() > 20)
+		if (l.length() > 50)
 			mat = l.drawing(mat);
 	}
 
 	vector<Point> landmarks;
 	landmarks = pht.readLandmarksFile(
-			"/home/linh/Desktop/landmarks/test.TPS");
+			"/home/linh/Desktop/landmarks/Md 028.TPS");
 
 	for (size_t t = 0; t < landmarks.size(); t++) {
 		Point landm = landmarks.at(t);
-		circle(mat, cv::Point(landm.x, landm.y), 7, Scalar(0, 0, 255),
+		circle(mat, cv::Point(landm.x, height - landm.y), 7, Scalar(0, 0, 255),
 				1, 4);
 	}
 
 	circle(mat, hPoint, 5, Scalar(0, 0, 255), 1, 8);
-	circle(mat, cv::Point(refPoint.x, refPoint.y), 5, Scalar(0, 255, 0), 1, 8);
+	circle(mat, cv::Point(refPoint.x, height - refPoint.y), 5,
+			Scalar(0, 255, 0), 1, 8);
 
+	qDebug() << "angle difference: " << angleDiff;
 	for (size_t t = 0; t < landmarks.size(); t++) {
 		Point lm = landmarks.at(t);
 		int px = hPoint.x - refPoint.x;
@@ -76,18 +87,18 @@ void PHoughTransform::test(vector<Line> refLines, vector<Line> sceneLines,
 					- hPoint.y * sin(round(angleDiff) * M_PI / 180) + hPoint.x;
 			refY = hPoint.x * sin(round(angleDiff) * M_PI / 180)
 					+ hPoint.y * cos(round(angleDiff) * M_PI / 180) + hPoint.y;
-			qDebug() << refX << ", " << refY;
+			//qDebug() << refX << ", " << refY;
 			px = refX - refPoint.x;
 			py = refY - refPoint.y;
 			x = x - px;
-			y = y - py;
+			y = y + py;
 
 		} else {
 			x = lm.x - px;
-			y = lm.y - py;
+			y = lm.y + py;
 		}
-		qDebug() << x << "," << y;
-		circle(mat, cv::Point(x, y), 2, Scalar(0, 255, 255), 1, 8);
+		//qDebug() << x << "," << y;
+		circle(mat, cv::Point(x, height - y), 2, Scalar(0, 255, 255), 1, 8);
 	}
 	imwrite("test/images/scene.jpg", mat);
 	cv::namedWindow("DetectLines", CV_WINDOW_AUTOSIZE);
@@ -177,6 +188,7 @@ bool PHoughTransform::closetLine(Line line1, Line line2) {
  */
 bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 		Line scene2) {
+
 	double refAngle = ref1.angleBetweenLines(ref2);
 	double refscaleRatio = ref1.length() / ref2.length();
 	Line temp(ref1.getP1(), ref2.getP1());
@@ -193,20 +205,6 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 		return true;
 	}
 	return false;
-
-	/*int dx11 = abs(ref1.getP1().x - ref1.getP2().x);
-	 int dy11 = abs(ref1.getP1().y - ref1.getP2().y);
-	 int dx12 = abs(ref2.getP1().x - ref2.getP1().x);
-	 int dy12 = abs(ref2.getP1().y - ref2.getP2().y);
-
-	 int dx21 = abs(scene1.getP1().x - scene1.getP1().x);
-	 int dy21 = abs(scene1.getP2().y - scene1.getP2().y);
-	 int dx22 = abs(scene2.getP2().x - scene2.getP1().x);
-	 int dy22 = abs(scene2.getP2().y - scene2.getP2().y);
-	 if(abs(dx11 - dx21) <= 5 && abs(dy11 - dy21) <= 5 && abs(dx12 - dx22) <= 5 && abs(dy12 - dy22) <= 5)
-	 return true;
-	 return false;*/
-
 }
 
 /**
@@ -272,6 +270,7 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 			}
 		}
 	}
+	qDebug() << "Number of maxVector: " << maxVector.size();
 	/*qDebug() << "maximum value in HS: " << maxValue;
 	 if (maxValue > 0) {
 	 cv::Mat matImg(cv::Size(361, rows), CV_8UC3, cv::Scalar(0, 0, 0));
@@ -313,7 +312,7 @@ Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	Line lineOrient;
 	if ((inter.x == -1 && inter.y == -1)
 			|| (abs(lineEntry1.length() - objl1.length())
-					<= abs(lineEntry1.length() - objl2.length()))) { // matching lines
+					< abs(lineEntry1.length() - objl2.length()))) { // matching lines
 		hs1 = entry.getHoughSpaces().at(0);
 		hs2 = entry.getHoughSpaces().at(1);
 		lineOrient = lineEntry1;
@@ -339,8 +338,8 @@ Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
 			//qDebug()<<"i,j "<<i<<", "<<j;
 			if (temp.x >= 0 && temp.x <= width && temp.y >= 0
 					&& temp.y <= height) {
-				qDebug() << hs1.getAngle();
-				qDebug() << hs1.computeAngle(objl1, temp) + round(angleDiff);
+				//qDebug() << hs1.getAngle();
+				//qDebug() << hs1.computeAngle(objl1, temp) + round(angleDiff);
 
 				if (round(hs1.computeAngle(objl1, temp) + round(angleDiff))
 						== round(hs1.getAngle())
@@ -409,7 +408,8 @@ vector<HoughSpace> PHoughTransform::peaksOfAccumulator(
 	}
 	return peaks;
 }
-
+//================================================================================
+// another method
 vector<TableEntry> PHoughTransform::referenceTable(vector<Line> refLines,
 		Point refPoint) {
 	vector<TableEntry> refTable;
@@ -428,41 +428,20 @@ vector<TableEntry> PHoughTransform::referenceTable(vector<Line> refLines,
 	return refTable;
 }
 
-bool PHoughTransform::similarLine(Line line1, Line line2, double &diff) {
-	// orientation and position
-	Line refLine(Point(0, 0), Point(100, 0));
-	double angle1 = refLine.angleBetweenLines(line1);
-	double angle2 = refLine.angleBetweenLines(line2);
-	double ratio = angle1 / angle2;
-	if (abs(ratio) > 0.8 && abs(ratio) < 1.2) {
-		diff = abs(ratio - 1);
-		return true;
-	}
-	return false;
-}
-
 TableEntry PHoughTransform::matchingEntry(vector<TableEntry> entryTable,
 		Line sceneLine) {
 
-	std::sort(entryTable.begin(), entryTable.end());
-
 	TableEntry entry;
-	double diff, match = 1;
 	for (size_t i = 0; i < entryTable.size(); i++) {
-		Line ref1 = entryTable.at(i).getLine();
-		if (similarLine(ref1, sceneLine, diff)) {
-			if (diff <= match) {
-				match = diff;
-				entry = entryTable.at(i);
-			}
+		Line refLine = entryTable.at(i).getLine();
+		if (refLine == sceneLine) {
+			entry = entryTable.at(i);
 		}
 	}
 	return entry;
 }
-
-vector<TableEntry> PHoughTransform::matchingInScene(
-		vector<TableEntry> entryTable, vector<Line> sceneLines, int width,
-		int height) {
+vector<TableEntry> PHoughTransform::matchingInScene(vector<Line> modelLines,
+		vector<Line> sceneLines, int width, int height, Point refPoint) {
 	vector<vector<int> > acc;
 	int rows = floor(sqrt(width * width + height * height));
 	acc.resize(rows);
@@ -471,65 +450,124 @@ vector<TableEntry> PHoughTransform::matchingInScene(
 	}
 
 	int maxValue = 0;
+	//vector<TableEntry> entryTable = referenceTable(modelLines, refPoint);
 
+	ShapeHistogram shapeHist;
+	vector<vector<Line> > linesLabel = shapeHist.sceneLinesLabel(sceneLines,
+			modelLines);
 	vector<TableEntry> entries;
-	for (size_t i = 0; i < sceneLines.size(); i++) {
-		Line line1 = sceneLines.at(i);
-		for (size_t j = 0; j < sceneLines.size(); j++) {
-			if (i != j) {
-				Line line2 = sceneLines.at(j);
-				if (closetLine(line1, line2)) {
+	for (size_t i = 0; i < linesLabel.size(); i++) {
+		Line sline = linesLabel.at(i).at(0);
+		Line rline = linesLabel.at(i).at(1);
+		HoughSpace hsp;
+		double angle = hsp.computeAngle(rline, refPoint);
+		double distance = hsp.computeDistance(rline, refPoint);
+		hsp.setAngle(angle);
+		hsp.setDistance(distance);
+		TableEntry entry;
+		entry.setRefLine(sline);
+		entry.setHoughValue(hsp);
+		entries.push_back(entry);
+	}
 
-					TableEntry entry1 = matchingEntry(entryTable, line1);
-					HoughSpace hsp1 = entry1.getHoughValue();
-					double angle1 = hsp1.getAngle();
-					double distance1 = hsp1.getDistance();
-					if (entry1.getLine().isNull() && !isnan(angle1)
-							&& angle1 > 0 && !isnan(distance1)
-							&& distance1 > 0) {
-						acc[distance1][angle1] += 1;
-						TableEntry tentry1;
-						tentry1.setRefLine(line1);
-						tentry1.setHoughValue(hsp1);
+	/*for (size_t i = 0; i < sceneLines.size(); i++) {
+	 Line line1 = sceneLines.at(i);
+	 for (size_t j = 0; j < sceneLines.size(); j++) {
+	 if (i != j) {
+	 Line line2 = sceneLines.at(j);
+	 if (closetLine(line1, line2)) {
 
-						if (acc[distance1][angle1] > maxValue) {
-							entries.clear();
-							maxValue = acc[distance1][angle1];
-							entries.push_back(tentry1);
-						} else {
-							if (acc[distance1][angle1] == maxValue) {
-								entries.push_back(tentry1);
-							}
-						}
-					}
+	 Line l1 = shapeHist.getModelHypothesis(linesLabel, line1);
 
-					TableEntry entry2 = matchingEntry(entryTable, line2);
-					HoughSpace hsp2 = entry2.getHoughValue();
-					double angle2 = hsp2.getAngle();
-					double distance2 = hsp2.getDistance();
-					if (!entry2.getLine().isNull() && !isnan(angle2)
-							&& angle2 > 0 && !isnan(distance2)
-							&& distance2 > 0) {
-						acc[distance2][angle2] += 1;
-						TableEntry tentry2;
-						tentry2.setRefLine(line2);
-						tentry2.setHoughValue(hsp2);
+	 TableEntry entry1 = matchingEntry(entryTable, l1);
+	 HoughSpace hsp1 = entry1.getHoughValue();
+	 double angle1 = hsp1.getAngle();
+	 double distance1 = hsp1.getDistance();
+	 if (!entry1.getLine().isNull() && !isnan(angle1)
+	 && angle1 > 0 && !isnan(distance1)
+	 && distance1 > 0) {
+	 acc[distance1][angle1] += 1;
+	 TableEntry tentry1;
+	 tentry1.setRefLine(line1);
+	 tentry1.setHoughValue(hsp1);
 
-						if (acc[distance2][angle2] > maxValue) {
-							entries.clear();
-							maxValue = acc[distance2][angle2];
-							entries.push_back(tentry2);
-						} else {
-							if (acc[distance2][angle2] == maxValue) {
-								entries.push_back(tentry2);
-							}
-						}
-					}
+	 if (acc[distance1][angle1] > maxValue) {
+	 entries.clear();
+	 maxValue = acc[distance1][angle1];
+	 entries.push_back(tentry1);
+	 } else {
+	 if (acc[distance1][angle1] == maxValue) {
+	 entries.push_back(tentry1);
+	 }
+	 }
+	 }
+
+	 Line l2 = shapeHist.getModelHypothesis(linesLabel, line2);
+	 TableEntry entry2 = matchingEntry(entryTable, l2);
+	 HoughSpace hsp2 = entry2.getHoughValue();
+	 double angle2 = hsp2.getAngle();
+	 double distance2 = hsp2.getDistance();
+	 if (!entry2.getLine().isNull() && !isnan(angle2)
+	 && angle2 > 0 && !isnan(distance2)
+	 && distance2 > 0) {
+	 acc[distance2][angle2] += 1;
+	 TableEntry tentry2;
+	 tentry2.setRefLine(line2);
+	 tentry2.setHoughValue(hsp2);
+
+	 if (acc[distance2][angle2] > maxValue) {
+	 entries.clear();
+	 maxValue = acc[distance2][angle2];
+	 entries.push_back(tentry2);
+	 } else {
+	 if (acc[distance2][angle2] == maxValue) {
+	 entries.push_back(tentry2);
+	 }
+	 }
+	 }
+	 }
+	 }
+	 }
+	 }*/
+	return entries;
+}
+
+Point PHoughTransform::refPointInScene(vector<TableEntry> matchLines,
+		double &angleDiff, int width, int height) {
+	if (matchLines.size() < 2)
+		return Point(0, 0);
+	TableEntry entry1 = matchLines.at(0);
+	Line line1 = entry1.getLine();
+	TableEntry entry2 = matchLines.at(1);
+	Line line2 = entry2.getLine();
+
+	vector<vector<double> > pline1 = line1.parallelLine(
+			entry1.getHoughValue().getDistance());
+	vector<vector<double> > pline2 = line2.parallelLine(
+			entry2.getHoughValue().getDistance());
+	cv::Point intersect;
+	HoughSpace hs1;
+	for (size_t i = 0; i < pline1.size(); i++) {
+		vector<double> l1 = pline1.at(i);
+		for (size_t j = 0; j < pline2.size(); j++) {
+			vector<double> l2 = pline2.at(j);
+			Point temp = line1.intersection(l1, l2);
+			if (temp.x >= 0 && temp.x <= width && temp.y >= 0
+					&& temp.y <= height) {
+				if (round(hs1.computeAngle(line1, temp))
+						== round(entry1.getHoughValue().getAngle())
+						&& round(hs1.computeAngle(line2, temp))
+								== round(entry2.getHoughValue().getAngle())) {
+					intersect = temp;
 				}
 			}
 		}
 	}
-	return entries;
+
+	//cv::Point intersect = objl1.intersection(pline1, pline2);
+
+	qDebug() << "Point intersection: " << intersect.x << ", " << intersect.y;
+	return intersect;
 }
 
 } /* namespace impls_2015 */
