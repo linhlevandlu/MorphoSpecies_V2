@@ -2516,7 +2516,7 @@ void ImageViewer::correctMorphAction() {
 // ====== add by LE Van Linh
 void ImageViewer::edgeSegementDirectory(QString path) {
 	qDebug() << "Edge segmentation in directory";
-	QString outputPath = "test/segmentation_translate200/";
+	QString outputPath = "/home/linh/Desktop/segmentation_rotation15/";
 	Scenario::edgeSegmentationDirectory(path, outputPath);
 }
 
@@ -2699,21 +2699,37 @@ void ImageViewer::pwIntersectionMatching() {
 
 void ImageViewer::pHoughTransform() {
 	qDebug() << "Probabilistic Hough Transform...";
-	/*Image image(fileName);
-	 QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 qDebug() << fileName2;
-	 Image image2(fileName2);
-	 Scenario::probabilisticHoughTransform(image.lineSegment(),
-	 image2.lineSegment());*/
+
+	Image image(fileName);
+	QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
+
+	/*QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
+	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
+			reflmPath);
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Probabilistic Hough Transform");
+	other->show();*/
+
+	/*
+	 * Working on each image
+	 */
 	//vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
 	//vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
-	vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
-	vector<Line> set4 = Edge::readFile("test/segmentation/Md028.PGH");
-	Scenario::probabilisticHoughTransform(set3, set4, 3264, 2448);
-	//Scenario::probabilisticHoughTransform(set1,set3);
-	//Scenario::probabilisticHoughTransform(set1,set4);
-
+	//vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
+	//vector<Line> set4 = Edge::readFile("test/segmentation/Md022.PGH");
+	//Scenario::probabilisticHoughTransform(set3, set4, reflmPath, 3264, 2448);
+	/*
+	 * Working on directory
+	 */
+	QString sceneImageDir = "/home/linh/Desktop/mandibule";
+	QString sceneLMDir = "/home/linh/Desktop/landmarks";
+	QString saveDir = "/home/linh/Desktop/phtEstimate";
+	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
+			saveDir);
 	qDebug() << "Done";
 }

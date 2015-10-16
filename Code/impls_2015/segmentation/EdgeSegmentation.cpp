@@ -31,7 +31,6 @@ namespace impls_2015 {
 EdgeSegmentation::EdgeSegmentation() {
 }
 
-
 vector<Line> EdgeSegmentation::lineSegment(Image image) {
 	return image.lineSegment();
 }
@@ -46,13 +45,7 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 	return resultImage;
 }
 void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
-	QDir qdir;
-	qdir.setPath(inputPath);
-	qdir.setFilter(QDir::Files);
-	QStringList filterNames;
-	filterNames << "*.JPG";
-	qdir.setNameFilters(QStringList("*.JPG"));
-	QFileInfoList files = qdir.entryInfoList();
+	QFileInfoList files = Image::readFolder(inputPath);
 
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
@@ -61,17 +54,37 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
 
 		qDebug() << _name;
 		int index2 = _name.lastIndexOf("/");
-		QString scenename = savePath
-				+ _name.mid(index2 + 1, _name.length() - index2 - 5).replace(
-						" ", "") + ".PGH";
+		QString scenename =
+				_name.mid(index2 + 1, _name.length() - index2 - 5).replace(" ",
+						"");
+		QString pghName = savePath + scenename + ".PGH";
 		vector<Line> lines = image.lineSegment();
-		ofstream of(scenename.toStdString().c_str());
+
+		//write the coordinates
+		/*int x1, y1, x2, y2;
+		ofstream of(pghName.toStdString().c_str());
 		for (size_t i = 0; i < lines.size(); i++) {
 			Line line = lines.at(i);
-			of << "(" << (line.getP1().x) << "," << (line.getP1().y) << ")" << " ("
-					<< (line.getP2().x) << "," << (line.getP2().y) << ")" << "\n";
+			// rotation 15 degree
+			x1 = line.getP1().x * cos(round(15) * M_PI / 180)
+					- line.getP1().y * sin(round(15) * M_PI / 180);
+			y1 = line.getP1().x * sin(round(15) * M_PI / 180)
+					+ line.getP1().y * cos(round(15) * M_PI / 180);
+			x2 = line.getP2().x * cos(round(15) * M_PI / 180)
+					- line.getP2().y * sin(round(15) * M_PI / 180);
+			y2 = line.getP2().x * sin(round(15) * M_PI / 180)
+					+ line.getP2().y * cos(round(15) * M_PI / 180);
+			of << "(" << x1 << "," << y1 << ")"
+					<< " (" << x2 << "," << y2
+					<< ")" << "\n";
 		}
-		of.close();
+		of.close();*/
+
+		//save the image
+		/*cv::Mat segImg(image.getMatrixImage().size(),image.getMatrixImage().type(),Scalar::all(0));
+		 segImg = rePresentation(segImg,lines);
+		 QString path = savePath + scenename + ".JPG";
+		 imwrite(path.toStdString().c_str(),segImg);*/
 	}
 }
 } /* namespace impls_2015 */

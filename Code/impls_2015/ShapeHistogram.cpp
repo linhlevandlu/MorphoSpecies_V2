@@ -342,32 +342,15 @@ vector<vector<Line> > ShapeHistogram::sceneLinesLabel(vector<Line> sceneLines,
 	vector<LocalHistogram> modelHists = constructPGH(modelLines);
 
 	vector<vector<Line> > lines;
-	int first = -1;
 	for (size_t i = 0; i < sceneHists.size(); i++) {
-		if (sceneLines.at(i).length() > 30) {
-			LocalHistogram sceneHist = sceneHists.at(i);
-			int index = lineLabel(sceneHist, modelHists);
-			if (index != -1) {
-				if (first == -1) {
-					vector<Line> llabel;
-					llabel.push_back(sceneLines.at(i));
-					llabel.push_back(modelLines.at(index));
-					lines.push_back(llabel);
-					first = i;
-				} else {
-					Line lf = sceneLines.at(first);
-					Line scf = sceneLines.at(i);
-					Point intersect = lf.intersection(scf);
-					if (intersect.x != -1 && intersect.y != -1) {
-						vector<Line> llabel;
-						llabel.push_back(sceneLines.at(i));
-						llabel.push_back(modelLines.at(index));
-						lines.push_back(llabel);
-					}
-				}
-				if (lines.size() == 2)
-					break;
-			}
+
+		LocalHistogram sceneHist = sceneHists.at(i);
+		int index = lineLabel(sceneHist, modelHists);
+		if (index != -1) {
+			vector<Line> llabel;
+			llabel.push_back(sceneLines.at(i));
+			llabel.push_back(modelLines.at(index));
+			lines.push_back(llabel);
 		}
 	}
 	for (size_t k = 0; k < lines.size(); k++) {

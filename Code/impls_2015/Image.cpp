@@ -65,8 +65,10 @@ void Image::setFileName(QString filePath) {
  * @return: the list of edges of image
  */
 vector<Edge> Image::getEdges() {
-	cv::Mat grayImg;
-	cv::cvtColor(this->matrixImage, grayImg, CV_BGR2GRAY);
+	cv::Mat grayImg, orgImg = this->matrixImage;
+
+	cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
+	//cv::cvtColor(this->matrixImage, grayImg, CV_BGR2GRAY);
 
 	cv::Mat histImg = histogram();
 	// calculate the median
@@ -103,6 +105,7 @@ vector<Edge> Image::getEdges() {
 	int mid1 = (imin + imax) / 2;
 	int mid2 = (imin + imax2) / 2;
 	int mid = (mid1 + mid2) / 2;
+
 	cv::threshold(grayImg, grayImg, mid, 255, CV_THRESH_BINARY);
 
 	//qDebug() << "middle value: " << mid;

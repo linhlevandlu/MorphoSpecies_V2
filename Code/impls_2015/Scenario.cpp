@@ -115,11 +115,22 @@ void Scenario::matchingDirectory(QString directoryPath,
 }
 
 void Scenario::probabilisticHoughTransform(vector<Line> refLines,
-		vector<Line> sceneLines, int width, int height) {
+		vector<Line> sceneLines,QString lmPath, int width, int height) {
 	PHoughTransform pht;
 
-	pht.test(refLines, sceneLines, width, height);
+	pht.test(refLines, sceneLines,lmPath, width, height);
 }
+
+Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage, QString reflmPath){
+	PHoughTransform pht;
+	return pht.pht(refImage,sceneImage,reflmPath,refImage.getMatrixImage().cols,refImage.getMatrixImage().rows);
+}
+void Scenario::phtDirectory(Image refImage, QString reflmPath,
+		QString sceneDir, QString scenelmDir, QString saveDir){
+	PHoughTransform pht;
+	pht.phtDirectory(refImage,reflmPath,sceneDir,scenelmDir,saveDir);
+}
+
 
 /**
  * Detect the landmarks on image automatically

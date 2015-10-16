@@ -39,11 +39,12 @@ public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
 
-	static void test(vector<Line> refLines, vector<Line> sceneLines, int width,
+	static void test(vector<Line> refLines, vector<Line> sceneLines,QString refLandmark, int width,
 			int height);
 
 	bool closetLine(Line line1, Line line2);
 	vector<PHTEntry> constructTable(vector<Line> lines, Point refPoint);
+	bool lineSimilar(Line line1, Line line2);
 	bool similarPairLines(Line ref1, Line ref2, Line scene1, Line scene2);
 	PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1,
 			Line line2);
@@ -59,15 +60,13 @@ public:
 			vector<Line> sceneLines, int width, int height, int &maxValue);
 	vector<HoughSpace> peaksOfAccumulator(vector<vector<int> > accumulator,
 			int maxValue);
-	vector<TableEntry> referenceTable(vector<Line> refLines,
-			Point refPoint);
-	TableEntry matchingEntry(vector<TableEntry> entryTable,
-			Line sceneLine);
-	vector<TableEntry> matchingInScene(
-			vector<Line> modelLines, vector<Line> sceneLines, int width,
-			int height,Point refPoint);
-	Point refPointInScene(vector<TableEntry> matchLines,
-			double &angleDiff, int width, int height);
+	vector<Point> estimateLandmarks(Point refPoint, Point esPoint,
+			double angleDiff, vector<Point> refLandmarks,int width, int height);
+	Mat pht(Image refImage, Image sceneImage, QString refLandmark,
+			int width, int height);
+	void phtDirectory(Image refImage, QString reflmPath,
+			QString sceneDir, QString scenelmDir, QString saveDir);
+	double angleDifference(Line refLine, Line sceneLine);
 };
 
 } /* namespace impls_2015 */

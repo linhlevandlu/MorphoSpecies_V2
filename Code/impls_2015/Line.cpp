@@ -312,18 +312,92 @@ vector<vector<double> > Line::parallelLine(double distance) {
 	equations.push_back(equation2);
 	return equations;
 }
+
+Point Line::interParallel(Line line1, Line line2, double distance1,
+		double distance2, int width, int height) {
+	vector<double> equation1 = line1.equationOfLine();
+	vector<double> equation2 = line2.equationOfLine();
+	double a = equation1[0];
+	double b = equation1[2];
+	double c = equation2[0];
+	double d = equation2[2];
+	double e = distance1 * (sqrt((a * a) + 1));
+	double f = distance2 * (sqrt((c * c) + 1));
+
+	qDebug() << distance1 << ", distance 2: " << distance2;
+
+	Point refPoint(width / 2, height / 2);
+	double minDistance = width;
+
+	double x0 = 0, y0 = 0, x = 0, y = 0;
+	x0 = (f + b - d - e) / (c - a);
+	if (x0 >= 0 && x0 < width) {
+		y0 = a * x0 + b - e;
+		if (y0 >= 0 && y0 < height) {
+			qDebug() << "1 nghiem " << x0 << "," << y0;
+			Line l1(refPoint, Point(x0, y0));
+			if (l1.length() < minDistance) {
+				minDistance = l1.length();
+				x = x0;
+				y = y0;
+
+			}
+		}
+	}
+	x0 = (b - e - f - d) / (c - a);
+	if (x0 >= 0 && x0 < width) {
+		y0 = a * x0 + b - e;
+		if (y0 >= 0 && y0 < height) {
+			qDebug() << "2 nghiem " << x0 << "," << y0;
+			Line l2(refPoint, Point(x0, y0));
+			if (l2.length() < minDistance) {
+				minDistance = l2.length();
+				x = x0;
+				y = y0;
+			}
+		}
+	}
+	x0 = (f + b - d + e) / (c - a);
+	if (x0 >= 0 && x0 < width) {
+		y0 = a * x0 + b + e;
+		if (y0 >= 0 && y0 < height) {
+			qDebug() << "3 nghiem " << x0 << "," << y0;
+			Line l3(refPoint, Point(x0, y0));
+			if (l3.length() < minDistance) {
+				minDistance = l3.length();
+				x = x0;
+				y = y0;
+			}
+		}
+	}
+	x0 = (b + e - f - d) / (c - a);
+	if (x0 >= 0 && x0 < width) {
+		y0 = a * x0 + b + e;
+		if (y0 >= 0 && y0 < height) {
+			qDebug() << "4 nghiem " << x0 << "," << y0;
+			Line l4(refPoint, Point(x0, y0));
+			if (l4.length() < minDistance) {
+				minDistance = l4.length();
+				x = x0;
+				y = y0;
+			}
+		}
+	}
+	return Point(round(x), round(y));
+}
+
 void Line::toString() {
 	qDebug() << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y
 			<< "))";
 }
 
-bool Line::operator<(const Line& l2) const{
-	if(p1.x < l2.p1.x)
+bool Line::operator<(const Line& l2) const {
+	if (p1.x < l2.p1.x)
 		return true;
 	return false;
 }
-bool Line::isNull(){
-	if(p1.x == p2.x && p1.y == p2.y)
+bool Line::isNull() {
+	if (p1.x == p2.x && p1.y == p2.y)
 		return true;
 	return false;
 }

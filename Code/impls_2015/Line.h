@@ -66,6 +66,8 @@ public:
 	bool operator<(const Line& l2) const;
 	void toString();
 	vector<vector<double> > parallelLine(double distance);
+	Point interParallel(Line line1, Line line2, double distance1,
+			double distance2, int width, int height);
 	bool isNull();
 };
 
