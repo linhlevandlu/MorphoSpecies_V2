@@ -64,14 +64,18 @@ public:
 	Point crossCorrelation(Mat templ, Mat scene) ;
 	vector<Point> crossCorrelation(Image refImage,Image sceneImage, QString lmPath,int templSize);
 	void landmarksByDirectory(Image refImage, QString path,QString savepath,QString lmPath);
-	double centroid(Image refImage, Image sceneImage, QString lmPath, QString slmPath, Point &center);
-	void centroidFolder(Image refImage, QString lmPath,
+	double centroidCCorelation(Image refImage, Image sceneImage, QString lmPath, QString slmPath, Point &center);
+	void centroidCCorelations(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
 	Mat rotateImage(Mat source, double angle);
 	Mat matchingTemplate(Image refImage, Image sceneImage,
-			QString lmPath, int templSize, int sceneSize, double angleDiff);
+			QString lmPath, int templSize, int sceneSize, double angleDiff,vector<Point> &mcResult);
 	void matchingDirectory(Image refImage, QString folderImages,
 			QString lmPath, QString savePath, int templSize, int sceneSize, double angleDiff);
+	double measureDistance(vector<Point> refLandmarks,
+			vector<Point> esLandmarks,double &mCentroid, double &eCentroid,Point &mBary, Point &eBary);
+	void centroidMatchings(Image refImage, QString lmPath,
+			QString folderImages, QString folderlandmarks);
 };
 
 } /* namespace impls_2015 */
