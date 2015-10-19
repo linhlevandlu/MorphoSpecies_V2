@@ -535,8 +535,8 @@ void Image::setShapeHistogram(ShapeHistogram shapeHistogram) {
 ShapeHistogram Image::getShapeHistogram() {
 	return this->pghHistogram;
 }
-vector<Point> Image::readLandmarksFile(QString filePath) {
-	ifstream openFile(filePath.toStdString().c_str());
+vector<Point> Image::readLandmarksFile(string filePath) {
+	ifstream openFile(filePath.c_str());
 	string lineText;
 	vector<Point> landmarks;
 	if (openFile.is_open()) {

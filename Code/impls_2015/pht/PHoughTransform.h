@@ -39,8 +39,8 @@ public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
 
-	static void test(vector<Line> refLines, vector<Line> sceneLines,QString refLandmark, int width,
-			int height);
+	static void test(vector<Line> refLines, vector<Line> sceneLines,
+			QString refLandmark, int width, int height);
 
 	bool closetLine(Line line1, Line line2);
 	vector<PHTEntry> constructTable(vector<Line> lines, Point refPoint);
@@ -56,16 +56,14 @@ public:
 			double &angleDiff, int width, int height);
 	vector<Point> readLandmarksFile(QString filePath);
 
-	vector<vector<int> > createAccumulator(Point refPoint,
-			vector<Line> sceneLines, int width, int height, int &maxValue);
-	vector<HoughSpace> peaksOfAccumulator(vector<vector<int> > accumulator,
-			int maxValue);
-	vector<Point> estimateLandmarks(Point refPoint, Point esPoint,
-			double angleDiff, vector<Point> refLandmarks,int width, int height);
-	Mat pht(Image refImage, Image sceneImage, QString refLandmark,
-			int width, int height);
-	void phtDirectory(Image refImage, QString reflmPath,
-			QString sceneDir, QString scenelmDir, QString saveDir);
+	vector<Point> findLandmarks(Point refPoint, Point esPoint,
+			double angleDiff, vector<Point> refLandmarks, int width,
+			int height);
+	vector<Point> estimateLandmarks(Image mImage, Image sImage,
+			string mlmPath, double &angleDiff);
+	Mat phtPresentation(Image refImage, Image sceneImage, string reflmPath);
+	void phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
+			QString scenelmDir, QString saveDir);
 	double angleDifference(Line refLine, Line sceneLine);
 };
 

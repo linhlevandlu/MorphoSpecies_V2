@@ -92,7 +92,7 @@ public:
 	vector<Line> lineSegment();
 	void setShapeHistogram(ShapeHistogram shapeHistogram);
 	ShapeHistogram getShapeHistogram();
-	vector<Point> readLandmarksFile(QString filePath);
+	vector<Point> readLandmarksFile(string filePath);
 
 
 	static QFileInfoList readFolder(QString folderPath);

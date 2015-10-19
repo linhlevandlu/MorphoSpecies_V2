@@ -334,7 +334,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b - e;
 		if (y0 >= 0 && y0 < height) {
-			qDebug() << "1 nghiem " << x0 << "," << y0;
+			//qDebug() << "1 nghiem " << x0 << "," << y0;
 			Line l1(refPoint, Point(x0, y0));
 			if (l1.length() < minDistance) {
 				minDistance = l1.length();
@@ -348,7 +348,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b - e;
 		if (y0 >= 0 && y0 < height) {
-			qDebug() << "2 nghiem " << x0 << "," << y0;
+			//qDebug() << "2 nghiem " << x0 << "," << y0;
 			Line l2(refPoint, Point(x0, y0));
 			if (l2.length() < minDistance) {
 				minDistance = l2.length();
@@ -361,7 +361,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b + e;
 		if (y0 >= 0 && y0 < height) {
-			qDebug() << "3 nghiem " << x0 << "," << y0;
+			//qDebug() << "3 nghiem " << x0 << "," << y0;
 			Line l3(refPoint, Point(x0, y0));
 			if (l3.length() < minDistance) {
 				minDistance = l3.length();
@@ -374,7 +374,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b + e;
 		if (y0 >= 0 && y0 < height) {
-			qDebug() << "4 nghiem " << x0 << "," << y0;
+			//qDebug() << "4 nghiem " << x0 << "," << y0;
 			Line l4(refPoint, Point(x0, y0));
 			if (l4.length() < minDistance) {
 				minDistance = l4.length();

@@ -115,22 +115,22 @@ void Scenario::matchingDirectory(QString directoryPath,
 }
 
 void Scenario::probabilisticHoughTransform(vector<Line> refLines,
-		vector<Line> sceneLines,QString lmPath, int width, int height) {
+		vector<Line> sceneLines, QString lmPath, int width, int height) {
 	PHoughTransform pht;
 
-	pht.test(refLines, sceneLines,lmPath, width, height);
+	pht.test(refLines, sceneLines, lmPath, width, height);
 }
 
-Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage, QString reflmPath){
+Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage,
+		QString reflmPath) {
 	PHoughTransform pht;
-	return pht.pht(refImage,sceneImage,reflmPath,refImage.getMatrixImage().cols,refImage.getMatrixImage().rows);
+	return pht.phtPresentation(refImage, sceneImage, reflmPath.toStdString());
 }
-void Scenario::phtDirectory(Image refImage, QString reflmPath,
-		QString sceneDir, QString scenelmDir, QString saveDir){
+void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
+		QString scenelmDir, QString saveDir) {
 	PHoughTransform pht;
-	pht.phtDirectory(refImage,reflmPath,sceneDir,scenelmDir,saveDir);
+	pht.phtDirectory(refImage, reflmPath, sceneDir, scenelmDir, saveDir);
 }
-
 
 /**
  * Detect the landmarks on image automatically
@@ -143,20 +143,35 @@ vector<Point> Scenario::landmarksAutoDetect(Image image, QString lpath,
 	LandmarkDetection lmdetection;
 	//landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath);
 
-	Point point;
-	int index2 = sceneImage.getFileName().lastIndexOf("/");
-	QString scenename = sceneImage.getFileName().mid(index2 + 1,
-			sceneImage.getFileName().length() - index2 - 5);
-	qDebug() << scenename;
-	QString slmPath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
-	double rs = lmdetection.centroid(image, sceneImage, lpath, slmPath, point);
-	qDebug() << "Point: " << point.x << ", " << point.y << ", centroid:  "
-			<< rs;
+	// xac dinh centroid point
+	/*Point point;
+	 int index2 = sceneImage.getFileName().lastIndexOf("/");
+	 QString scenename = sceneImage.getFileName().mid(index2 + 1,
+	 sceneImage.getFileName().length() - index2 - 5);
+	 qDebug() << scenename;
+	 QString slmPath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
+	 double rs = lmdetection.centroid(image, sceneImage, lpath, slmPath, point);
+	 qDebug() << "Point: " << point.x << ", " << point.y << ", centroid:  "
+	 << rs;*/
 
+	// working on folder
 	/*QString folder = "/home/linh/Desktop/mandibule";
-	QString lmfolder ="/home/linh/Desktop/landmarks";
-	lmdetection.centroidFolder(image,lpath,folder,lmfolder);*/
+	 QString lmfolder ="/home/linh/Desktop/landmarks";
+	 lmdetection.centroidFolder(image,lpath,folder,lmfolder);*/
 	return landmarks;
+}
+Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
+		QString reflmPath, int templSize, int scnSize) {
+	LandmarkDetection lmdetection;
+	double angle;
+	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath,
+			templSize, scnSize, angle);
+}
+void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
+		QString lmPath, QString savePath, int templSize, int sceneSize){
+	LandmarkDetection lmdetection;
+	double angle;
+	return lmdetection.matchingDirectory(refImage,folderImages,lmPath,savePath,templSize,sceneSize,angle);
 }
 void Scenario::landmarksDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {

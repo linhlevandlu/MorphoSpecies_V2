@@ -2561,15 +2561,21 @@ void ImageViewer::getLandmarks() {
 	Image image(fileName);
 	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 
-	/*QString folder = "/home/linh/Desktop/mandibule";
-	 QString saveFolder = "/home/linh/Desktop/cross";
-	 landmarksByDirectory(image, folder, saveFolder, lpath);*/
+	QString folder = "/home/linh/Desktop/mandibule";
+	 QString saveFolder = "/home/linh/Desktop/estlandmarks";
+	 /*landmarksByDirectory(image, folder, saveFolder, lpath);*/
 
-	QString fileName2 = QFileDialog::getOpenFileName(this);
+	// teplate matching an image
+	/*QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	Image sceneImage(fileName2);
-	vector<Point> landmarks = Scenario::landmarksAutoDetect(image, lpath,
+	Mat enddest = Scenario::landmarksMatching(image,sceneImage,lpath,200,1400);*/
+
+	// template matching on folder
+	Scenario::landmarksMatchingDirectory(image,folder,lpath,saveFolder,200,1400);
+
+	/*vector<Point> landmarks = Scenario::landmarksAutoDetect(image, lpath,
 			sceneImage);
 
 	int index2 = sceneImage.getFileName().lastIndexOf("/");
@@ -2577,7 +2583,7 @@ void ImageViewer::getLandmarks() {
 			sceneImage.getFileName().length() - index2 - 5);
 	qDebug() << scenename;
 	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
-	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(spath);
+	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(spath.toStdString());
 
 	Mat enddest(sceneImage.getMatrixImage().clone());
 	for (size_t i = 0; i < landmarks.size(); i++) {
@@ -2610,12 +2616,12 @@ void ImageViewer::getLandmarks() {
 		Line line = setLines.at(i);
 		cv::line(enddest, line.getP1(), line.getP2(), Scalar(255, 255, 0), 1,
 				8);
-	}
+	}*/
 
-	ImageViewer *other = new ImageViewer;
+	/*ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
-	other->show();
+	other->show();*/
 	//Scenario::landmarksAutoDetect(image, lpath, image);
 	qDebug() << "Done";
 }
