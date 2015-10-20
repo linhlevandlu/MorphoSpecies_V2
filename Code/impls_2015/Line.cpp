@@ -324,8 +324,6 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 	double e = distance1 * (sqrt((a * a) + 1));
 	double f = distance2 * (sqrt((c * c) + 1));
 
-	qDebug() << distance1 << ", distance 2: " << distance2;
-
 	Point refPoint(width / 2, height / 2);
 	double minDistance = width;
 

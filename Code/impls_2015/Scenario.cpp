@@ -136,12 +136,12 @@ void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
  * Detect the landmarks on image automatically
  * @return: the image contains the landmarks
  */
-vector<Point> Scenario::landmarksAutoDetect(Image image, QString lpath,
+vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 		Image sceneImage) {
 
 	vector<Point> landmarks;
 	LandmarkDetection lmdetection;
-	//landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath);
+	landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath,200);
 
 	// xac dinh centroid point
 	/*Point point;
@@ -154,28 +154,35 @@ vector<Point> Scenario::landmarksAutoDetect(Image image, QString lpath,
 	 qDebug() << "Point: " << point.x << ", " << point.y << ", centroid:  "
 	 << rs;*/
 
-	// working on folder
+	// centroid point with folder
 	/*QString folder = "/home/linh/Desktop/mandibule";
 	 QString lmfolder ="/home/linh/Desktop/landmarks";
-	 lmdetection.centroidFolder(image,lpath,folder,lmfolder);*/
+	 lmdetection.centroidCCorelations(image,lpath,folder,lmfolder);*/
 	return landmarks;
 }
 Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		QString reflmPath, int templSize, int scnSize) {
 	LandmarkDetection lmdetection;
 	double angle;
+	vector<Point> mcResult;
 	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath,
-			templSize, scnSize, angle);
+			templSize, scnSize, angle,mcResult);
 }
 void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
 		QString lmPath, QString savePath, int templSize, int sceneSize){
 	LandmarkDetection lmdetection;
-	double angle;
-	return lmdetection.matchingDirectory(refImage,folderImages,lmPath,savePath,templSize,sceneSize,angle);
+	// estimated the landmarks
+	//double angle;
+	//return lmdetection.matchingDirectory(refImage,folderImages,lmPath,savePath,templSize,sceneSize,angle);
+
+	// compute the centroid
+	QString lmFolder = "/home/linh/Desktop/landmarks";
+	lmdetection.centroidMatchingDirectory(refImage,lmPath,folderImages,lmFolder);
+
 }
-void Scenario::landmarksDirectory(Image refImage, QString path,
+void Scenario::cCorelationDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {
 	LandmarkDetection lmdetection;
-	lmdetection.landmarksByDirectory(refImage, path, savePath, lmPath);
+	lmdetection.cCorelationByDirectory(refImage, path, savePath, lmPath);
 }
 } /* namespace impls_2015 */

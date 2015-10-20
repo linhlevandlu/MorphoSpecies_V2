@@ -318,14 +318,16 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 	QString scenename = sceneImage.getFileName().mid(index2 + 1,
 			sceneImage.getFileName().length() - index2 - 5);
 	QString scenelmPath = scenelmDir + "/" + scenename + ".TPS";
-	vector<Point> landmarks = readLandmarksFile(scenelmPath);
+	vector<Point> orglandmarks = readLandmarksFile(scenelmPath);
 	double angleDiff;
+	Point ePoint;
 	vector<Point> esLandmarks = estimateLandmarks(refImage, sceneImage,
-			reflmPath, angleDiff);
+			reflmPath, angleDiff,ePoint);
 
-	cv::Mat mat(sceneImage.getMatrixImage().clone());
+	Mat sceneMat = sceneImage.getMatrixImage();
+	cv::Mat mat(sceneMat.clone());
 	for (size_t t = 0; t < esLandmarks.size(); t++) {
-		Point landm = landmarks.at(t);
+		Point landm = orglandmarks.at(t);
 		circle(mat, cv::Point(landm.x, mat.rows - landm.y), 7,
 				Scalar(0, 0, 255), 2, 4);
 	}
@@ -338,7 +340,7 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 }
 
 vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
-		string mlmPath, double &angleDiff) {
+		string mlmPath, double &angleDiff,Point &ePoint) {
 	vector<Point> eLandmarks;
 	Mat mMatrix = mImage.getMatrixImage();
 	int width = mMatrix.cols;
@@ -355,7 +357,7 @@ vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
 	PHTEntry entry = matchingInScene(entryTable, sLines, width, height,
 			maxVector);
 	if (maxVector.size() > 0) {
-		Point ePoint = refPointInScene(entry, maxVector, angleDiff, width,
+		ePoint = refPointInScene(entry, maxVector, angleDiff, width,
 				height);
 		eLandmarks = findLandmarks(mPoint, ePoint, angleDiff, mLandmarks, width,
 				height);
@@ -375,35 +377,12 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 		int y, refY;
 		/*if (angleDiff != 0) {
 			//  rotation
-			if (angleDiff > 0) {
-				x = lm.x * cos(round(angleDiff) * M_PI / 180)
-						- lm.y * sin(round(angleDiff) * M_PI / 180)
-						+ refPoint.x;
-				y = lm.x * sin(round(angleDiff) * M_PI / 180)
-						+ lm.y * cos(round(angleDiff) * M_PI / 180)
-						+ refPoint.y;
-
-				refX = refPoint.x * cos(round(angleDiff) * M_PI / 180)
-						- refPoint.y * sin(round(angleDiff) * M_PI / 180)
-						+ refPoint.x;
-				refY = refPoint.x * sin(round(angleDiff) * M_PI / 180)
-						+ refPoint.y * cos(round(angleDiff) * M_PI / 180)
-						+ refPoint.y;
-			} else {
-				x = lm.x * cos(round(angleDiff) * M_PI / 180)
-						+ lm.y * sin(round(angleDiff) * M_PI / 180)
-						+ refPoint.x;
-				y = -lm.x * sin(round(angleDiff) * M_PI / 180)
-						+ lm.y * cos(round(angleDiff) * M_PI / 180)
-						+ refPoint.y;
-
-				refX = refPoint.x * cos(round(angleDiff) * M_PI / 180)
-						+ refPoint.y * sin(round(angleDiff) * M_PI / 180)
-						+ refPoint.x;
-				refY = -refPoint.x * sin(round(angleDiff) * M_PI / 180)
-						+ refPoint.y * cos(round(angleDiff) * M_PI / 180)
-						+ refPoint.y;
-			}
+			Point tpoint = newLocation(lm,angleDiff,refPoint);
+			x= tpoint.x;
+			y= tpoint.y;
+			Point tref = newLocation(refPoint,angleDiff,refPoint);
+			refX = tref.x;
+			refY = tref.y;
 			// and translation
 			px = refX - refPoint.x;
 			py = refY - refPoint.y;
@@ -426,7 +405,22 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 	}
 	return esLandmarks;
 }
-
+Point PHoughTransform::newLocation(Point point, double angleDiff,
+		Point refPoint) {
+	int x, y;
+	if (angleDiff >= 0) {
+		x = point.x * cos(round(angleDiff) * M_PI / 180)
+				- point.y * sin(round(angleDiff) * M_PI / 180) + refPoint.x;
+		y = point.x * sin(round(angleDiff) * M_PI / 180)
+				+ point.y * cos(round(angleDiff) * M_PI / 180) + refPoint.y;
+	} else {
+		x = point.x * cos(round(angleDiff) * M_PI / 180)
+				+ point.y * sin(round(angleDiff) * M_PI / 180) + refPoint.x;
+		y = -point.x * sin(round(angleDiff) * M_PI / 180)
+				+ point.y * cos(round(angleDiff) * M_PI / 180) + refPoint.y;
+	}
+	return Point(x,y);
+}
 void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		QString sceneDir, QString scenelmDir, QString saveDir) {
 

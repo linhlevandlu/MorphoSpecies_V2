@@ -147,14 +147,14 @@ void ImageViewer::activeFunction() {
 
 	//add by LE Van Linh
 	removeLinesAct->setEnabled(true);
-	removeLinesAct2->setEnabled(true);
+	landmarksDetection->setEnabled(true);
 	edgeSegment->setEnabled(true);
 	pwHistogram->setEnabled(true);
 	pwhMatching->setEnabled(true);
 	pwhChisquared->setEnabled(true);
 	pwhIntersection->setEnabled(true);
 	phTransform->setEnabled(true);
-
+	cCorrelation->setEnabled(true);
 	//end
 	updateActions();
 
@@ -526,10 +526,11 @@ void ImageViewer::createActions() {
 	connect(removeLinesAct, SIGNAL(triggered()), this,
 			SLOT(removeYLinesAction()));
 
-	removeLinesAct2 = new QAction(tr("Landmarks identifying"), this);
-	removeLinesAct2->setEnabled(false);
-	removeLinesAct2->setShortcut(tr("Ctrl+L"));
-	connect(removeLinesAct2, SIGNAL(triggered()), this, SLOT(getLandmarks()));
+	landmarksDetection = new QAction(tr("Landmarks identifying"), this);
+	landmarksDetection->setEnabled(false);
+	landmarksDetection->setShortcut(tr("Ctrl+L"));
+	connect(landmarksDetection, SIGNAL(triggered()), this,
+			SLOT(getLandmarks()));
 
 	edgeSegment = new QAction(tr("Edge segmentation"), this);
 	edgeSegment->setEnabled(false);
@@ -564,6 +565,11 @@ void ImageViewer::createActions() {
 	phTransform->setEnabled(false);
 	phTransform->setShortcut(tr("Ctrl+T"));
 	connect(phTransform, SIGNAL(triggered()), this, SLOT(pHoughTransform()));
+
+	cCorrelation = new QAction(tr("Cross Correlation"), this);
+	cCorrelation->setEnabled(false);
+	//crossCorrelation->setShortcut(tr("Ctrl+T"));
+	connect(cCorrelation, SIGNAL(triggered()), this, SLOT(crossCorrelation()));
 
 	//end
 }
@@ -657,15 +663,17 @@ void ImageViewer::createMenus() {
 
 	//add by Linh
 
-	other2015 = pluginsMenu->addMenu(tr("Others 2015"));
-	other2015->addAction(removeLinesAct);
-	other2015->addAction(edgeSegment);
-	other2015->addAction(pwHistogram);
-	other2015->addAction(pwhMatching);
-	other2015->addAction(pwhChisquared);
-	other2015->addAction(pwhIntersection);
-	other2015->addAction(phTransform);
-	other2015->addAction(removeLinesAct2); // landmarks detection
+	other2015 = pluginsMenu->addMenu(tr("Classification"));
+	other2015->addAction(cCorrelation);
+	QMenu* mnuArticle = other2015->addMenu(tr("Automatic extraction"));
+	mnuArticle->addAction(removeLinesAct);
+	mnuArticle->addAction(edgeSegment);
+	mnuArticle->addAction(pwHistogram);
+	mnuArticle->addAction(pwhMatching);
+	mnuArticle->addAction(pwhChisquared);
+	mnuArticle->addAction(pwhIntersection);
+	mnuArticle->addAction(phTransform);
+	mnuArticle->addAction(landmarksDetection); // landmarks detection
 	//end
 
 	menuBar()->addMenu(fileMenu);
@@ -2548,11 +2556,7 @@ void ImageViewer::removeYLinesAction() {
 	//other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
 	other->show();
 }
-void ImageViewer::landmarksByDirectory(Image refImage, QString path,
-		QString savePath, QString lmPath) {
-	qDebug() << "Landmarks detected by cross-correlation (in directory)";
-	Scenario::landmarksDirectory(refImage, path, savePath, lmPath);
-}
+
 // remove yellow grid by using Histogram
 void ImageViewer::getLandmarks() {
 
@@ -2560,69 +2564,26 @@ void ImageViewer::getLandmarks() {
 
 	Image image(fileName);
 	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
-
 	QString folder = "/home/linh/Desktop/mandibule";
-	 QString saveFolder = "/home/linh/Desktop/estlandmarks";
-	 /*landmarksByDirectory(image, folder, saveFolder, lpath);*/
+	QString saveFolder = "/home/linh/Desktop/estlandmarks";
+
+	// by directory
+	qDebug() << "Landmarks detected by automatic define";
+	Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder, 200,	1400);
 
 	// teplate matching an image
 	/*QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	Image sceneImage(fileName2);
-	Mat enddest = Scenario::landmarksMatching(image,sceneImage,lpath,200,1400);*/
+	// matching template
+	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath, 200,
+			1400);
 
-	// template matching on folder
-	Scenario::landmarksMatchingDirectory(image,folder,lpath,saveFolder,200,1400);
-
-	/*vector<Point> landmarks = Scenario::landmarksAutoDetect(image, lpath,
-			sceneImage);
-
-	int index2 = sceneImage.getFileName().lastIndexOf("/");
-	QString scenename = sceneImage.getFileName().mid(index2 + 1,
-			sceneImage.getFileName().length() - index2 - 5);
-	qDebug() << scenename;
-	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
-	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(spath.toStdString());
-
-	Mat enddest(sceneImage.getMatrixImage().clone());
-	for (size_t i = 0; i < landmarks.size(); i++) {
-		Point lm = landmarks.at(i);
-		//qDebug() << lm.x << ", " << (enddest.rows - lm.y);
-		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 0, 255), 2, 4);
-		stringstream ss;
-		ss << i;
-		cv::putText(enddest, ss.str(), Point(lm.x, lm.y), FONT_HERSHEY_COMPLEX,
-				1, Scalar(0, 0, 255), 1, 8);
-		Point orglm = sceneLandmarks.at(i);
-		circle(enddest,
-				Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
-				Scalar(0, 255, 0), 2, 4);
-		cv::putText(enddest, ss.str(),
-				Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y),
-				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
-
-		Line diff(orglm, Point(lm.x, enddest.rows - lm.y));
-		qDebug() << "(" << orglm.x << "," << orglm.y << ")" << "\t" << "("
-				<< lm.x << "," << enddest.rows - lm.y << ")" << "\t"
-				<< diff.length();
-
-	}
-	QString segmentFile = "test/segmentation/" + scenename.replace(" ", "")
-			+ ".PGH";
-	vector<Line> setLines = Edge::readFile(segmentFile);
-
-	for (size_t i = 0; i < setLines.size(); i++) {
-		Line line = setLines.at(i);
-		cv::line(enddest, line.getP1(), line.getP2(), Scalar(255, 255, 0), 1,
-				8);
-	}*/
-
-	/*ImageViewer *other = new ImageViewer;
+	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
 	other->show();*/
-	//Scenario::landmarksAutoDetect(image, lpath, image);
 	qDebug() << "Done";
 }
 void ImageViewer::edgeSegmentation() {
@@ -2709,7 +2670,7 @@ void ImageViewer::pHoughTransform() {
 	Image image(fileName);
 	QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 
-	/*QString fileName2 = QFileDialog::getOpenFileName(this);
+	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
@@ -2719,23 +2680,54 @@ void ImageViewer::pHoughTransform() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
-	other->show();*/
+	other->show();
 
-	/*
-	 * Working on each image
-	 */
-	//vector<Line> set1 = Edge::readFile("/home/linh/Desktop/test/test1.PGH");
-	//vector<Line> set2 = Edge::readFile("/home/linh/Desktop/test/test4.PGH");
-	//vector<Line> set3 = Edge::readFile("test/segmentation/Md028.PGH");
-	//vector<Line> set4 = Edge::readFile("test/segmentation/Md022.PGH");
-	//Scenario::probabilisticHoughTransform(set3, set4, reflmPath, 3264, 2448);
 	/*
 	 * Working on directory
 	 */
-	QString sceneImageDir = "/home/linh/Desktop/mandibule";
-	QString sceneLMDir = "/home/linh/Desktop/landmarks";
-	QString saveDir = "/home/linh/Desktop/phtEstimate";
-	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-			saveDir);
+	/*QString sceneImageDir = "/home/linh/Desktop/mandibule";
+	 QString sceneLMDir = "/home/linh/Desktop/landmarks";
+	 QString saveDir = "/home/linh/Desktop/phtEstimate";
+	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
+	 saveDir);*/
+	qDebug() << "Done";
+}
+void ImageViewer::crossCorrelation() {
+	qDebug() << "Cross correlation";
+	Image image(fileName);
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
+	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
+			sceneImage);
+	int index2 = sceneImage.getFileName().lastIndexOf("/");
+	QString scenename = sceneImage.getFileName().mid(index2 + 1,
+			sceneImage.getFileName().length() - index2 - 5);
+	qDebug() << scenename;
+	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
+	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
+			spath.toStdString());
+
+	Mat enddest(sceneImage.getMatrixImage().clone());
+	for (size_t i = 0; i < landmarks.size(); i++) {
+		Point lm = landmarks.at(i);
+		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 0, 255), 2, 4);
+		Point orglm = sceneLandmarks.at(i);
+		circle(enddest,
+				Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
+				Scalar(0, 255, 0), 2, 4);
+	}
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Landmark -- " + this->fileName);
+	other->show();
+
+	// cross-corelation directory
+	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	 QString folder = "/home/linh/Desktop/mandibule";
+	 QString saveFolder = "/home/linh/Desktop/estlandmarks";
+	 Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);*/
 	qDebug() << "Done";
 }

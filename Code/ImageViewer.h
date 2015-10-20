@@ -95,7 +95,7 @@ public:
 	//void removeYLinesAction(int minBrightness, QString pathImage);
 	void edgeSegementDirectory(QString path);
 	void matchingDirectory(impls_2015::Image image, QString path);
-	void landmarksByDirectory(impls_2015::Image refImage, QString path,QString savePath, QString lmPath);
+	//void landmarksByDirectory(impls_2015::Image refImage, QString path,QString savePath, QString lmPath);
 	//end
 
 protected:
@@ -174,7 +174,7 @@ private slots:
 	void pwIntersectionMatching();
 	void getLandmarks();
 	void pHoughTransform();
-
+	void crossCorrelation();
 private:
 	void createActions();
 	void createMenus();
@@ -261,13 +261,14 @@ private:
 
 //add by LE Van Linh
 	QAction *removeLinesAct; // remove yellow lines using the algorithm 1
-	QAction *removeLinesAct2; // detect landmarks
+	QAction *landmarksDetection; // detect landmarks
 	QAction *edgeSegment; // edge segmentation (get edge and break into a set of lines)
 	QAction *pwHistogram; // compute the PGHs of an image
 	QAction *pwhMatching; // matching 2 PGH of 2 image using Bhattachyya metric
 	QAction *pwhChisquared; // matching 2 PGH using chi-squared metric
 	QAction *pwhIntersection; // matching 2 PGH using intersection
 	QAction *phTransform;
+	QAction *cCorrelation; // cross correlation
 
 // end
 	QMenu *fileMenu;

@@ -28,6 +28,7 @@
 #include "HoughMethod.h"
 #include "PHTEntry.h"
 #include "TableEntry.h"
+#include "../landmarks/LandmarkDetection.h"
 
 using namespace std;
 using namespace cv;
@@ -60,11 +61,13 @@ public:
 			double angleDiff, vector<Point> refLandmarks, int width,
 			int height);
 	vector<Point> estimateLandmarks(Image mImage, Image sImage,
-			string mlmPath, double &angleDiff);
+			string mlmPath, double &angleDiff,Point &ePoint);
 	Mat phtPresentation(Image refImage, Image sceneImage, string reflmPath);
 	void phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
 			QString scenelmDir, QString saveDir);
 	double angleDifference(Line refLine, Line sceneLine);
+	Point newLocation(Point point, double angleDiff,
+			Point refPoint);
 };
 
 } /* namespace impls_2015 */

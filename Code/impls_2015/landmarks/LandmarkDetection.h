@@ -46,7 +46,6 @@
 #include "../Landmark.h"
 #include "../pht/PHoughTransform.h"
 
-
 using namespace cv;
 using namespace std;
 
@@ -60,22 +59,30 @@ public:
 	virtual ~LandmarkDetection();
 	void setNoise(double noise);
 	vector<Landmark> getLandmarks(Image image);
-	Mat createTemplate(Mat matImage, Point landmark,int tsize, Point &location,Point &distance);
-	Point crossCorrelation(Mat templ, Mat scene) ;
-	vector<Point> crossCorrelation(Image refImage,Image sceneImage, QString lmPath,int templSize);
-	void landmarksByDirectory(Image refImage, QString path,QString savepath,QString lmPath);
-	double centroidCCorelation(Image refImage, Image sceneImage, QString lmPath, QString slmPath, Point &center);
+	Mat createTemplate(Mat matImage, Point landmark, int tsize, Point &location,
+			Point &distance);
+	Point matCrossCorrelation(Mat templ, Mat scene);
+	vector<Point> crossCorrelation(Image refImage, Image sceneImage,
+			QString lmPath, int templSize);
+	void cCorelationByDirectory(Image refImage, QString path, QString savepath,
+			QString lmPath);
+	double centroidCCorelation(Image refImage, Image sceneImage, QString lmPath,
+			QString slmPath, Point &center);
 	void centroidCCorelations(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
 	Mat rotateImage(Mat source, double angle);
-	Mat matchingTemplate(Image refImage, Image sceneImage,
-			QString lmPath, int templSize, int sceneSize, double angleDiff,vector<Point> &mcResult);
-	void matchingDirectory(Image refImage, QString folderImages,
-			QString lmPath, QString savePath, int templSize, int sceneSize, double angleDiff);
+	Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
+			int templSize, int sceneSize, double angleDiff,
+			vector<Point> &mcResult);
+	void matchingDirectory(Image refImage, QString folderImages, QString lmPath,
+			QString savePath, int templSize, int sceneSize, double angleDiff);
 	double measureDistance(vector<Point> refLandmarks,
-			vector<Point> esLandmarks,double &mCentroid, double &eCentroid,Point &mBary, Point &eBary);
-	void centroidMatchings(Image refImage, QString lmPath,
+			vector<Point> esLandmarks, double &mCentroid, double &eCentroid,
+			Point &mBary, Point &eBary);
+	void centroidMatchingDirectory(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
+	double centroidMatching(Image refImage, Image sceneImage,
+			QString lmPath, QString slmPath, int templSize, int sceneSize);
 };
 
 } /* namespace impls_2015 */
