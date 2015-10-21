@@ -70,7 +70,7 @@ public:
 			QString slmPath, Point &center);
 	void centroidCCorelations(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
-	Mat rotateImage(Mat source, double angle);
+	Mat rotateImage(Mat source, double angle, Point center);
 	Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
 			int templSize, int sceneSize, double angleDiff,
 			vector<Point> &mcResult);

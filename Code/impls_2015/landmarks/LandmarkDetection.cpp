@@ -85,7 +85,7 @@ Point LandmarkDetection::matCrossCorrelation(Mat templ, Mat scene) {
 	int height = scene.rows - templ.rows + 1;
 	if (width > 0 && height > 0) {
 		Mat result(width, height, CV_32FC1);
-		cv::matchTemplate(scene, templ, result, CV_TM_CCOEFF_NORMED);
+		cv::matchTemplate(scene, templ, result, CV_TM_CCORR_NORMED);
 		double maxValue, minValue;
 		Point maxLoc, minLoc;
 		cv::minMaxLoc(result, &minValue, &maxValue, &minLoc, &maxLoc, Mat());
@@ -109,11 +109,9 @@ void LandmarkDetection::cCorelationByDirectory(Image refImage, QString path,
 
 		cv::Mat result(sceneImage.getMatrixImage().clone());
 		vector<Point> landmarks = crossCorrelation(refImage, sceneImage, lmPath,
-				500);
+				400);
 
-		int index2 = sceneImage.getFileName().lastIndexOf("/");
-		QString scenename = sceneImage.getFileName().mid(index2 + 1,
-				sceneImage.getFileName().length() - index2 - 5);
+		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
 		QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
 		vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
@@ -151,9 +149,7 @@ void LandmarkDetection::cCorelationByDirectory(Image refImage, QString path,
 		meanDiff << scenename.toStdString().c_str() << ".JPG " << "\t"
 				<< (totalDiff / 18) << "\n";
 
-		QString saveImg = savepath + "/"
-				+ _name.mid(index2 + 1, _name.length() - index2 - 5).replace(
-						" ", "") + ".JPG";
+		QString saveImg = savepath + "/" + scenename + ".JPG";
 		imwrite(saveImg.toStdString().c_str(), result);
 	}
 	meanDiff.close();
@@ -186,9 +182,8 @@ void LandmarkDetection::centroidCCorelations(Image refImage, QString lmPath,
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image sceneImage(_name);
-		int index2 = sceneImage.getFileName().lastIndexOf("/");
-		QString scenename = sceneImage.getFileName().mid(index2 + 1,
-				sceneImage.getFileName().length() - index2 - 5);
+
+		QString scenename = sceneImage.getName();
 		QString spath = folderlandmarks + "/" + scenename + ".TPS";
 		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
@@ -217,7 +212,8 @@ double LandmarkDetection::measureDistance(vector<Point> orgLandmarks,
 		Point lm = orgLandmarks.at(j);
 		totalX += lm.x;
 		totalY += lm.y;
-
+	}
+	for (size_t j = 0; j < esLandmarks.size(); j++) {
 		Point elm = esLandmarks.at(j);
 		totalxE += elm.x;
 		totalyE += elm.y;
@@ -236,7 +232,8 @@ double LandmarkDetection::measureDistance(vector<Point> orgLandmarks,
 		Point lm = orgLandmarks.at(k);
 		Line line(lm, mBary);
 		totalM += (line.length() * line.length());
-
+	}
+	for (size_t k = 0; k < esLandmarks.size(); k++) {
 		Line sline(eBary, Point(esLandmarks.at(k).x, esLandmarks.at(k).y));
 		totalS += (sline.length() * sline.length());
 	}
@@ -245,12 +242,12 @@ double LandmarkDetection::measureDistance(vector<Point> orgLandmarks,
 	double subtraction = abs(mCentroid - eCentroid);
 	return subtraction;
 }
-Mat LandmarkDetection::rotateImage(Mat source, double angle) {
+Mat LandmarkDetection::rotateImage(Mat source, double angle, Point center) {
 	if (angle > 0)
 		angle = -angle;
 	Mat dest = Mat::zeros(source.size(), source.type());
-	Point2f pt(dest.cols / 2, dest.rows / 2);
-	Mat rotate = getRotationMatrix2D(pt, angle, 1);
+	//Point2f pt(dest.cols / 2, dest.rows / 2);
+	Mat rotate = getRotationMatrix2D(center, angle, 1);
 	warpAffine(source, dest, rotate, source.size());
 	return dest;
 }
@@ -267,14 +264,13 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	vector<Point> esLandmarks = pht.estimateLandmarks(refImage, sceneImage,
 			lmPath.toStdString(), angleDiff, ePoint);
 
-	int index2 = sceneImage.getFileName().lastIndexOf("/");
-	QString scenename = sceneImage.getFileName().mid(index2 + 1,
-			sceneImage.getFileName().length() - index2 - 5);
+	QString scenename = sceneImage.getName();
 	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
 	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
 			spath.toStdString().c_str());
 
-	Mat sRotateImg = rotateImage(sMatrix, angleDiff);
+	Mat sRotateImg = rotateImage(sMatrix, angleDiff, ePoint);
+
 	for (size_t i = 0; i < esLandmarks.size(); i++) {
 		Point lm(refLandmarks.at(i).x, mMatrix.rows - refLandmarks.at(i).y);
 		Point tLocation, tDistance, iLocation, iDistance;
@@ -287,42 +283,47 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	}
 	Mat sDisplay(sMatrix.clone());
 	for (size_t k = 0; k < sceneLandmarks.size(); k++) {
-		Point slm(sceneLandmarks.at(k).x, sMatrix.rows - sceneLandmarks.at(k).y);
+		Point slm(sceneLandmarks.at(k).x,
+				sMatrix.rows - sceneLandmarks.at(k).y);
 		circle(sDisplay, slm, 7, Scalar(0, 0, 255), 2, 8);
 	}
-	Mat result(rotateImage(sDisplay,angleDiff).clone());
+	Mat result(rotateImage(sDisplay, angleDiff, ePoint).clone());
 	for (size_t j = 0; j < mcResult.size(); j++) {
 		circle(result, mcResult.at(j), 5, Scalar(0, 255, 255), 2, 8);
 	}
 	return result;
 }
-double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage, QString lmPath, QString slmPath, int templSize, int sceneSize){
+double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage,
+		QString lmPath, QString slmPath, int templSize, int sceneSize) {
 
-	double angleDiff,mCentroid,eCentroid;
+	double angleDiff, mCentroid, eCentroid;
 	vector<Point> mcResult;
-	matchingTemplate(refImage,sceneImage,lmPath,templSize,sceneSize,angleDiff,mcResult);
-	vector<Point> orgLandmarks = sceneImage.readLandmarksFile(slmPath.toStdString());
-	Point mBary,eBary;
-	double distance = measureDistance(orgLandmarks,mcResult,mCentroid,eCentroid,mBary,eBary);
+	matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
+			angleDiff, mcResult);
+	vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
+			slmPath.toStdString());
+	Point mBary, eBary;
+	double distance = measureDistance(orgLandmarks, mcResult, mCentroid,
+			eCentroid, mBary, eBary);
 	return distance;
 }
-void LandmarkDetection::centroidMatchingDirectory(Image refImage, QString lmPath,
-		QString folderImages, QString folderlandmarks) {
+void LandmarkDetection::centroidMatchingDirectory(Image refImage,
+		QString lmPath, QString folderImages, QString folderlandmarks) {
 	QFileInfoList files = Image::readFolder(folderImages);
 	ofstream of("/home/linh/Desktop/cross/centroidMatching.PHG");
-	for (int i = 0; i < files.size(); i++) {
+	for (int i = 145; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image sceneImage(_name);
-		int index2 = sceneImage.getFileName().lastIndexOf("/");
-		QString scenename = sceneImage.getFileName().mid(index2 + 1,
-				sceneImage.getFileName().length() - index2 - 5);
+
+		QString scenename = sceneImage.getName();
 		QString spath = folderlandmarks + "/" + scenename + ".TPS";
 		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
 		vector<Point> mcResult;
 		double angle;
-		matchingTemplate(refImage, sceneImage, lmPath, 200, 1400, angle, mcResult);
+		matchingTemplate(refImage, sceneImage, lmPath, 200, 1400, angle,
+				mcResult);
 		of << scenename.toStdString().c_str() << ".JPG" << "\t";
 		qDebug() << scenename;
 		Point mBary, eBary;
@@ -334,8 +335,11 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage, QString lmPath
 				<< "," << eBary.y << ")" << "\t";
 
 		of << mCentroid << "\t" << eCentroid << "\t" << distance << "\n";
-		qDebug()<< "value: (" << mBary.x << "," << mBary.y << ")" << "\t" << "(" << eBary.x
-				<< "," << eBary.y << ")" << "\t" << mCentroid << "\t" << eCentroid << "\t" << distance;
+		qDebug() << "value: (" << mBary.x << "," << mBary.y << ")" << "\t"
+				<< "(" << eBary.x << "," << eBary.y << ")" << "\t" << mCentroid
+				<< "\t" << eCentroid << "\t" << distance;
+		if(i == 149)
+			break;
 	}
 	of.close();
 }
@@ -343,21 +347,17 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		QString lmPath, QString savePath, int templSize, int sceneSize,
 		double angleDiff) {
 	QFileInfoList files = Image::readFolder(folderImages);
-	for (int i = 145; i < files.size(); i++) {
+	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image sceneImage(_name);
 
-		int index2 = sceneImage.getFileName().lastIndexOf("/");
-		QString scenename = sceneImage.getFileName().mid(index2 + 1,
-				sceneImage.getFileName().length() - index2 - 5);
+		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
 		vector<Point> mcresult;
 		Mat result = matchingTemplate(refImage, sceneImage, lmPath, templSize,
 				sceneSize, angleDiff, mcresult);
-		QString saveImg = savePath + "/"
-				+ _name.mid(index2 + 1, _name.length() - index2 - 5).replace(
-						" ", "") + ".JPG";
+		QString saveImg = savePath + "/" + scenename + ".JPG";
 		imwrite(saveImg.toStdString().c_str(), result);
 	}
 }

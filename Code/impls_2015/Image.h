@@ -96,6 +96,7 @@ public:
 
 
 	static QFileInfoList readFolder(QString folderPath);
+	QString getName();
 };
 
 } /* namespace impls_2015 */

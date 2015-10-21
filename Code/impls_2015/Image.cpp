@@ -567,4 +567,10 @@ QFileInfoList Image::readFolder(QString folderPath) {
 	QFileInfoList files = qdir.entryInfoList();
 	return files;
 }
+QString Image::getName() {
+	int index = this->fileName.lastIndexOf("/");
+	QString scenename = this->fileName.mid(index + 1,
+			this->fileName.length() - index - 5);
+	return scenename;
+}
 } /* namespace impls_2015 */

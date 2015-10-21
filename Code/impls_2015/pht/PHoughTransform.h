@@ -40,9 +40,6 @@ public:
 	PHoughTransform();
 	virtual ~PHoughTransform();
 
-	static void test(vector<Line> refLines, vector<Line> sceneLines,
-			QString refLandmark, int width, int height);
-
 	bool closetLine(Line line1, Line line2);
 	vector<PHTEntry> constructTable(vector<Line> lines, Point refPoint);
 	bool lineSimilar(Line line1, Line line2);
@@ -55,7 +52,7 @@ public:
 	Point refPointInScene(Image modelImage, Image sceneImage);
 	Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 			double &angleDiff, int width, int height);
-	vector<Point> readLandmarksFile(QString filePath);
+	vector<Point> readLandmarksFile(string filePath);
 
 	vector<Point> findLandmarks(Point refPoint, Point esPoint,
 			double angleDiff, vector<Point> refLandmarks, int width,
@@ -68,6 +65,8 @@ public:
 	double angleDifference(Line refLine, Line sceneLine);
 	Point newLocation(Point point, double angleDiff,
 			Point refPoint);
+	Mat testPHT(Image mImage, Image sImage,
+			string mlmPath, double &angleDiff,Point &ePoint);
 };
 
 } /* namespace impls_2015 */

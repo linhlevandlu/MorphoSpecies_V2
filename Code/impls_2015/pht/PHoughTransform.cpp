@@ -17,80 +17,11 @@ PHoughTransform::~PHoughTransform() {
 	// TODO Auto-generated destructor stub
 }
 
-void PHoughTransform::test(vector<Line> refLines, vector<Line> sceneLines,
-		QString refLandmark, int width, int height) {
-
-	PHoughTransform pht;
-	Point hPoint(width / 2, height / 2);
-	qDebug() << "Reference model point: (" << hPoint.x << ", " << hPoint.y
-			<< ")";
-
-	vector<PHTEntry> entryTable = pht.constructTable(refLines, hPoint);
-	qDebug() << "finished table";
-	vector<Line> maxVector;
-	double angleDiff;
-	PHTEntry entry = pht.matchingInScene(entryTable, sceneLines, width, height,
-			maxVector);
-	if (maxVector.size() > 0) {
-		qDebug() << "matching finished";
-		Point refPoint = pht.refPointInScene(entry, maxVector, angleDiff, width,
-				height);
-
-		cv::Mat mat(cv::Size(width, height), CV_8UC3, cv::Scalar(0, 0, 0));
-		for (size_t t = 0; t < sceneLines.size(); t++) {
-			Line l = sceneLines.at(t);
-			if (l.length() > 50)
-				mat = l.drawing(mat);
-		}
-
-		mat = entry.getLine1().drawing(mat);
-		mat = entry.getLine2().drawing(mat);
-		line(mat, entry.getLine1().getP1(), entry.getLine1().getP2(),
-				Scalar(0, 255, 0), 1, 8);
-		cv::putText(mat, "1", entry.getLine1().getP1(), FONT_HERSHEY_COMPLEX, 1,
-				Scalar(0, 255, 0), 1, 8);
-		line(mat, entry.getLine2().getP1(), entry.getLine2().getP2(),
-				Scalar(0, 255, 0), 1, 8);
-		cv::putText(mat, "2", entry.getLine2().getP1(), FONT_HERSHEY_COMPLEX, 1,
-				Scalar(0, 255, 0), 1, 8);
-		line(mat, maxVector.at(0).getP1(), maxVector.at(0).getP2(),
-				Scalar::all(255), 1, 8);
-		cv::putText(mat, "1", maxVector.at(0).getP1(), FONT_HERSHEY_COMPLEX, 1,
-				Scalar(0, 0, 255), 1, 8);
-		line(mat, maxVector.at(1).getP1(), maxVector.at(1).getP2(),
-				Scalar::all(255), 1, 8);
-		cv::putText(mat, "2", maxVector.at(1).getP1(), FONT_HERSHEY_COMPLEX, 1,
-				Scalar(0, 0, 255), 1, 8);
-
-		vector<Point> landmarks = pht.readLandmarksFile(refLandmark);
-
-		for (size_t t = 0; t < landmarks.size(); t++) {
-			Point landm = landmarks.at(t);
-			circle(mat, cv::Point(landm.x, height - landm.y), 7,
-					Scalar(0, 0, 255), 1, 4);
-		}
-
-		circle(mat, hPoint, 5, Scalar(0, 0, 255), 1, 8);
-		circle(mat, cv::Point(refPoint.x, refPoint.y), 5, Scalar(0, 255, 0), 1,
-				8);
-
-		vector<Point> esLandmarks = pht.findLandmarks(hPoint, refPoint,
-				angleDiff, landmarks, width, height);
-		for (size_t t = 0; t < esLandmarks.size(); t++) {
-			circle(mat, esLandmarks.at(t), 2, Scalar(0, 255, 255), 1, 8);
-		}
-
-		imwrite("test/images/scene.jpg", mat);
-		cv::namedWindow("DetectLines", CV_WINDOW_AUTOSIZE);
-		cv::imshow("DetectLines", mat);
-	}
-}
-
 /**
  * Getting the landmarks from a file and saving into a vector
  */
-vector<Point> PHoughTransform::readLandmarksFile(QString filePath) {
-	ifstream openFile(filePath.toStdString().c_str());
+vector<Point> PHoughTransform::readLandmarksFile(string filePath) {
+	ifstream openFile(filePath.c_str());
 	string lineText;
 	vector<Point> landmarks;
 	if (openFile.is_open()) {
@@ -180,8 +111,9 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 	if (abs(refAngle - sceneAngle) < 1
 			&& (abs(
 					ref1.length() / scene1.length()
-							- ref2.length() / scene2.length()) < 2))
+							- ref2.length() / scene2.length()) < 2)) {
 		return true;
+	}
 	return false;
 
 }
@@ -314,15 +246,13 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 		string reflmPath) {
 
 	QString scenelmDir = "/home/linh/Desktop/landmarks";
-	int index2 = sceneImage.getFileName().lastIndexOf("/");
-	QString scenename = sceneImage.getFileName().mid(index2 + 1,
-			sceneImage.getFileName().length() - index2 - 5);
+	QString scenename = sceneImage.getName();
 	QString scenelmPath = scenelmDir + "/" + scenename + ".TPS";
-	vector<Point> orglandmarks = readLandmarksFile(scenelmPath);
+	vector<Point> orglandmarks = readLandmarksFile(scenelmPath.toStdString());
 	double angleDiff;
 	Point ePoint;
 	vector<Point> esLandmarks = estimateLandmarks(refImage, sceneImage,
-			reflmPath, angleDiff,ePoint);
+			reflmPath, angleDiff, ePoint);
 
 	Mat sceneMat = sceneImage.getMatrixImage();
 	cv::Mat mat(sceneMat.clone());
@@ -340,7 +270,7 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 }
 
 vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
-		string mlmPath, double &angleDiff,Point &ePoint) {
+		string mlmPath, double &angleDiff, Point &ePoint) {
 	vector<Point> eLandmarks;
 	Mat mMatrix = mImage.getMatrixImage();
 	int width = mMatrix.cols;
@@ -357,8 +287,12 @@ vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
 	PHTEntry entry = matchingInScene(entryTable, sLines, width, height,
 			maxVector);
 	if (maxVector.size() > 0) {
-		ePoint = refPointInScene(entry, maxVector, angleDiff, width,
-				height);
+		ePoint = refPointInScene(entry, maxVector, angleDiff, width, height);
+
+		double angle1 = entry.getLine1().angleBetweenLines(entry.getLine2());
+		double angle2 = maxVector.at(0).angleBetweenLines(maxVector.at(1));
+		angleDiff += abs(angle1 - angle2);
+
 		eLandmarks = findLandmarks(mPoint, ePoint, angleDiff, mLandmarks, width,
 				height);
 	}
@@ -376,30 +310,30 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 		int x, refX;
 		int y, refY;
 		/*if (angleDiff != 0) {
-			//  rotation
-			Point tpoint = newLocation(lm,angleDiff,refPoint);
-			x= tpoint.x;
-			y= tpoint.y;
-			Point tref = newLocation(refPoint,angleDiff,refPoint);
-			refX = tref.x;
-			refY = tref.y;
-			// and translation
-			px = refX - refPoint.x;
-			py = refY - refPoint.y;
+		 //  rotation
+		 Point tpoint = newLocation(lm, angleDiff, refPoint);
+		 x = tpoint.x;
+		 y = tpoint.y;
+		 Point tref = newLocation(refPoint, angleDiff, refPoint);
+		 refX = tref.x;
+		 refY = tref.y;
+		 // and translation
+		 px = refX - refPoint.x;
+		 py = refY - refPoint.y;
 
-			x = x - px;
-			if (py > 0)
-				y = y - py;
-			else
-				y = y + py;
+		 x = x - px;
+		 if (py > 0)
+		 y = y - py;
+		 else
+		 y = y + py;
 
-		} else {*/
+		 } else {*/
 
-			x = lm.x - px;
-			if (y > 0)
-				y = lm.y - py;
-			else
-				y = lm.y + py;
+		x = lm.x - px;
+		if (y > 0)
+			y = lm.y - py;
+		else
+			y = lm.y + py;
 		//}
 		esLandmarks.push_back(Point(x, y));
 	}
@@ -408,6 +342,7 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 Point PHoughTransform::newLocation(Point point, double angleDiff,
 		Point refPoint) {
 	int x, y;
+	qDebug() << "rotate angle: " << angleDiff;
 	if (angleDiff >= 0) {
 		x = point.x * cos(round(angleDiff) * M_PI / 180)
 				- point.y * sin(round(angleDiff) * M_PI / 180) + refPoint.x;
@@ -419,24 +354,26 @@ Point PHoughTransform::newLocation(Point point, double angleDiff,
 		y = -point.x * sin(round(angleDiff) * M_PI / 180)
 				+ point.y * cos(round(angleDiff) * M_PI / 180) + refPoint.y;
 	}
-	return Point(x,y);
+	return Point(x, y);
 }
 void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		QString sceneDir, QString scenelmDir, QString saveDir) {
 
 	QFileInfoList files = Image::readFolder(sceneDir);
-	for (int i = 0; i < files.size(); i++) {
+	for (int i = 100; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image sceneImage(_name);
 
-		int index2 = sceneImage.getFileName().lastIndexOf("/");
-		QString scenename = sceneImage.getFileName().mid(index2 + 1,
-				sceneImage.getFileName().length() - index2 - 5);
+		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
-
-		Mat mat = phtPresentation(refImage, sceneImage,
-				reflmPath.toStdString());
+		/*
+		 Mat mat = phtPresentation(refImage, sceneImage,
+		 reflmPath.toStdString());*/
+		Point ePoint;
+		double angle;
+		Mat mat = testPHT(refImage, sceneImage, reflmPath.toStdString().c_str(),
+				angle, ePoint);
 		QString savePath = saveDir + "/" + scenename + ".JPG";
 		imwrite(savePath.toStdString().c_str(), mat);
 	}
@@ -446,10 +383,73 @@ double PHoughTransform::angleDifference(Line refLine, Line sceneLine) {
 	if (angle > 90)
 		angle = 180 - angle;
 
-	Point p1 = sceneLine.getP1();
-	Point p2 = sceneLine.getP2();
-	if (p1.x < refLine.getP1().x || p2.x < refLine.getP2().x)
-		return -angle;
+	/*Point p1 = sceneLine.getP1();
+	 Point p2 = sceneLine.getP2();
+	 if (p1.x < refLine.getP1().x || p2.x < refLine.getP2().x)
+	 return -angle;*/
 	return angle;
+}
+
+Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
+		double &angleDiff, Point &ePoint) {
+	vector<Point> eLandmarks;
+	Mat mMatrix = mImage.getMatrixImage();
+	int width = mMatrix.cols;
+	int height = mMatrix.rows;
+
+	vector<Point> mLandmarks = mImage.readLandmarksFile(mlmPath);
+
+	vector<Line> mLines = mImage.lineSegment();
+	vector<Line> sLines = sImage.lineSegment();
+
+	Point mPoint(width / 2, height / 2);
+	vector<PHTEntry> entryTable = constructTable(mLines, mPoint);
+	vector<Line> maxVector;
+	PHTEntry entry = matchingInScene(entryTable, sLines, width, height,
+			maxVector);
+	Mat result(sImage.getMatrixImage().clone());
+
+	result = entry.getLine1().drawing(result);
+	cv::putText(result, "line 1", entry.getLine1().getP1(),
+			FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1, 8);
+	result = entry.getLine2().drawing(result);
+	cv::putText(result, "line 2", entry.getLine2().getP1(),
+			FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1, 8);
+	circle(result, mPoint, 5, Scalar(0, 0, 255), 5, 8);
+	if (maxVector.size() > 0) {
+		cv::line(result, maxVector[0].getP1(), maxVector[0].getP2(),
+				Scalar(0, 255, 0), 2, 8);
+		cv::putText(result, "line 1", maxVector[0].getP1(),
+				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
+		cv::line(result, maxVector[1].getP1(), maxVector[1].getP2(),
+				Scalar(0, 255, 0), 2, 8);
+		cv::putText(result, "line 2", maxVector[1].getP1(),
+				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
+		ePoint = refPointInScene(entry, maxVector, angleDiff, width, height);
+		double angle1 = entry.getLine1().angleBetweenLines(entry.getLine2());
+		double angle2 = maxVector.at(0).angleBetweenLines(maxVector.at(1));
+
+		qDebug() << "angle Difference: " << angleDiff << ", subtraction: "
+				<< abs(angle1 - angle2);
+		angleDiff += abs(angle1 - angle2);
+		circle(result, ePoint, 5, Scalar(0, 255, 255), 5, 8);
+		eLandmarks = findLandmarks(mPoint, ePoint, angleDiff, mLandmarks, width,
+				height);
+		LandmarkDetection lmd;
+		result = lmd.rotateImage(result,
+				(angleDiff < 10) ? (angleDiff * 2) : angleDiff, ePoint);
+
+		for (size_t j = 0; j < mLines.size(); j++) {
+			Line line = mLines.at(j);
+			if (line.length() > 50)
+				result = line.drawing(result);
+		}
+
+		for (size_t i = 0; i < eLandmarks.size(); i++) {
+			circle(result, eLandmarks.at(i), 3, Scalar(0, 255, 255), 2, 8);
+		}
+	}
+	return result;
+
 }
 } /* namespace impls_2015 */

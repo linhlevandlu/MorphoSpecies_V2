@@ -41,7 +41,6 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 		Line line = lines.at(i);
 		resultImage = line.drawing(resultImage);
 	}
-
 	return resultImage;
 }
 void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
@@ -62,23 +61,23 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
 
 		//write the coordinates
 		/*int x1, y1, x2, y2;
-		ofstream of(pghName.toStdString().c_str());
-		for (size_t i = 0; i < lines.size(); i++) {
-			Line line = lines.at(i);
-			// rotation 15 degree
-			x1 = line.getP1().x * cos(round(15) * M_PI / 180)
-					- line.getP1().y * sin(round(15) * M_PI / 180);
-			y1 = line.getP1().x * sin(round(15) * M_PI / 180)
-					+ line.getP1().y * cos(round(15) * M_PI / 180);
-			x2 = line.getP2().x * cos(round(15) * M_PI / 180)
-					- line.getP2().y * sin(round(15) * M_PI / 180);
-			y2 = line.getP2().x * sin(round(15) * M_PI / 180)
-					+ line.getP2().y * cos(round(15) * M_PI / 180);
-			of << "(" << x1 << "," << y1 << ")"
-					<< " (" << x2 << "," << y2
-					<< ")" << "\n";
-		}
-		of.close();*/
+		 ofstream of(pghName.toStdString().c_str());
+		 for (size_t i = 0; i < lines.size(); i++) {
+		 Line line = lines.at(i);
+		 // rotation 15 degree
+		 x1 = line.getP1().x * cos(round(15) * M_PI / 180)
+		 - line.getP1().y * sin(round(15) * M_PI / 180);
+		 y1 = line.getP1().x * sin(round(15) * M_PI / 180)
+		 + line.getP1().y * cos(round(15) * M_PI / 180);
+		 x2 = line.getP2().x * cos(round(15) * M_PI / 180)
+		 - line.getP2().y * sin(round(15) * M_PI / 180);
+		 y2 = line.getP2().x * sin(round(15) * M_PI / 180)
+		 + line.getP2().y * cos(round(15) * M_PI / 180);
+		 of << "(" << x1 << "," << y1 << ")"
+		 << " (" << x2 << "," << y2
+		 << ")" << "\n";
+		 }
+		 of.close();*/
 
 		//save the image
 		/*cv::Mat segImg(image.getMatrixImage().size(),image.getMatrixImage().type(),Scalar::all(0));

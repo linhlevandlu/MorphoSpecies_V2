@@ -77,9 +77,11 @@ public:
 	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc,int distanceAcc);
 	static void matchingDirectory(QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	static void pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums);
-	static void probabilisticHoughTransform(vector<Line> refLines, vector<Line> sceneLines,QString lmPath,int width, int height);
 	static Mat probabilisticHoughTransform(Image refImage, Image sceneImage, QString reflmPath);
 	static void phtDirectory(Image refImage, QString reflmPath, QString sceneDir, QString scenelmDir, QString saveDir);
+
+
+	static Mat testPHT(Image refImage, Image sceneImage, string lmPath) ;
 };
 
 } /* namespace impls_2015 */

@@ -2565,7 +2565,7 @@ void ImageViewer::getLandmarks() {
 	Image image(fileName);
 	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 	QString folder = "/home/linh/Desktop/mandibule";
-	QString saveFolder = "/home/linh/Desktop/estlandmarks";
+	QString saveFolder = "/home/linh/Desktop/est2110";
 
 	// by directory
 	qDebug() << "Landmarks detected by automatic define";
@@ -2577,7 +2577,7 @@ void ImageViewer::getLandmarks() {
 		return;
 	Image sceneImage(fileName2);
 	// matching template
-	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath, 200,
+	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath, 400,
 			1400);
 
 	ImageViewer *other = new ImageViewer;
@@ -2670,26 +2670,27 @@ void ImageViewer::pHoughTransform() {
 	Image image(fileName);
 	QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 
-	QString fileName2 = QFileDialog::getOpenFileName(this);
+	/*QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
 	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
 			reflmPath);
+	Mat enddest = Scenario::testPHT(image,image2,reflmPath.toStdString());
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
-	other->show();
+	other->show();*/
 
 	/*
 	 * Working on directory
 	 */
-	/*QString sceneImageDir = "/home/linh/Desktop/mandibule";
+	QString sceneImageDir = "/home/linh/Desktop/mandibule";
 	 QString sceneLMDir = "/home/linh/Desktop/landmarks";
-	 QString saveDir = "/home/linh/Desktop/phtEstimate";
+	 QString saveDir = "/home/linh/Desktop/pht2110";
 	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-	 saveDir);*/
+	 saveDir);
 	qDebug() << "Done";
 }
 void ImageViewer::crossCorrelation() {

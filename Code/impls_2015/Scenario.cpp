@@ -114,13 +114,6 @@ void Scenario::matchingDirectory(QString directoryPath,
 			distanceAcc);
 }
 
-void Scenario::probabilisticHoughTransform(vector<Line> refLines,
-		vector<Line> sceneLines, QString lmPath, int width, int height) {
-	PHoughTransform pht;
-
-	pht.test(refLines, sceneLines, lmPath, width, height);
-}
-
 Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage,
 		QString reflmPath) {
 	PHoughTransform pht;
@@ -141,7 +134,7 @@ vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 
 	vector<Point> landmarks;
 	LandmarkDetection lmdetection;
-	landmarks = lmdetection.crossCorrelation(image, sceneImage,lpath,200);
+	landmarks = lmdetection.crossCorrelation(image, sceneImage, lpath, 200);
 
 	// xac dinh centroid point
 	/*Point point;
@@ -166,23 +159,31 @@ Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 	double angle;
 	vector<Point> mcResult;
 	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath,
-			templSize, scnSize, angle,mcResult);
+			templSize, scnSize, angle, mcResult);
 }
 void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
-		QString lmPath, QString savePath, int templSize, int sceneSize){
+		QString lmPath, QString savePath, int templSize, int sceneSize) {
 	LandmarkDetection lmdetection;
 	// estimated the landmarks
-	//double angle;
-	//return lmdetection.matchingDirectory(refImage,folderImages,lmPath,savePath,templSize,sceneSize,angle);
+	double angle;
+	lmdetection.matchingDirectory(refImage,folderImages,lmPath,savePath,templSize,sceneSize,angle);
 
 	// compute the centroid
-	QString lmFolder = "/home/linh/Desktop/landmarks";
-	lmdetection.centroidMatchingDirectory(refImage,lmPath,folderImages,lmFolder);
+	/*QString lmFolder = "/home/linh/Desktop/landmarks";
+	lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,
+			lmFolder);*/
 
 }
 void Scenario::cCorelationDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {
 	LandmarkDetection lmdetection;
 	lmdetection.cCorelationByDirectory(refImage, path, savePath, lmPath);
+}
+
+Mat Scenario::testPHT(Image refImage, Image sceneImage, string lmPath) {
+	PHoughTransform pht;
+	double angle;
+	Point ePoint;
+	return pht.testPHT(refImage, sceneImage, lmPath,angle,ePoint);
 }
 } /* namespace impls_2015 */
