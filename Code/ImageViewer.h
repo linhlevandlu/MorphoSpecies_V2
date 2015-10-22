@@ -175,6 +175,8 @@ private slots:
 	void getLandmarks();
 	void pHoughTransform();
 	void crossCorrelation();
+	void crossCorrelationDistance();
+	void tplMatchingDistance();
 private:
 	void createActions();
 	void createMenus();
@@ -269,6 +271,8 @@ private:
 	QAction *pwhIntersection; // matching 2 PGH using intersection
 	QAction *phTransform;
 	QAction *cCorrelation; // cross correlation
+	QAction *ccMeasureDistance;
+	QAction *tmMeasureDistance;
 
 // end
 	QMenu *fileMenu;

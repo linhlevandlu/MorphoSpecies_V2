@@ -48,7 +48,6 @@
 #include "pht/PHoughTransform.h"
 #include "landmarks/LandmarkDetection.h"
 
-
 using namespace cv;
 using namespace std;
 
@@ -64,24 +63,43 @@ public:
 
 	Scenario();
 	virtual ~Scenario();
-	static vector<Line> edgeSegmentation(Image image,cv::Mat &result);
-	static void edgeSegmentationDirectory(QString inputFolder,QString saveFolder);
-	static vector<LocalHistogram> pairwiseHistogram(Image image,LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
-	static vector<Point> landmarksByCrossCorelation(Image image,QString lpath,Image sceneImage);
+	static vector<Line> edgeSegmentation(Image image, cv::Mat &result);
+	static void edgeSegmentationDirectory(QString inputFolder,
+			QString saveFolder);
+	static vector<LocalHistogram> pairwiseHistogram(Image image,
+			LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
+	static vector<Point> landmarksByCrossCorelation(Image image, QString lpath,
+			Image sceneImage);
+	static double mDistanceByCrossCorrelation(Image image, QString lmpath,
+			Image sceneImage, int size, Point &ebary);
+	static void mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
+			QString imgFolder);
 	static Mat landmarksMatching(Image refImage, Image sceneImage,
 			QString reflmPath, int templSize, int scnSize);
 	static void landmarksMatchingDirectory(Image refImage, QString folderImages,
 			QString lmPath, QString savePath, int templSize, int sceneSize);
-	static void cCorelationDirectory(Image refImage, QString path,QString savePath, QString lmPath);
-	static double pghMatching(Image refImage, Image sceneImage, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
-	static void matchingDirectory(Image refImage, QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc,int distanceAcc);
-	static void matchingDirectory(QString directoryPath, GeometricHistogram::MatchingMethod matching, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
-	static void pairwiseHistogramDirectory(QString folderPath,LocalHistogram::AccuracyPGH angleAcc, int colums);
-	static Mat probabilisticHoughTransform(Image refImage, Image sceneImage, QString reflmPath);
-	static void phtDirectory(Image refImage, QString reflmPath, QString sceneDir, QString scenelmDir, QString saveDir);
+	static void cCorelationDirectory(Image refImage, QString path,
+			QString savePath, QString lmPath);
+	static double pghMatching(Image refImage, Image sceneImage,
+			GeometricHistogram::MatchingMethod matching,
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
+	static void matchingDirectory(Image refImage, QString directoryPath,
+			GeometricHistogram::MatchingMethod matching,
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
+	static void matchingDirectory(QString directoryPath,
+			GeometricHistogram::MatchingMethod matching,
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
+	static void pairwiseHistogramDirectory(QString folderPath,
+			LocalHistogram::AccuracyPGH angleAcc, int colums);
+	static Mat probabilisticHoughTransform(Image refImage, Image sceneImage,
+			QString reflmPath);
+	static void phtDirectory(Image refImage, QString reflmPath,
+			QString sceneDir, QString scenelmDir, QString saveDir);
 
-
-	static Mat testPHT(Image refImage, Image sceneImage, string lmPath) ;
+	static double mDistanceByTemplateMatching(Image refImage, Image sceneImage,
+			QString lmPath, int templSize, int sceneSize, Point &ebary);
+	static void mDistanceByTemplateMatchingDirectory(Image refImage,
+			QString lmPath, QString folderImages, int templSize, int sceneSize);
 };
 
 } /* namespace impls_2015 */

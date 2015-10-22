@@ -155,6 +155,9 @@ void ImageViewer::activeFunction() {
 	pwhIntersection->setEnabled(true);
 	phTransform->setEnabled(true);
 	cCorrelation->setEnabled(true);
+	ccMeasureDistance->setEnabled(true);
+	tmMeasureDistance->setEnabled(true);
+
 	//end
 	updateActions();
 
@@ -568,8 +571,17 @@ void ImageViewer::createActions() {
 
 	cCorrelation = new QAction(tr("Cross Correlation"), this);
 	cCorrelation->setEnabled(false);
-	//crossCorrelation->setShortcut(tr("Ctrl+T"));
 	connect(cCorrelation, SIGNAL(triggered()), this, SLOT(crossCorrelation()));
+
+	ccMeasureDistance = new QAction(tr("CC measure distance"), this);
+	ccMeasureDistance->setEnabled(false);
+	connect(ccMeasureDistance, SIGNAL(triggered()), this,
+			SLOT(crossCorrelationDistance()));
+
+	tmMeasureDistance = new QAction(tr("Template matching MS"), this);
+	tmMeasureDistance->setEnabled(false);
+	connect(tmMeasureDistance, SIGNAL(triggered()), this,
+			SLOT(tplMatchingDistance()));
 
 	//end
 }
@@ -664,16 +676,27 @@ void ImageViewer::createMenus() {
 	//add by Linh
 
 	other2015 = pluginsMenu->addMenu(tr("Classification"));
-	other2015->addAction(cCorrelation);
+
+	QMenu* mnuccorrelation = other2015->addMenu("Cross correlations");
+	mnuccorrelation->addAction(cCorrelation);
+	mnuccorrelation->addAction(ccMeasureDistance);
+
 	QMenu* mnuArticle = other2015->addMenu(tr("Automatic extraction"));
 	mnuArticle->addAction(removeLinesAct);
 	mnuArticle->addAction(edgeSegment);
 	mnuArticle->addAction(pwHistogram);
-	mnuArticle->addAction(pwhMatching);
-	mnuArticle->addAction(pwhChisquared);
-	mnuArticle->addAction(pwhIntersection);
+
+	QMenu* mnuHistMatch = mnuArticle->addMenu(tr("PGH matching"));
+	mnuHistMatch->addAction(pwhMatching);
+	mnuHistMatch->addAction(pwhChisquared);
+	mnuHistMatch->addAction(pwhIntersection);
+
 	mnuArticle->addAction(phTransform);
-	mnuArticle->addAction(landmarksDetection); // landmarks detection
+
+	QMenu* mnuTmMatch = mnuArticle->addMenu("Landmarks Estimation");
+	mnuTmMatch->addAction(landmarksDetection); // landmarks detection
+	mnuTmMatch->addAction(tmMeasureDistance);
+
 	//end
 
 	menuBar()->addMenu(fileMenu);
@@ -2561,29 +2584,42 @@ void ImageViewer::removeYLinesAction() {
 void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
-
 	Image image(fileName);
-	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
-	QString folder = "/home/linh/Desktop/mandibule";
-	QString saveFolder = "/home/linh/Desktop/est2110";
+
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+
+	QString lpath = QFileDialog::getOpenFileName(this);
 
 	// by directory
-	qDebug() << "Landmarks detected by automatic define";
-	Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder, 200,	1400);
+	/*
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+
+	 msgbox.setText("Select the saving folder.");
+	 msgbox.exec();
+	 QString saveFolder = QFileDialog::getExistingDirectory(this);
+	 Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder, 400,
+	 1400);*/
 
 	// teplate matching an image
-	/*QString fileName2 = QFileDialog::getOpenFileName(this);
+	msgbox.setText("Select the scene image.");
+	msgbox.exec();
+
+	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	Image sceneImage(fileName2);
-	// matching template
+
 	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath, 400,
 			1400);
-
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
-	other->show();*/
+	other->show();
 	qDebug() << "Done";
 }
 void ImageViewer::edgeSegmentation() {
@@ -2671,54 +2707,63 @@ void ImageViewer::pHoughTransform() {
 	QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 
 	/*QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	qDebug() << fileName2;
-	Image image2(fileName2);
-	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
-			reflmPath);
-	Mat enddest = Scenario::testPHT(image,image2,reflmPath.toStdString());
-	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-			"Probabilistic Hough Transform");
-	other->show();*/
+	 if (fileName2.isEmpty())
+	 return;
+	 qDebug() << fileName2;
+	 Image image2(fileName2);
+	 Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
+	 reflmPath);
+	 Mat enddest = Scenario::testPHT(image,image2,reflmPath.toStdString());
+	 ImageViewer *other = new ImageViewer;
+	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+	 "Probabilistic Hough Transform");
+	 other->show();*/
 
 	/*
 	 * Working on directory
 	 */
 	QString sceneImageDir = "/home/linh/Desktop/mandibule";
-	 QString sceneLMDir = "/home/linh/Desktop/landmarks";
-	 QString saveDir = "/home/linh/Desktop/pht2110";
-	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-	 saveDir);
+	QString sceneLMDir = "/home/linh/Desktop/landmarks";
+	QString saveDir = "/home/linh/Desktop/pht2110";
+	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
+			saveDir);
 	qDebug() << "Done";
 }
 void ImageViewer::crossCorrelation() {
+
 	qDebug() << "Cross correlation";
 	Image image(fileName);
+
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+	QString lpath = QFileDialog::getOpenFileName(this); //"/home/linh/Desktop/landmarks/Md 028.TPS";
+
+	// cross correlation on an image
+	msgbox.setText("Select the second image.");
+	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	Image sceneImage(fileName2);
-	QString lpath = "/home/linh/Desktop/landmarks/Md 028.TPS";
+
 	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
 			sceneImage);
-	int index2 = sceneImage.getFileName().lastIndexOf("/");
-	QString scenename = sceneImage.getFileName().mid(index2 + 1,
-			sceneImage.getFileName().length() - index2 - 5);
+	QString scenename = sceneImage.getName();
 	qDebug() << scenename;
-	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
-	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
-			spath.toStdString());
+
+	//QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
+	//vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
+	//		spath.toStdString());
 
 	Mat enddest(sceneImage.getMatrixImage().clone());
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		Point lm = landmarks.at(i);
 		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 0, 255), 2, 4);
-		Point orglm = sceneLandmarks.at(i);
-		circle(enddest,
-				Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
-				Scalar(0, 255, 0), 2, 4);
+		//Point orglm = sceneLandmarks.at(i);
+		//circle(enddest,Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
+		//		Scalar(0, 255, 0), 2, 4);
 	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
@@ -2727,8 +2772,79 @@ void ImageViewer::crossCorrelation() {
 
 	// cross-corelation directory
 	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
-	 QString folder = "/home/linh/Desktop/mandibule";
-	 QString saveFolder = "/home/linh/Desktop/estlandmarks";
+
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+
+	 msgbox.setText("Select the saving folder.");
+	 msgbox.exec();
+	 QString saveFolder = QFileDialog::getExistingDirectory(this) ;
 	 Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);*/
+	qDebug() << "Done";
+}
+void ImageViewer::crossCorrelationDistance() {
+
+	qDebug() << "Compute the measure distance by cross correlation";
+	Image image(fileName);
+
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+	QString lpath = QFileDialog::getOpenFileName(this);
+
+	// measure distance cross correlation on an image
+	/*msgbox.setText("Select the second image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	Point ebary;
+	double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
+			sceneImage, 400, ebary);
+	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
+	qDebug() << "Measure distance estimated: " << eCentroid;*/
+
+	// measrue distance cross correlation on a directory
+	qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+	 Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);
+
+	qDebug() << "Done";
+}
+void ImageViewer::tplMatchingDistance() {
+	qDebug() << "Measure distance by article";
+	Image image(fileName);
+
+	QMessageBox msgbox;
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+
+	QString lpath = QFileDialog::getOpenFileName(this);
+
+	// by directory
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+
+	 Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400, 1400);
+
+	// an image
+	/*msgbox.setText("Select the scene image.");
+	msgbox.exec();
+
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	Point ebary;
+	double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
+			lpath, 400, 1400, ebary);
+	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
+	qDebug() << "Measure distance estimated: " << eCentroid;*/
 	qDebug() << "Done";
 }
