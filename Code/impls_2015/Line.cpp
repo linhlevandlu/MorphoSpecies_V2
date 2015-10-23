@@ -252,11 +252,8 @@ GFeatures Line::pairwiseHistogram(Line objectLine) {
  * @parameter: outputImage - the output image
  * @return: the result image in matrix
  */
-cv::Mat Line::drawing(cv::Mat outputImage) {
-	//qDebug() << "Draw a line";
-	//Mat output = Mat::zeros(outputImage.size(), CV_8UC3);
-	cv::line(outputImage, this->p1, this->p2, cv::Scalar(0, 0, 255), 1, 8);
-	return outputImage;
+void Line::drawing(cv::Mat &outputImage) {
+	cv::line(outputImage, this->p1, this->p2, cv::Scalar(0, 0, 255), 2, 8);
 }
 bool Line::operator==(Line &line) {
 	cv::Point lp1 = line.p1;

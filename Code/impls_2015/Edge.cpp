@@ -198,11 +198,11 @@ vector<cv::Point> Edge::segment() {
  * @parameter: outputImage - image contains the result
  * @result: an image in Matrix
  */
-cv::Mat Edge::drawing(cv::Mat outputImage) {
+void Edge::drawing(cv::Mat &outputImage) {
 	//Mat output = Mat::zeros(inputImage.size(), CV_8UC3);
 	QString title;
 	if (listOfLines.size() > 0) {
-		//qDebug() << "Drawing the edges from a list of lines.";
+		qDebug() << "Drawing the edges from a list of lines.";
 		for (size_t i = 0; i < listOfLines.size(); i++) {
 			Line linei = listOfLines.at(i);
 			linei.drawing(outputImage);
@@ -210,7 +210,7 @@ cv::Mat Edge::drawing(cv::Mat outputImage) {
 		title = "Edge By Lines";
 	} else {
 		if (listOfPoints.size() > 0) {
-			//qDebug() << "Drawing the edges from list of points.";
+			qDebug() << "Drawing the edges from list of points.";
 			cv::Point p;
 			p = listOfPoints.at(0);
 			for (size_t i = 1; i < listOfPoints.size(); i++) {
@@ -221,7 +221,6 @@ cv::Mat Edge::drawing(cv::Mat outputImage) {
 			title = "Edge by Points";
 		}
 	}
-	return outputImage;
 }
 
 vector<Line> Edge::readFile(QString filePath) {

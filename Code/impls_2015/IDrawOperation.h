@@ -42,7 +42,7 @@ public:
 	IDrawOperation();
 	static IDrawOperation* create();
 	virtual ~IDrawOperation();
-	virtual cv::Mat drawing(cv::Mat outputImage)=0;
+	virtual void drawing(cv::Mat &outputImage)=0;
 };
 
 } /* namespace impls_2015 */

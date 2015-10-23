@@ -36,10 +36,9 @@ vector<Line> EdgeSegmentation::lineSegment(Image image) {
 }
 cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 		vector<Line> lines) {
-
 	for (size_t i = 0; i < lines.size(); i++) {
 		Line line = lines.at(i);
-		resultImage = line.drawing(resultImage);
+		line.drawing(resultImage);
 	}
 	return resultImage;
 }

@@ -63,9 +63,8 @@ void Landmark::setLocation(cv::Point location) {
  * @parameter: outputImage - the image contains the result
  * @return: an image contains the landmark
  */
-cv::Mat Landmark::drawing(cv::Mat outputImage) {
+void Landmark::drawing(cv::Mat &outputImage) {
 	cv::circle(outputImage, this->location, 1, cv::Scalar(0, 0, 255), 1, 8);
-	return outputImage;
 }
 
 } /* namespace impls_2015 */

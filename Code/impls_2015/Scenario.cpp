@@ -43,9 +43,6 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
 	vector<Line> appLines;
 	EdgeSegmentation sgMethod;
 	appLines = sgMethod.lineSegment(image);
-
-	//Mat temp(image.getMatrixImage().size(), CV_8UC3, cv::Scalar(0, 0, 0));
-	//temp.copyTo(result);
 	result = sgMethod.rePresentation(result, appLines);
 	return appLines;
 }

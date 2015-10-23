@@ -80,7 +80,7 @@ public:
 	double medianHistogram();
 	float meanHistogram();
 	cv::Mat drawingHistogram();
-	cv::Mat drawing(cv::Mat outputImage);
+	void drawing(cv::Mat &outputImage);
 
 	// removing yellow grid
 	InsectPart getPart();

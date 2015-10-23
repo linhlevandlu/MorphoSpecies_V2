@@ -2711,7 +2711,7 @@ void ImageViewer::pHoughTransform() {
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 
-	/*msgbox.setText("Select the second image.");
+	msgbox.setText("Select the scene image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
@@ -2723,16 +2723,16 @@ void ImageViewer::pHoughTransform() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
-	other->show();*/
+	other->show();
 
 	/*
 	 * Working on directory
 	 */
-	QString sceneImageDir = "/home/linh/Desktop/mg/images";
+	/*QString sceneImageDir = "/home/linh/Desktop/mg/images";
 	 QString sceneLMDir = "/home/linh/Desktop/mg/landmarks";
 	 QString saveDir = "/home/linh/Desktop/pht2310";
 	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-	 saveDir);
+	 saveDir);*/
 	qDebug() << "Done";
 }
 void ImageViewer::crossCorrelation() {
@@ -2766,7 +2766,7 @@ void ImageViewer::crossCorrelation() {
 	Mat enddest(sceneImage.getMatrixImage().clone());
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		Point lm = landmarks.at(i);
-		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 0, 255), 2, 4);
+		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 255, 255), 2, 4);
 		//Point orglm = sceneLandmarks.at(i);
 		//circle(enddest,Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
 		//		Scalar(0, 255, 0), 2, 4);
@@ -2801,24 +2801,24 @@ void ImageViewer::crossCorrelationDistance() {
 	QString lpath = QFileDialog::getOpenFileName(this);
 
 	// measure distance cross correlation on an image
-	/*msgbox.setText("Select the second image.");
-	 msgbox.exec();
-	 QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 Image sceneImage(fileName2);
-	 Point ebary;
-	 double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
-	 sceneImage, 400, ebary);
-	 qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
-	 qDebug() << "Measure distance estimated: " << eCentroid;*/
+	msgbox.setText("Select the scene image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	Point ebary;
+	double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
+			sceneImage, 400, ebary);
+	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
+	qDebug() << "Measure distance estimated: " << eCentroid;
 
 	// measrue distance cross correlation on a directory
-	qDebug() << "Landmarks detected by cross-correlation (in directory)";
-	msgbox.setText("Select the images folder.");
-	msgbox.exec();
-	QString folder = QFileDialog::getExistingDirectory(this);
-	Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);
+	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+	 Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);*/
 
 	qDebug() << "Done";
 }
@@ -2834,25 +2834,25 @@ void ImageViewer::tplMatchingDistance() {
 	QString lpath = QFileDialog::getOpenFileName(this);
 
 	// by directory
-	msgbox.setText("Select the images folder.");
-	msgbox.exec();
-	QString folder = QFileDialog::getExistingDirectory(this);
+	/*msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
 
-	Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400,
-			1400);
+	 Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400,
+	 1400);*/
 
 	// an image
-	/*msgbox.setText("Select the scene image.");
-	 msgbox.exec();
+	msgbox.setText("Select the scene image.");
+	msgbox.exec();
 
-	 QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 Image sceneImage(fileName2);
-	 Point ebary;
-	 double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
-	 lpath, 400, 1400, ebary);
-	 qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
-	 qDebug() << "Measure distance estimated: " << eCentroid;*/
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	Point ebary;
+	double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
+			lpath, 400, 1400, ebary);
+	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
+	qDebug() << "Measure distance estimated: " << eCentroid;
 	qDebug() << "Done";
 }

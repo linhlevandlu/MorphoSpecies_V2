@@ -70,7 +70,7 @@ public:
 	void setPoints(vector<cv::Point> points);
 	void addLine(Line line);
 	vector<cv::Point> segment();
-	cv::Mat drawing(cv::Mat outputImage);
+	void drawing(cv::Mat &outputImage);
 
 	static vector<Line> readFile(QString filePath);
 

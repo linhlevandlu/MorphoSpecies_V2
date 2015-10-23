@@ -61,7 +61,7 @@ public:
 	double angleBetweenLines(Line objectLine);
 	bool checkBelongPoint(cv::Point point);
 	GFeatures pairwiseHistogram(Line objectLine);
-	cv::Mat drawing(cv::Mat outputImage);
+	void drawing(cv::Mat &outputImage);
 	bool operator==(Line &line);
 	bool operator<(const Line& l2) const;
 	void toString();

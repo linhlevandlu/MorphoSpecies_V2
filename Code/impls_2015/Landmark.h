@@ -47,7 +47,7 @@ public:
 	virtual ~Landmark();
 	cv::Point getLocation();
 	void setLocation(cv::Point location);
-	cv::Mat drawing(cv::Mat outputImage);
+	void drawing(cv::Mat &outputImage);
 };
 
 } /* namespace impls_2015 */

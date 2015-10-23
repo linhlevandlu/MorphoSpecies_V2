@@ -288,19 +288,17 @@ cv::Mat Image::drawingHistogram() {
  * @parameter: outputImage - the output image
  * @return: the image in matrix
  */
-cv::Mat Image::drawing(cv::Mat outputImage) {
+void Image::drawing(cv::Mat &outputImage) {
 	//Mat output = Mat::zeros(inputImage.size(), CV_8UC3);
 	QString title;
 	if (listOfEdges.size() > 0) {
 		qDebug() << "Draw the image.";
 		for (size_t i = 0; i < listOfEdges.size(); i++) {
 			Edge edgei = listOfEdges.at(i);
-			outputImage = edgei.drawing(outputImage);
+			edgei.drawing(outputImage);
 		}
 		title = "The image";
 	}
-
-	return outputImage;
 }
 
 /**

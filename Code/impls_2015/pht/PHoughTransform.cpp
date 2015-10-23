@@ -3,6 +3,21 @@
  *
  *  Created on: Sep 23, 2015
  *      Author: linh
+ *  Image processing for morphometrics (IPM) Version 2
+ *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
+ *
+ *	This program is free software: you can redistribute it and/or modify
+ * 	it under the terms of the GNU General Public License as published by
+ * 	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	This program is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
 #include "PHoughTransform.h"
@@ -17,31 +32,6 @@ PHoughTransform::~PHoughTransform() {
 	// TODO Auto-generated destructor stub
 }
 
-/**
- * Getting the landmarks from a file and saving into a vector
- */
-/*vector<Point> PHoughTransform::readLandmarksFile(string filePath) {
-	ifstream openFile(filePath.c_str());
-	string lineText;
-	vector<Point> landmarks;
-	if (openFile.is_open()) {
-		getline(openFile, lineText);
-		QString firsLine = (lineText.c_str());
-		int numOfLandmarks = firsLine.split("=").at(1).toInt();
-		int i = 0;
-		while (i < numOfLandmarks) {
-			getline(openFile, lineText);
-			QString line = lineText.c_str();
-			QStringList listString = line.split(" ");
-			cv::Point point1(listString.at(0).toDouble(),
-					listString.at(1).toDouble());
-			landmarks.push_back(point1);
-			i++;
-		}
-		openFile.close();
-	}
-	return landmarks;
-}*/
 /**
  * Construct the table to store the angle and distance of pair lines to a reference point
  */
@@ -245,10 +235,10 @@ Point PHoughTransform::refPointInScene(Image modelImage, Image sceneImage) {
 Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 		string reflmPath) {
 
-	QString scenelmDir = "/home/linh/Desktop/mg/landmarks";
+	//QString scenelmDir = "/home/linh/Desktop/mg/landmarks";
 	QString scenename = sceneImage.getName();
-	QString scenelmPath = scenelmDir + "/" + scenename + ".TPS";
-	vector<Point> orglandmarks = sceneImage.readLandmarksFile(scenelmPath.toStdString());
+	//QString scenelmPath = scenelmDir + "/" + scenename + ".TPS";
+	//vector<Point> orglandmarks = sceneImage.readLandmarksFile(scenelmPath.toStdString());
 	double angleDiff;
 	Point ePoint;
 	vector<Point> esLandmarks = estimateLandmarks(refImage, sceneImage,
@@ -256,16 +246,16 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 
 	Mat sceneMat = sceneImage.getMatrixImage();
 	cv::Mat mat(sceneMat.clone());
-	for (size_t t = 0; t < esLandmarks.size(); t++) {
+	/*for (size_t t = 0; t < esLandmarks.size(); t++) {
 		Point landm = orglandmarks.at(t);
 		circle(mat, cv::Point(landm.x, mat.rows - landm.y), 7,
 				Scalar(0, 0, 255), 2, 4);
-	}
+	}*/
 
 	qDebug() << "angle Diff: " << angleDiff;
 	for (size_t t = 0; t < esLandmarks.size(); t++) {
 		circle(mat, esLandmarks.at(t), 2, Scalar(0, 255, 255), 2, 8);
-		qDebug()<<"x, y"<<esLandmarks.at(t).x<<", "<< esLandmarks.at(t).y;
+		//qDebug()<<"x, y"<<esLandmarks.at(t).x<<", "<< esLandmarks.at(t).y;
 	}
 	return mat;
 }
@@ -308,28 +298,8 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 		Point lm(temp.x, height - temp.y);
 		int px = refPoint.x - esPoint.x;
 		int py = refPoint.y - esPoint.y;
-		int x, refX;
-		int y, refY;
-		/*if (angleDiff != 0) {
-		 //  rotation
-		 Point tpoint = newLocation(lm, angleDiff, refPoint);
-		 x = tpoint.x;
-		 y = tpoint.y;
-		 Point tref = newLocation(refPoint, angleDiff, refPoint);
-		 refX = tref.x;
-		 refY = tref.y;
-		 // and translation
-		 px = refX - refPoint.x;
-		 py = refY - refPoint.y;
-
-		 x = x - px;
-		 if (py > 0)
-		 y = y - py;
-		 else
-		 y = y + py;
-
-		 } else {*/
-
+		int x;
+		int y;
 		x = lm.x - px;
 		if (y > 0)
 			y = lm.y - py;
@@ -410,10 +380,10 @@ Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 			maxVector);
 	Mat result(sImage.getMatrixImage().clone());
 
-	result = entry.getLine1().drawing(result);
+	entry.getLine1().drawing(result);
 	cv::putText(result, "line 1", entry.getLine1().getP1(),
 			FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1, 8);
-	result = entry.getLine2().drawing(result);
+	entry.getLine2().drawing(result);
 	cv::putText(result, "line 2", entry.getLine2().getP1(),
 			FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1, 8);
 	circle(result, mPoint, 5, Scalar(0, 0, 255), 5, 8);
@@ -442,7 +412,7 @@ Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 		for (size_t j = 0; j < mLines.size(); j++) {
 			Line line = mLines.at(j);
 			if (line.length() > 50)
-				result = line.drawing(result);
+				line.drawing(result);
 		}
 
 		for (size_t i = 0; i < eLandmarks.size(); i++) {

@@ -246,10 +246,10 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	vector<Point> esLandmarks = pht.estimateLandmarks(refImage, sceneImage,
 			lmPath.toStdString(), angleDiff, ePoint);
 
-	QString scenename = sceneImage.getName();
-	QString spath = "/home/linh/Desktop/mg/landmarks/" + scenename + ".TPS";
-	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
-			spath.toStdString().c_str());
+	//QString scenename = sceneImage.getName();
+	//QString spath = "/home/linh/Desktop/mg/landmarks/" + scenename + ".TPS";
+	//vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
+	//		spath.toStdString().c_str());
 
 	Mat sRotateImg = rotateImage(sMatrix, angleDiff, ePoint);
 
@@ -264,11 +264,11 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 		mcResult.push_back(iLocation + maxLoc + tDistance);
 	}
 	Mat sDisplay(sMatrix.clone());
-	for (size_t k = 0; k < sceneLandmarks.size(); k++) {
+	/*for (size_t k = 0; k < sceneLandmarks.size(); k++) {
 		Point slm(sceneLandmarks.at(k).x,
 				sMatrix.rows - sceneLandmarks.at(k).y);
 		circle(sDisplay, slm, 7, Scalar(0, 0, 255), 2, 8);
-	}
+	}*/
 	Mat result(rotateImage(sDisplay, angleDiff, ePoint).clone());
 	for (size_t j = 0; j < mcResult.size(); j++) {
 		circle(result, mcResult.at(j), 5, Scalar(0, 255, 255), 2, 8);
