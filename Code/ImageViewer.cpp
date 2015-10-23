@@ -2627,7 +2627,7 @@ void ImageViewer::edgeSegmentation() {
 	//edgeSegementDirectory("/home/linh/Desktop/mandibule");
 
 	Image image(fileName);
-	cv::Mat enddest;
+	cv::Mat enddest(image.getMatrixImage().clone());
 	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest);
 
 	ImageViewer *other = new ImageViewer;
@@ -2704,29 +2704,35 @@ void ImageViewer::pHoughTransform() {
 	qDebug() << "Probabilistic Hough Transform...";
 
 	Image image(fileName);
-	QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
+	//QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
+	QMessageBox msgbox;
 
-	/*QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 qDebug() << fileName2;
-	 Image image2(fileName2);
-	 Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
-	 reflmPath);
-	 Mat enddest = Scenario::testPHT(image,image2,reflmPath.toStdString());
-	 ImageViewer *other = new ImageViewer;
-	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-	 "Probabilistic Hough Transform");
-	 other->show();*/
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+
+	/*msgbox.setText("Select the second image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
+	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
+			reflmPath);
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Probabilistic Hough Transform");
+	other->show();*/
 
 	/*
 	 * Working on directory
 	 */
-	QString sceneImageDir = "/home/linh/Desktop/mandibule";
-	QString sceneLMDir = "/home/linh/Desktop/landmarks";
-	QString saveDir = "/home/linh/Desktop/pht2110";
-	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-			saveDir);
+	QString sceneImageDir = "/home/linh/Desktop/mg/images";
+	 QString sceneLMDir = "/home/linh/Desktop/mg/landmarks";
+	 QString saveDir = "/home/linh/Desktop/pht2310";
+	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
+	 saveDir);
 	qDebug() << "Done";
 }
 void ImageViewer::crossCorrelation() {
@@ -2796,28 +2802,29 @@ void ImageViewer::crossCorrelationDistance() {
 
 	// measure distance cross correlation on an image
 	/*msgbox.setText("Select the second image.");
-	msgbox.exec();
-	QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	Image sceneImage(fileName2);
-	Point ebary;
-	double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
-			sceneImage, 400, ebary);
-	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
-	qDebug() << "Measure distance estimated: " << eCentroid;*/
+	 msgbox.exec();
+	 QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 Image sceneImage(fileName2);
+	 Point ebary;
+	 double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
+	 sceneImage, 400, ebary);
+	 qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
+	 qDebug() << "Measure distance estimated: " << eCentroid;*/
 
 	// measrue distance cross correlation on a directory
 	qDebug() << "Landmarks detected by cross-correlation (in directory)";
-	 msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-	 Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);
+	msgbox.setText("Select the images folder.");
+	msgbox.exec();
+	QString folder = QFileDialog::getExistingDirectory(this);
+	Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);
 
 	qDebug() << "Done";
 }
 void ImageViewer::tplMatchingDistance() {
 	qDebug() << "Measure distance by article";
+
 	Image image(fileName);
 
 	QMessageBox msgbox;
@@ -2827,24 +2834,25 @@ void ImageViewer::tplMatchingDistance() {
 	QString lpath = QFileDialog::getOpenFileName(this);
 
 	// by directory
-	 msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
+	msgbox.setText("Select the images folder.");
+	msgbox.exec();
+	QString folder = QFileDialog::getExistingDirectory(this);
 
-	 Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400, 1400);
+	Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400,
+			1400);
 
 	// an image
 	/*msgbox.setText("Select the scene image.");
-	msgbox.exec();
+	 msgbox.exec();
 
-	QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	Image sceneImage(fileName2);
-	Point ebary;
-	double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
-			lpath, 400, 1400, ebary);
-	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
-	qDebug() << "Measure distance estimated: " << eCentroid;*/
+	 QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 Image sceneImage(fileName2);
+	 Point ebary;
+	 double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
+	 lpath, 400, 1400, ebary);
+	 qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
+	 qDebug() << "Measure distance estimated: " << eCentroid;*/
 	qDebug() << "Done";
 }

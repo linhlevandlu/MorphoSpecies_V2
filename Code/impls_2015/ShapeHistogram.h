@@ -56,25 +56,16 @@ public:
 	vector<vector<int> > getMatrix();
 	vector<LocalHistogram> getListLocalHistogram();
 
-	vector<LocalHistogram> constructPGH(vector<Line> prLines,
-			LocalHistogram::AccuracyPGH angleAcc, double distanceAxis);
-	//vector<LocalHistogram> shapePGH();
-	//vector<vector<int> > savePGH(vector<LocalHistogram> pghHistograms,AccuracyPGH angleAcc);
 	cv::Mat presentation(vector<LocalHistogram> pghHistograms, LocalHistogram::AccuracyPGH angleAcc, int cols);
 	double bhattacharyaMetric(ShapeHistogram scenHist);
 	double chiSquaredMetric(ShapeHistogram sceneHist);
 	double intersectionMetric(ShapeHistogram sceneHist);
-
-	void createShape();
 
 	vector<LocalHistogram> constructPGH(vector<Line> prLines);
 	int distanceOffset(double distance, int cols);
 	void constructMatPGH(LocalHistogram::AccuracyPGH angleAcc, int cols);
 	void writeMatrix(QString fileName);
 
-	int lineLabel(LocalHistogram sceneHist, vector<LocalHistogram> modelHists);
-	vector<vector<Line> > sceneLinesLabel(vector<Line> sceneLines, vector<Line> modelLines);
-	Line getModelHypothesis(vector<vector<Line> > labelLines, Line sceneLine);
 };
 
 } /* namespace impls_2015 */

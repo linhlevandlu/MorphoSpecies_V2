@@ -40,73 +40,6 @@ vector<LocalHistogram> ShapeHistogram::getListLocalHistogram() {
 	return listLocalHistogram;
 }
 
-void ShapeHistogram::createShape() {
-	qDebug() << "Create shape";
-	Line l1(cv::Point(450, 600), cv::Point(650, 550));
-	Line l2(cv::Point(650, 550), cv::Point(600, 700));
-	Line l3(cv::Point(600, 700), cv::Point(400, 800));
-	Line l4(cv::Point(400, 800), cv::Point(450, 600));
-	vector<Line> set1;
-	set1.push_back(l1);
-	set1.push_back(l2);
-	set1.push_back(l3);
-	set1.push_back(l4);
-
-	Line l31(cv::Point(200, 600), cv::Point(400, 550));
-	Line l32(cv::Point(400, 550), cv::Point(350, 700));
-	Line l33(cv::Point(350, 700), cv::Point(150, 800));
-	Line l34(cv::Point(150, 800), cv::Point(200, 600));
-	vector<Line> set2;
-	set2.push_back(l31);
-	set2.push_back(l32);
-	set2.push_back(l33);
-	set2.push_back(l34);
-
-	Line l41(cv::Point(600, 150), cv::Point(800, 200));
-	Line l42(cv::Point(800, 200), cv::Point(850, 400));
-	Line l43(cv::Point(850, 400), cv::Point(700, 350));
-	Line l44(cv::Point(700, 350), cv::Point(600, 150));
-	vector<Line> set3;
-	set3.push_back(l41);
-	set3.push_back(l42);
-	set3.push_back(l43);
-	set3.push_back(l44);
-
-	cv::Mat mat(cv::Size(2000, 2000), CV_8UC3, cv::Scalar(0, 0, 0));
-	for (size_t i = 0; i < set1.size(); i++) {
-		Line l = set1.at(i);
-		mat = l.drawing(mat);
-	}
-	/*for (size_t i = 0; i < set2.size(); i++) {
-	 Line l = set2.at(i);
-	 mat = l.drawing(mat);
-	 }*/
-	for (size_t i = 0; i < set3.size(); i++) {
-		Line l = set3.at(i);
-		mat = l.drawing(mat);
-	}
-	cv::namedWindow("Histogram", CV_WINDOW_AUTOSIZE);
-	cv::imshow("Histogram", mat);
-	ShapeHistogram hist1;
-	vector<LocalHistogram> refHist = hist1.constructPGH(set1);
-	hist1.constructMatPGH(LocalHistogram::Degree, 500);
-	ShapeHistogram hist2;
-	vector<LocalHistogram> sceneHist = hist2.constructPGH(set2);
-	hist2.constructMatPGH(LocalHistogram::Degree, 500);
-	ShapeHistogram hist3;
-	vector<LocalHistogram> sceneHist2 = hist3.constructPGH(set3);
-	hist3.constructMatPGH(LocalHistogram::Degree, 500);
-
-	for (size_t i = 0; i < sceneHist2.size(); i++) {
-		LocalHistogram lc = sceneHist2.at(i);
-		qDebug() << "Metric: "
-				<< refHist.at(1).bhattacharyyaMetric(lc, 500,
-						LocalHistogram::Degree);
-	}
-
-	sceneLinesLabel(set1, set3);
-}
-
 // xay dung the pairwise histogram of shape
 vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
 	vector<LocalHistogram> shapeHistogram;
@@ -179,61 +112,6 @@ void ShapeHistogram::writeMatrix(QString fileName) {
 	of.close();
 }
 
-/*vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines,
- LocalHistogram::AccuracyPGH angleAcc, double distanceAxis) {
- if (distanceAxis != 0)
- max_distance = distanceAxis;
- int height = heightAngleAxis(angleAcc);
- double entries = 0;
- vector<vector<int> > vcResult;
- vcResult.resize(height + 1);
- for (int i = 0; i <= height; ++i) {
- vcResult[i].resize(max_distance + 1, 0);
- }
- vector<LocalHistogram> pwh;
- for (size_t t = 0; t < prLines.size(); t++) {
- Line refLine = prLines.at(t);
- LocalHistogram pwHistogram;
-
- for (size_t i = 0; i < prLines.size(); i++) {
- Line objLine = prLines.at(i);
- if (t != i) {
- GFeatures prH = refLine.pairwiseHistogram(objLine);
- pwHistogram.addGFeatures(prH);
-
- int x1 = round(prH.getDmin());
- int x2 = round(prH.getDmax());
- int y = angleOffset(prH.getAngle(), angleAcc);
- if (prH.getDmax() > max_distance && distanceAxis == 0) {
- max_distance = round(prH.getDmax());
- // resize the size of matrix
- for (int i = 0; i <= height; ++i) {
- vcResult[i].resize(max_distance + 1, 0);
- }
- }
- // save the information into matrix
- if (!isnan(y)) {
- for (int k = x1; k <= x2; k++) {
- if (y >= 0) {
- if (k >= max_distance + 1) {
- vcResult[y][max_distance] += 1;
- } else {
- vcResult[y][k] += 1;
- }
- entries++;
- }
- }
- }
- }
- }
- //pwHistogram.setpwHistogram(pgh);
- pwh.push_back(pwHistogram);
- }
- this->setTotalEntries(entries);
- this->setMatrix(vcResult);
- this->listLocalHistogram = pwh;
- return pwh;
- }*/
 int ShapeHistogram::heightAngleAxis(LocalHistogram::AccuracyPGH angleAcc) {
 	return LocalHistogram::heightOfAngleAxis(angleAcc);
 }
@@ -318,58 +196,6 @@ double ShapeHistogram::intersectionMetric(ShapeHistogram sceneHist) {
 		}
 	}
 	return distance;
-}
-//===========================================================================
-int ShapeHistogram::lineLabel(LocalHistogram sceneHist,
-		vector<LocalHistogram> modelHists) {
-	double maxMatching = 0;
-	int index = -1;
-	for (size_t i = 0; i < modelHists.size(); i++) {
-		LocalHistogram modelHist = modelHists.at(i);
-		double distance = sceneHist.bhattacharyyaMetric(modelHist, 500,
-				LocalHistogram::Degree);
-		if (distance > 0.9 && distance > maxMatching) {
-			maxMatching = distance;
-			index = i;
-		}
-	}
-	return index;
-}
-
-vector<vector<Line> > ShapeHistogram::sceneLinesLabel(vector<Line> sceneLines,
-		vector<Line> modelLines) {
-	vector<LocalHistogram> sceneHists = constructPGH(sceneLines);
-	vector<LocalHistogram> modelHists = constructPGH(modelLines);
-
-	vector<vector<Line> > lines;
-	for (size_t i = 0; i < sceneHists.size(); i++) {
-
-		LocalHistogram sceneHist = sceneHists.at(i);
-		int index = lineLabel(sceneHist, modelHists);
-		if (index != -1) {
-			vector<Line> llabel;
-			llabel.push_back(sceneLines.at(i));
-			llabel.push_back(modelLines.at(index));
-			lines.push_back(llabel);
-		}
-	}
-	for (size_t k = 0; k < lines.size(); k++) {
-		vector<Line> pair = lines.at(k);
-		pair.at(0).toString();
-		pair.at(1).toString();
-		qDebug() << "= = = = =";
-	}
-	return lines;
-}
-Line ShapeHistogram::getModelHypothesis(vector<vector<Line> > labelLines,
-		Line sceneLine) {
-	Line lResult;
-	for (size_t i = 0; i < labelLines.size(); i++) {
-		vector<Line> pair = labelLines.at(i);
-		if (pair.at(0) == sceneLine)
-			lResult = pair.at(1);
-	}
-	return lResult;
 }
 
 } /* namespace impls_2015 */

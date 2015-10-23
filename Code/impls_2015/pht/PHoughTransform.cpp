@@ -20,7 +20,7 @@ PHoughTransform::~PHoughTransform() {
 /**
  * Getting the landmarks from a file and saving into a vector
  */
-vector<Point> PHoughTransform::readLandmarksFile(string filePath) {
+/*vector<Point> PHoughTransform::readLandmarksFile(string filePath) {
 	ifstream openFile(filePath.c_str());
 	string lineText;
 	vector<Point> landmarks;
@@ -41,7 +41,7 @@ vector<Point> PHoughTransform::readLandmarksFile(string filePath) {
 		openFile.close();
 	}
 	return landmarks;
-}
+}*/
 /**
  * Construct the table to store the angle and distance of pair lines to a reference point
  */
@@ -245,10 +245,10 @@ Point PHoughTransform::refPointInScene(Image modelImage, Image sceneImage) {
 Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 		string reflmPath) {
 
-	QString scenelmDir = "/home/linh/Desktop/landmarks";
+	QString scenelmDir = "/home/linh/Desktop/mg/landmarks";
 	QString scenename = sceneImage.getName();
 	QString scenelmPath = scenelmDir + "/" + scenename + ".TPS";
-	vector<Point> orglandmarks = readLandmarksFile(scenelmPath.toStdString());
+	vector<Point> orglandmarks = sceneImage.readLandmarksFile(scenelmPath.toStdString());
 	double angleDiff;
 	Point ePoint;
 	vector<Point> esLandmarks = estimateLandmarks(refImage, sceneImage,
@@ -265,6 +265,7 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 	qDebug() << "angle Diff: " << angleDiff;
 	for (size_t t = 0; t < esLandmarks.size(); t++) {
 		circle(mat, esLandmarks.at(t), 2, Scalar(0, 255, 255), 2, 8);
+		qDebug()<<"x, y"<<esLandmarks.at(t).x<<", "<< esLandmarks.at(t).y;
 	}
 	return mat;
 }
@@ -359,8 +360,8 @@ Point PHoughTransform::newLocation(Point point, double angleDiff,
 void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		QString sceneDir, QString scenelmDir, QString saveDir) {
 
-	QFileInfoList files = Image::readFolder(sceneDir);
-	for (int i = 100; i < files.size(); i++) {
+	QFileInfoList files = Image::readImagesFolder(sceneDir);
+	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image sceneImage(_name);
@@ -435,9 +436,8 @@ Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 		circle(result, ePoint, 5, Scalar(0, 255, 255), 5, 8);
 		eLandmarks = findLandmarks(mPoint, ePoint, angleDiff, mLandmarks, width,
 				height);
-		LandmarkDetection lmd;
-		result = lmd.rotateImage(result,
-				(angleDiff < 10) ? (angleDiff * 2) : angleDiff, ePoint);
+		//LandmarkDetection lmd;
+		//result = lmd.rotateImage(result,angleDiff, ePoint);
 
 		for (size_t j = 0; j < mLines.size(); j++) {
 			Line line = mLines.at(j);

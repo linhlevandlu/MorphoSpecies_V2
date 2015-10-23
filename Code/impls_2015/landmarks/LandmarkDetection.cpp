@@ -98,7 +98,7 @@ vector<Point> LandmarkDetection::crossCorrelation(Image refImage,
 void LandmarkDetection::cCorelationByDirectory(Image refImage,
 		QString folderpath, QString savepath, QString lmPath) {
 
-	QFileInfoList files = Image::readFolder(folderpath);
+	QFileInfoList files = Image::readImagesFolder(folderpath);
 
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
@@ -140,8 +140,8 @@ double LandmarkDetection::centroidCCorelation(Image refImage, Image sceneImage,
 void LandmarkDetection::centroidCCorelations(Image refImage, QString lmPath,
 		QString folderImages, QString folderlandmarks) {
 
-	QFileInfoList files = Image::readFolder(folderImages);
-	ofstream of("/home/linh/Desktop/cross/centroid.PHG");
+	QFileInfoList files = Image::readImagesFolder(folderImages);
+	ofstream of("ecentroid.PHG");
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
@@ -170,7 +170,7 @@ void LandmarkDetection::centroidCCorelations(Image refImage, QString lmPath,
 void LandmarkDetection::centroidCCorelations(Image refImage, QString lmPath,
 		QString folderImages) {
 	qDebug()<<"Compute centroid by correlation";
-	QFileInfoList files = Image::readFolder(folderImages);
+	QFileInfoList files = Image::readImagesFolder(folderImages);
 	ofstream of("ecentroid.PHG");
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
@@ -246,10 +246,10 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	vector<Point> esLandmarks = pht.estimateLandmarks(refImage, sceneImage,
 			lmPath.toStdString(), angleDiff, ePoint);
 
-	/*QString scenename = sceneImage.getName();
-	QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
+	QString scenename = sceneImage.getName();
+	QString spath = "/home/linh/Desktop/mg/landmarks/" + scenename + ".TPS";
 	vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
-			spath.toStdString().c_str());*/
+			spath.toStdString().c_str());
 
 	Mat sRotateImg = rotateImage(sMatrix, angleDiff, ePoint);
 
@@ -264,11 +264,11 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 		mcResult.push_back(iLocation + maxLoc + tDistance);
 	}
 	Mat sDisplay(sMatrix.clone());
-	/*for (size_t k = 0; k < sceneLandmarks.size(); k++) {
+	for (size_t k = 0; k < sceneLandmarks.size(); k++) {
 		Point slm(sceneLandmarks.at(k).x,
 				sMatrix.rows - sceneLandmarks.at(k).y);
 		circle(sDisplay, slm, 7, Scalar(0, 0, 255), 2, 8);
-	}*/
+	}
 	Mat result(rotateImage(sDisplay, angleDiff, ePoint).clone());
 	for (size_t j = 0; j < mcResult.size(); j++) {
 		circle(result, mcResult.at(j), 5, Scalar(0, 255, 255), 2, 8);
@@ -279,7 +279,7 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		QString lmPath, QString savePath, int templSize, int sceneSize,
 		double angleDiff) {
-	QFileInfoList files = Image::readFolder(folderImages);
+	QFileInfoList files = Image::readImagesFolder(folderImages);
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
@@ -308,7 +308,7 @@ double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage,
 void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		QString lmPath, QString folderImages, QString folderlandmarks,
 		int templSize, int sceneSize) {
-	QFileInfoList files = Image::readFolder(folderImages);
+	QFileInfoList files = Image::readImagesFolder(folderImages);
 	ofstream of("ECentroidMatching.PHG");
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
@@ -343,7 +343,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 
 void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		QString lmPath, QString folderImages, int templSize, int sceneSize) {
-	QFileInfoList files = Image::readFolder(folderImages);
+	QFileInfoList files = Image::readImagesFolder(folderImages);
 	ofstream of("ECentroidMatching.PHG");
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);

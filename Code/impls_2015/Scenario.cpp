@@ -44,8 +44,8 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
 	EdgeSegmentation sgMethod;
 	appLines = sgMethod.lineSegment(image);
 
-	Mat temp(image.getMatrixImage().size(), CV_8UC3, cv::Scalar(0, 0, 0));
-	temp.copyTo(result);
+	//Mat temp(image.getMatrixImage().size(), CV_8UC3, cv::Scalar(0, 0, 0));
+	//temp.copyTo(result);
 	result = sgMethod.rePresentation(result, appLines);
 	return appLines;
 }
@@ -156,9 +156,10 @@ void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 		QString imgFolder) {
 	// centroid point with folder
 	//QString lmfolder = "/home/linh/Desktop/landmarks";
+	QString lmfolder = "/home/linh/Desktop/mg/landmarks";
 	LandmarkDetection lmdetection;
-	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder);
-	//lmdetection.centroidCCorelations(refImage, lmpath, imgFolder,lmfolder);
+//	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder);
+	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder,lmfolder);
 }
 Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		QString reflmPath, int templSize, int scnSize) {
@@ -188,9 +189,10 @@ double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
 void Scenario::mDistanceByTemplateMatchingDirectory(Image refImage,
 		QString lmPath, QString folderImages, int templSize, int sceneSize) {
 	// compute the centroid
-	QString lmFolder = "/home/linh/Desktop/landmarks";
+	//QString lmFolder = "/home/linh/Desktop/landmarks";
+	QString lmFolder = "/home/linh/Desktop/mg/landmarks";
 	LandmarkDetection lmdetection;
-	lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,templSize,sceneSize);
-	//lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,lmFolder,templSize,sceneSize);
+	//lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,templSize,sceneSize);
+	lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,lmFolder,templSize,sceneSize);
 }
 } /* namespace impls_2015 */

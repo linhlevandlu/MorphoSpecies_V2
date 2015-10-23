@@ -555,9 +555,10 @@ vector<Point> Image::readLandmarksFile(string filePath) {
 		}
 		openFile.close();
 	}
+	this->listOfLandmarks = landmarks;
 	return landmarks;
 }
-QFileInfoList Image::readFolder(QString folderPath) {
+QFileInfoList Image::readImagesFolder(QString folderPath) {
 	QDir qdir;
 	qdir.setPath(folderPath);
 	qdir.setFilter(QDir::Files);

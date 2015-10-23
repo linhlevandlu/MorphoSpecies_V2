@@ -95,7 +95,7 @@ public:
 	vector<Point> readLandmarksFile(string filePath);
 
 
-	static QFileInfoList readFolder(QString folderPath);
+	static QFileInfoList readImagesFolder(QString folderPath);
 	QString getName();
 };
 

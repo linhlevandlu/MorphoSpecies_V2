@@ -27,7 +27,6 @@
 #include "../Image.h"
 #include "HoughMethod.h"
 #include "PHTEntry.h"
-#include "TableEntry.h"
 #include "../landmarks/LandmarkDetection.h"
 
 using namespace std;
@@ -52,7 +51,7 @@ public:
 	Point refPointInScene(Image modelImage, Image sceneImage);
 	Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 			double &angleDiff, int width, int height);
-	vector<Point> readLandmarksFile(string filePath);
+	//vector<Point> readLandmarksFile(string filePath);
 
 	vector<Point> findLandmarks(Point refPoint, Point esPoint,
 			double angleDiff, vector<Point> refLandmarks, int width,

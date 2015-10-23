@@ -44,7 +44,7 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 	return resultImage;
 }
 void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
-	QFileInfoList files = Image::readFolder(inputPath);
+	QFileInfoList files = Image::readImagesFolder(inputPath);
 
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
