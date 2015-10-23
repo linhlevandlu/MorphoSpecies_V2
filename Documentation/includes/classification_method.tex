@@ -179,7 +179,7 @@ The significance of parameters in equation (\ref{eq:2}) and (\ref{eq:3}) is simi
 Hence, depend on the purpose of comparison will choose a suitable comparing method. In this program, we want to try on three method to have a general view result when matching the histograms.
 \subsection{Probabilistic Hough transform}
 The probabilistic Hough transform (PHT) used to estimate the global shape. Based on a group of features within the scene, identifying the present of a model image in a scene image. The hypothesised location of the model in the scene is indicated based on the conditional probability that any pair scene lines agreement about a position in model.\\[0.3cm]
-Estimating the global shape has two main stages. Firstly, training process begin by recording the perpendicular distance and the angle from a reference point to each pair of model lines. Secondly, predicting the pose of scene difference from the model, then we estimate the location of the landmarks. We create a Hough space to store value when exist a pair of scene lines match with the entry in training process. The peak in Hough space is assumed of the reference point of the model in the scene. From this reference point, we can estimate the landmarks of the scene.
+Estimating the global shape has two main stages. Firstly, training process begin by recording the perpendicular distance and the angle from a reference point to each pair of model lines. Secondly, predicting the pose of scene difference from the model, then we estimate the location of the landmarks. We create a Hough space to store value when exist a pair of scene lines match with the entry in training process. The peak in Hough space is assumed of the reference point of the model in the scene. From this reference point, we can estimate the reference landmarks of reference image on the scene.
 The process to estimate the global pose is described as follows:
 \begin{itemize}
 \item Choose a arbitrary point in model as reference point
@@ -198,7 +198,98 @@ In the example below, we apply the PHT to estimate the landmarks of model in the
 \caption{The landmarks estimated by probabilistic Hough transform}
 \label{fig:figure_31}
 \end{figure}
+\subsubsection{Training process}
+In this step, recording the perpendicular distance and angle from each pair model lines to a reference point (called reference table). The reference point can be chosen at arbitrary position on model image. To save the time to process at the next step, we just consider the ``closet pair lines". In this application, the reference point chosen at the center of image and the closet pair lines are pair of lines have all three conditions: the length of each line greater than 60 pixels, the lines are not parallel and the distance between it less than 5 pixels. The algorithm to consider a pair closet lines and construct the reference table as follows:\\[0.2cm]
+\begin{algorithm}[H]
+\Indm 
+\KwData{line1 (the first line), line2 (the second line)}
+\KwResult{Two line closet or not (bool)}
+\Indp
+$distance1$ $\leftarrow$ distance from the first endpoint of $line1$ to $line2$\;
+$distance2$ $\leftarrow$  distance from the second endpoint of $line1$ to $line2$\;
+\If {$line1.length() > $ 60 and $line2.length() > $60  \\
+		and $line1$ not parallel with $line2$\\
+		and ($distance1$ $<=$ 5 or $ditance2$ $<=$ 5 )}{
+	$return$ $true$\;
+}
+return $false$\;
+\caption{Algorithm to consider the closet lines}
+\end{algorithm}~\\[0.2cm]
+\begin{algorithm}[H]
+\Indm 
+\KwData{lines (a list of lines), refPoint (the reference point)}
+\KwResult{The reference table}
+\Indp
+Declare the reference table $refTable$ \;
+\For{ line $i$ in $lines.size()$}{
+	\For{line $j$ in $lines.size()$}{
+		\If{i $!=$ j and $line(i)$ closet with $line(j)$}{
+			Compute the angle and perpendicular distance from $line(i)$ to $refPoint$\;
+			Compute the angle and perpendicular distance from $line(j)$ to $refPoint$\;
+			Create an entry to store pair of lines and its information \;
+			Add the entry into reference table \;
+		}
+	}
+}
+return reference table \;
+\caption{Algorithm to construct the reference table}
+\end{algorithm}~\\
+\subsubsection{Estimating process}
+The estimating process is duration estimate the reference landmarks on the scene image. Firstly, we need to find the reference point on scene image. Secondly, we estimate the reference landmarks on the scene image from the reference point.\\[0.2cm]
+By finding a pair of scene lines agree with a pair of model lines, we can detect the position of the reference point on scene image. We create an accumulator to store each agreement between pair of scene lines and pair of model lines. For each pair of scene lines, we find its exist in the reference table and increase the value at correspondence position in accumulator. At the end, we can obtain the pair of scene lines and pair of model lines correspondence with the maximum value in accumulator. By extending the perpendicular lines of the pair of scene lines at the appropriate position, we can meet the reference point at the intersection of them.\\[0.2cm]
+In this program, two pair lines called agreement if the angle difference between them less than one degree and the length scale less than two. Two algorithm followed describe the definition between two pair lines and finding the position of reference point in scene image.\\[0.2cm]
+\begin{algorithm}[H]
+\Indm 
+\KwData{line1 (the first reference line), line2 (the second reference line), sline1 (the first scene line), sline2 (the second scene line)}
+\KwResult{Two pair lines similar or not (boo)}
+\Indp
+$angle1$ $\leftarrow$ angle between $line1$ and $line2$\;
+$angle2$ $\leftarrow$ angle between $sline1$ and $sline2$\;
+\If{$abs(ange1$ - $angle2) < 1$ $and$ $abs(line1.length()/sline1.length()$ - $line2.length()/sline2.length()) < 2$}{
+	return $true$\;
+}
+return $false$ \;
+\caption{Algorithm to check the agreement between two pair lines}
+\end{algorithm}~\\[0.2cm]
+\begin{algorithm}[H]
+\Indm 
+\KwData{refTable (the reference table), slines (pair of scene lines)}
+\KwResult{The entry in reference table}
+\Indp
+Declare the entry in reference table $entry$ \;
+\For{ entry $et$ in $refTable$}{
+	\If{agree between lines in entry and $slines$}{
+		$entry$ $\leftarrow$ $et$\;
+	}
+}
+return $entry$ \;
+\caption{Algorithm to find the agreement of pair scene lines in model}
+\end{algorithm}~\\[0.2cm]
+\begin{algorithm}[H]
+\Indm 
+\KwData{lines (a list of scene lines), refTable (reference table)}
+\KwResult{The reference table}
+\Indp
+Create an accumulator, $acc$\;
+Declare the reference table $refTable$ \;
+\For{ line $i$ in $lines.size()$}{
+	\For{line $j$ in $lines.size()$}{
+		\If{i $!=$ j and $line(i)$ closet with $line(j)$}{
+			Find the agreement of pair scene lines in mode\;
+			Increase the value in $acc$ with correspondence position\;
+			Marked the maximum value, pair of scene lines and entry in reference table\;
+		}
+	}
+}
+
+Find the intersection ($intersect$) between two perpendicular lines with pair scene lines at appropriate position\;
+\tcp{The appropriate position is correct with the distances in reference table.}
+return $intersect$ \;
+\caption{Algorithm to find the reference point in scene}
+\end{algorithm}~\\[0.2cm]
+By finding the reference point, the landmarks in scene image can be estimated by calculating the relative between the reference point and the reference landmarks. Besides, we also record the difference about rotation, orientation and scale between model image and scene image.
 \subsection{Template matching}
+Template matching is duration to refine the estimated landmarks on the scene image with an appropriate method.
 \subsubsection{Cross-correlation}
 Cross-correlation is a method of estimating the similarity between two signals. By computing the sum of product between 2 signals when sliding, and choose the maximal value. It is used for searching a short signal in a longer signal. In image processing, it used to detect the present of an object (template) in a large object (image). The equation of cross-correlation as follows (equation \ref{eq:cross-correlation}):
 \begin{center}
@@ -226,9 +317,9 @@ The value of this method when we normalized computation as below:
 R_{ccorr\_norm}(x,y) =\frac{R_{ccorr}(x,y)}{Z(x,y)} = \frac{\sum\limits_{x',y'}[T(x'.y').I(x + x', y + y')]}{\sqrt{\sum\limits_{x',y'}T(x'.y')^{2}.\sum\limits_{x',y'}I(x + x', y + y')^{2}}}
 \end{equation}
 \end{center}
-\subsubsection{Estimating the landmarks by applying cross-correlation}
-Now, back to the our problem. With a reference image and its set of landmarks. We need to find the landmarks position on a set of scene image by using cross-correlation. In this case, the template is a region around each landmark in reference image and the image is each scene image.\\[0.2cm]
-For each landmarks in reference image, we create a bounding box around the landmarks with an arbitrary size and use landmark as center point. When create the bounding box, we also need to keep the distance between left corner to the landmarks, because sometime, with the landmark position, the size of bounding box can be over the size of image. Use this box as template and do the cross-correlation with each scene image. The results obtained store the location where template match with image. From these position, we can indicate the position of each landmark of reference image on scene image. The algorithms to create the bounding box and apply the cross-correlation to detect reference landmarks in scene described follows:\\[0.2cm]
+\subsubsection{Template matching}
+Now, back to the our problem. With a reference image and its set of landmarks. We use the cross-correlation to refine the landmarks. In this case, the template is a region around each landmark in reference image and the image is also a region around the Hough landmark detection in scene image. Hence, to save the time to process, before applying the cross-correlation, the scene image rotated to match with model using Hough estimate.\\[0.2cm]
+For each landmarks in reference image, we create a bounding box around the landmarks with an arbitrary size and use landmark as center point. When create the bounding box, we also need to keep the distance between left corner to the landmarks, because sometime, with the landmark position, the size of bounding box can be over the size of image. Use this box as template and do the cross-correlation with each scene image. The results obtained store the location where template match with image. From these position, we can indicate the position of each landmark of reference image on scene image. The algorithm to create the bounding box around a landmark described follows:\\[0.2cm]
 \begin{algorithm}[H]
 \Indm 
 \KwData{image (reference image), landmark (location of a reference landmark), tsize (size of bounding box), distance (to keep the distance from the landmark to bounding box)}
@@ -249,7 +340,7 @@ $Mat$ $box(matImg,Rect(lx,ly,lx2 - lx, ly2 - ly))$\;
 return the $box$;
 \caption{Algorithm to create a bounding box around a landmark}
 \end{algorithm}~\\[0.2cm]
-The below algorithm describe the method to estimate the reference landmarks on scene image by using cross-correlation. To apply the cross correlation, we have used the function $matchTemplate$\footnote{http://docs.opencv.org/modules/imgproc/doc/object\_detection.html?highlight=matchtemplate\#matchtemplate} in OpenCV library with matching method is $CV\_CCORR\_NORMED$ (cross-correlation normalize). This function allow we compare the template overlap the image and it support many different methods to match. When the template slide over each pixel on image, the coefficient between them was calculated and stored in a array.\\[0.2cm]
+The below algorithm describe the method to estimate the reference landmarks on scene image by using cross-correlation. Before applying the cross-correlation, the scene image rotated to match with the model. The angle used to rotate is sum of the difference between the scene line and model line to which it matched and the difference between two pairs of similar lines. To apply the cross correlation, we have used the function $matchTemplate$\footnote{http://docs.opencv.org/modules/imgproc/doc/object\_detection.html?highlight=matchtemplate\#matchtemplate} in OpenCV library with matching method is $CV\_CCORR\_NORMED$ (cross-correlation normalize). This function allow we compare the template overlap the image and it support many different methods to match. When the template slide over each pixel on image, the coefficient between them was calculated and stored in a array.\\[0.2cm]
 After finished, to get the value and position of maximum value when we compute the coefficient, we use a function in OpenCV,  $minMaxLoc$\footnote{http://docs.opencv.org/modules/core/doc/operations\_on\_arrays.html?highlight=minmaxloc\#minmaxloc}. This method used to detect the minimum and maximum value in an array. Beside that, it also output the location where having the minimum and maximum value.\\[0.2cm]
 \begin{algorithm}[H]
 \Indm 
@@ -258,11 +349,19 @@ After finished, to get the value and position of maximum value when we compute t
 \Indp
 Get the reference landmarks from file and store in list $refLandmarks$\;
 Create a variable to store the new landmarks: $sceneLandmarks$\;
+Estimate the reference landmarks ($refLandmarks$) in scene image using probabilistic Hough transform and save into a variable: $esLandmarks$\;
 \tcp{Get the matrix of scene image}
 $sceneMatrix$ = $sceneImage.getMatrix()$\;
-\For{ landmark $lm$ in $refLandmarks$}{
-	\tcp{Create a bounding box of landmark $lm$} 
-	$Mat$ $template$ = $createTemplate(refImage, lm, size, )$\;
+Rotate the scene matrix with appropriate angle\;
+\For{ variable $i$ in $esLandmarks.size()$}{
+	\tcp{Get the reference landmark}
+	$Point$ $refPoint$ = $refLandmarks.at(i)$\;
+	\tcp{Create a bounding box of reference landmark $refPoint$} 
+	$Mat$ $template$ = $createTemplate(refImage, refPoint, size )$\;
+	\tcp{Get the estimate landmark}
+	$Point$ $esPoint$ = $esLandmarks.at(i)$\;
+	\tcp{Create a bounding box of estimate landmark $esPoint$} 
+	$Mat$ $sceneImg$ = $createTemplate(sceneImage, esPoint, size )$\;
 	Create the matrix to store the value when do the cross-correlation: $result$ \;
 	\tcp{Apply the matching and store the result into matrix $result$}
 	$cv::matchTemplate(sceneMatrix,template,result,CV\_TM\_CCORR\_NORMED$\;	
@@ -277,37 +376,3 @@ Return the list of landmarks\;
 \caption{Algorithm to get the position of reference landmarks in scene image}
 \label{alccross}
 \end{algorithm}~\\[0.2cm]
-
-\subsubsection{Template matching}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -28,18 +28,44 @@
 \contentsline {subsection}{\numberline {4.2.2}Global pairwise histogram}{23}
 \contentsline {subsection}{\numberline {4.2.3}Histogram matching}{23}
 \contentsline {subsection}{\numberline {4.2.4}Probabilistic Hough transform}{25}
-\contentsline {subsection}{\numberline {4.2.5}Template matching}{26}
-\contentsline {subsubsection}{Cross-correlation}{26}
-\contentsline {subsubsection}{Estimating the landmarks by applying cross-correlation}{26}
-\contentsline {subsubsection}{Template matching}{28}
-\contentsline {chapter}{\numberline {5}Implementation}{29}
-\contentsline {section}{\numberline {5.1}Software architecture}{29}
-\contentsline {section}{\numberline {5.2}Image preprocessing}{30}
-\contentsline {subsection}{\numberline {5.2.1}Line class}{30}
-\contentsline {subsubsection}{The attributes}{30}
-\contentsline {subsubsection}{The methods}{30}
-\contentsline {subsection}{\numberline {5.2.2}Edge class}{31}
-\contentsline {subsection}{\numberline {5.2.3}Image class}{31}
-\contentsline {section}{\numberline {5.3}Automatic classification }{31}
-\contentsline {section}{\numberline {5.4}Result}{31}
-\contentsline {chapter}{\numberline {6}Conclusion}{32}
+\contentsline {subsubsection}{Training process}{26}
+\contentsline {subsubsection}{Estimating process}{26}
+\contentsline {subsection}{\numberline {4.2.5}Template matching}{28}
+\contentsline {subsubsection}{Cross-correlation}{28}
+\contentsline {subsubsection}{Template matching}{29}
+\contentsline {chapter}{\numberline {5}Implementation}{31}
+\contentsline {section}{\numberline {5.1}Software architecture}{31}
+\contentsline {section}{\numberline {5.2}Image preprocessing}{32}
+\contentsline {subsection}{\numberline {5.2.1}Line class}{32}
+\contentsline {subsubsection}{The attributes}{32}
+\contentsline {subsubsection}{The methods}{32}
+\contentsline {subsection}{\numberline {5.2.2}Edge class}{33}
+\contentsline {subsubsection}{The attributes}{33}
+\contentsline {subsection}{\numberline {5.2.3}The methods}{33}
+\contentsline {subsection}{\numberline {5.2.4}Image class}{34}
+\contentsline {subsubsection}{The attributes}{34}
+\contentsline {subsubsection}{The methods}{34}
+\contentsline {section}{\numberline {5.3}Edge segmentation }{35}
+\contentsline {section}{\numberline {5.4}Construct pairwise geometric histogram}{35}
+\contentsline {subsection}{\numberline {5.4.1}GFeatures class}{35}
+\contentsline {subsubsection}{The attributes}{35}
+\contentsline {subsubsection}{The methods}{36}
+\contentsline {subsection}{\numberline {5.4.2}LocalHistogram class}{36}
+\contentsline {subsubsection}{The attributes}{36}
+\contentsline {subsubsection}{The methods}{36}
+\contentsline {subsection}{\numberline {5.4.3}ShapeHistogram class}{37}
+\contentsline {subsubsection}{The attributes}{37}
+\contentsline {subsubsection}{The methods}{37}
+\contentsline {subsection}{\numberline {5.4.4}GeometricHistogram class}{38}
+\contentsline {section}{\numberline {5.5}Estimate the global pose}{38}
+\contentsline {subsection}{\numberline {5.5.1}HoughSpace class}{38}
+\contentsline {subsubsection}{The attributes}{38}
+\contentsline {subsubsection}{The methods}{38}
+\contentsline {subsection}{\numberline {5.5.2}PHTEntry class}{39}
+\contentsline {subsubsection}{The attributes}{39}
+\contentsline {subsubsection}{The methods}{39}
+\contentsline {subsection}{\numberline {5.5.3}PHoughTransform class}{39}
+\contentsline {subsubsection}{The methods}{39}
+\contentsline {section}{\numberline {5.6}Refine the landmarks}{40}
+\contentsline {section}{\numberline {5.7}Result}{41}
+\contentsline {chapter}{\numberline {6}Conclusion}{42}

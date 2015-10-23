@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.6.23)  12 OCT 2015 13:52
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.6.23)  23 OCT 2015 17:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -499,29 +499,34 @@ File: ./images/pht_2.png Graphic file (type png)
 Package pdftex.def Info: ./images/pht_2.png used on input line 197.
 (pdftex.def)             Requested size: 158.54152pt x 95.22675pt.
 
-[25 <./images/pht_1.png> <./images/pht_2.png>] [26]
-Overfull \hbox (17.09436pt too wide) in paragraph at lines 252--252
+[25 <./images/pht_1.png> <./images/pht_2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 236--237
+
+ []
+
+[26] [27] [28]
+Overfull \hbox (17.09436pt too wide) in paragraph at lines 343--343
 [][]\OT1/cmr/m/n/9 http://docs.opencv.org/modules/imgproc/doc/object[]detection
 .html?highlight=matchtemplate#matchtemplate| 
  []
 
-[27]
-Underfull \hbox (badness 10000) in paragraph at lines 279--280
+[29])
+Underfull \hbox (badness 10000) in paragraph at lines 378--26
 
  []
 
-) [28]
+[30]
 \openout2 = `includes/implementation.aux'.
 
  (./includes/implementation.tex
 Chapter 5.
-<images/cdiagram.png, id=140, 1175.14032pt x 831.85782pt>
+<images/cdiagram.png, id=146, 1175.14032pt x 831.85782pt>
 File: images/cdiagram.png Graphic file (type png)
 
 <use images/cdiagram.png>
 Package pdftex.def Info: images/cdiagram.png used on input line 6.
 (pdftex.def)             Requested size: 407.66833pt x 288.5779pt.
- [29
+ [31
 
 
 
@@ -531,16 +536,54 @@ Overfull \hbox (0.1954pt too wide) in paragraph at lines 29--30
 m-pute the per-pen-dic-u-lar dis-tance from point
  []
 
-[30]) [31]
+[32]
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 53.
+ (/usr/share/texlive/texmf-dist/tex/latex/base/omlcmr.fd
+File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10.95> not available
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 53.
+ [33] [34]
+[35]
+Overfull \hbox (1.56541pt too wide) in paragraph at lines 147--148
+[]\OT1/cmr/bx/n/10.95 bhattacharyyaMetric(sceneHist: Lo-cal-His-togram, dis-tan
+ceAxis: int, an-gleAcc:
+ []
+
+[36] [37]
+Overfull \hbox (20.59248pt too wide) in paragraph at lines 186--187
+[]\OT1/cmr/bx/n/10.95 getDistanceMetric(refHist: Shape-His-togram, scene-Hist: 
+Shape-His-togram, match-
+ []
+
+
+Overfull \hbox (15.24066pt too wide) in paragraph at lines 187--188
+[]\OT1/cmr/bx/n/10.95 pghHistogramMatching(refImage: Im-age, sceneIm-age: Im-ag
+e, match-ing: Match-
+ []
+
+
+Overfull \hbox (12.75261pt too wide) in paragraph at lines 188--189
+[]\OT1/cmr/bx/n/10.95 pghHistogramDirectoryMatching(refImage: Im-age, fold-er-P
+ath: QString, match-
+ []
+
+[38] [39]
+Overfull \hbox (2.4034pt too wide) in paragraph at lines 242--243
+[]\OT1/cmr/bx/n/10.95 phtDirectory(mImage: Im-age, mlm-Path: QString, sceneDir:
+ QString, saveDir:
+ []
+
+[40]) [41]
 \openout2 = `includes/conclusion.aux'.
 
  (./includes/conclusion.tex
 Chapter 6.
-) [32
+) [42
 
 
 
-] (./index.bbl) [33
+] (./index.bbl) [43
 
 
 ] (./index.aux (./includes/cover.aux)
@@ -556,11 +599,11 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5061 strings out of 493304
- 75214 string characters out of 6139871
- 171325 words of memory out of 5000000
- 8372 multiletter control sequences out of 15000+600000
- 16450 words of font info for 58 fonts, out of 8000000 for 9000
+ 5080 strings out of 493304
+ 75532 string characters out of 6139871
+ 173335 words of memory out of 5000000
+ 8387 multiletter control sequences out of 15000+600000
+ 16808 words of font info for 59 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  44i,26n,49p,1075b,532s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
@@ -572,18 +615,19 @@ dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/t
 ype1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
 blic/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on index.pdf (38 pages, 2780431 bytes).
+sfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on index.pdf (48 pages, 2811420 bytes).
 PDF statistics:
- 217 PDF objects out of 1000 (max. 8388607)
- 142 compressed objects within 2 object streams
+ 252 PDF objects out of 1000 (max. 8388607)
+ 166 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  66 words of extra memory for PDF output out of 10000 (max. 10000000)
 
