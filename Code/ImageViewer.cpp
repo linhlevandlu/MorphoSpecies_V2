@@ -2594,8 +2594,8 @@ void ImageViewer::getLandmarks() {
 	QString lpath = QFileDialog::getOpenFileName(this);
 
 	// by directory
-	/*
-	 msgbox.setText("Select the images folder.");
+
+	/*msgbox.setText("Select the images folder.");
 	 msgbox.exec();
 	 QString folder = QFileDialog::getExistingDirectory(this);
 
@@ -2613,6 +2613,7 @@ void ImageViewer::getLandmarks() {
 	if (fileName2.isEmpty())
 		return;
 	Image sceneImage(fileName2);
+	qDebug() << fileName2;
 
 	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath, 400,
 			1400);
@@ -2730,7 +2731,7 @@ void ImageViewer::pHoughTransform() {
 	 */
 	/*QString sceneImageDir = "/home/linh/Desktop/mg/images";
 	 QString sceneLMDir = "/home/linh/Desktop/mg/landmarks";
-	 QString saveDir = "/home/linh/Desktop/pht2310";
+	 QString saveDir = "/home/linh/Desktop/29Oct/mg_pht";
 	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
 	 saveDir);*/
 	qDebug() << "Done";
@@ -2800,7 +2801,7 @@ void ImageViewer::crossCorrelationDistance() {
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
 
-	// measure distance cross correlation on an image
+	// On an image
 	msgbox.setText("Select the scene image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -2813,7 +2814,7 @@ void ImageViewer::crossCorrelationDistance() {
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
 	qDebug() << "Measure distance estimated: " << eCentroid;
 
-	// measrue distance cross correlation on a directory
+	// on directory
 	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
 	 msgbox.setText("Select the images folder.");
 	 msgbox.exec();

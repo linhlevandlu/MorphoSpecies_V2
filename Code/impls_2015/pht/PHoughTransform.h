@@ -42,7 +42,6 @@
 #include "../Image.h"
 #include "HoughMethod.h"
 #include "PHTEntry.h"
-#include "../landmarks/LandmarkDetection.h"
 
 using namespace std;
 using namespace cv;
@@ -63,24 +62,20 @@ public:
 	PHTEntry matchingInScene(vector<PHTEntry> entryTable,
 			vector<Line> sceneLines, int width, int height,
 			vector<Line> &maxVector);
-	Point refPointInScene(Image modelImage, Image sceneImage);
 	Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
-			double &angleDiff, int width, int height);
-	//vector<Point> readLandmarksFile(string filePath);
-
+			double &angleDiff, vector<Point> refLandmarks, int width, int height);
 	vector<Point> findLandmarks(Point refPoint, Point esPoint,
-			double angleDiff, vector<Point> refLandmarks, int width,
-			int height);
-	vector<Point> estimateLandmarks(Image mImage, Image sImage,
-			string mlmPath, double &angleDiff,Point &ePoint);
-	Mat phtPresentation(Image refImage, Image sceneImage, string reflmPath);
+			vector<Point> refLandmarks, int width, int height, int &positive);
+	vector<Point> estimateLandmarks(Image mImage, Image sImage, string mlmPath,
+			double &angleDiff, Point &ePoint);
+	Mat phtPresentation(Image refImage, Image sceneImage, string reflmPath,
+			vector<Point> &esLandmarks);
 	void phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
 			QString scenelmDir, QString saveDir);
 	double angleDifference(Line refLine, Line sceneLine);
-	Point newLocation(Point point, double angleDiff,
-			Point refPoint);
-	Mat testPHT(Image mImage, Image sImage,
-			string mlmPath, double &angleDiff,Point &ePoint);
+	Point newLocation(Point point, double angleDiff, Point refPoint);
+	//Mat testPHT(Image mImage, Image sImage, string mlmPath, double &angleDiff,
+	//		Point &ePoint);
 };
 
 } /* namespace impls_2015 */

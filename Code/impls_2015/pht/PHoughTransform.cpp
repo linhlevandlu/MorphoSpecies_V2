@@ -2,7 +2,7 @@
  * PHoughTransform.cpp
  *
  *  Created on: Sep 23, 2015
- *      Author: linh
+ *  Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -38,7 +38,7 @@ PHoughTransform::~PHoughTransform() {
 vector<PHTEntry> PHoughTransform::constructTable(vector<Line> lines,
 		Point refPoint) {
 	vector<PHTEntry> phtransform;
-	ofstream of("table_acc.txt");
+	ofstream of("results/table_acc.txt");
 	for (size_t i = 0; i < lines.size(); i++) {
 		Line line1 = lines.at(i);
 		for (size_t j = 0; j < lines.size(); j++) {
@@ -79,8 +79,7 @@ bool PHoughTransform::closetLine(Line line1, Line line2) {
 	double distance1 = line2.perpendicularDistance(line1.getP1());
 	double distance2 = line2.perpendicularDistance(line1.getP2());
 	if (line1.length() > 60 && line2.length() > 60
-			&& line1.intersection(line2).x != -1
-			&& line1.intersection(line2).y != -1
+			&& line1.angleBetweenLines(line2) >= 15
 			&& (distance1 <= 5 || distance2 <= 5))
 		return true;
 	return false;
@@ -94,14 +93,21 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 
 	double refAngle = ref1.angleBetweenLines(ref2);
 	Line temp(ref1.getP1(), ref2.getP1());
+	double rd1 = ref1.perpendicularDistance(ref2.getP1());
+	double rd2 = ref1.perpendicularDistance(ref2.getP2());
+	double rd = rd1 + rd2;
 
 	double sceneAngle = scene1.angleBetweenLines(scene2);
 	Line temp2(scene1.getP1(), scene2.getP1());
+	double sd1 = scene1.perpendicularDistance(scene2.getP1());
+	double sd2 = scene1.perpendicularDistance(scene2.getP2());
+	double sd = sd1 + sd2;
 
 	if (abs(refAngle - sceneAngle) < 1
 			&& (abs(
 					ref1.length() / scene1.length()
-							- ref2.length() / scene2.length()) < 2)) {
+							- ref2.length() / scene2.length()) < 1)
+			&& (abs(rd - sd) < 2)) {
 		return true;
 	}
 	return false;
@@ -176,86 +182,117 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 }
 
 Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
-		double &angleDiff, int width, int height) {
+		double &angleDiff, vector<Point> refLandmarks, int width, int height) {
+
+	Point inter(0, 0);
+	Point refPoint(width / 2, height / 2);
 	if (matchLines.size() <= 0)
-		return Point(0, 0);
+		return inter;
 	Line objl1 = matchLines.at(0);
 	Line objl2 = matchLines.at(1);
 
-	qDebug() << "scene pairs: ";
-	objl1.toString();
-	objl2.toString();
-	qDebug() << "Entry";
 	Line lineEntry1 = entry.getLine1();
 	Line lineEntry2 = entry.getLine2();
 
 	HoughSpace hs1, hs2;
-	lineEntry1.toString();
-	lineEntry2.toString();
 	hs1 = entry.getHoughSpaces().at(0);
 	hs2 = entry.getHoughSpaces().at(1);
-	angleDiff = angleDifference(lineEntry1, objl1);
-	double angleDiff2 = angleDifference(lineEntry2, objl2);
-	if (abs(lineEntry1.length() - objl1.length())
-			>= abs(lineEntry1.length() - objl2.length())) {
-		hs1 = entry.getHoughSpaces().at(1);
-		hs2 = entry.getHoughSpaces().at(0);
-		angleDiff = angleDifference(lineEntry1, objl2);
-		angleDiff2 = angleDifference(lineEntry2, objl2);
+
+	// display the angle
+	//double angle1 = lineEntry1.angleBetweenLines(lineEntry2);
+	//double angle2 = objl1.angleBetweenLines(objl2);
+	double angle3 = lineEntry1.angleBetweenLines(objl1);
+	double angle4 = lineEntry1.angleBetweenLines(objl2);
+
+	vector<Point> intersects1 = objl1.interParallel(objl1, objl2,
+			hs1.getDistance(), hs2.getDistance(), width, height);
+	int max = 0;
+	vector<Point> estLM;
+	vector<double> angles;
+	for (size_t i = 0; i < intersects1.size(); i++) {
+		Point esPoint = intersects1.at(i);
+		int positive = 0;
+		vector<Point> lms = findLandmarks(refPoint, esPoint, refLandmarks,
+				width, height, positive);
+		if (positive > max) {
+			estLM.clear();
+			estLM.push_back(esPoint);
+			angles.clear();
+			angles.push_back(angle3);
+			max = positive;
+		} else {
+			if (positive == max) {
+				estLM.push_back(esPoint);
+				angles.push_back(angle3);
+			}
+		}
 	}
-	if (angleDiff > 0) {
-		if (angleDiff2 < angleDiff)
-			angleDiff = angleDiff2;
+
+	vector<Point> intersects2 = objl1.interParallel(objl1, objl2,
+			hs2.getDistance(), hs1.getDistance(), width, height);
+	for (size_t i = 0; i < intersects2.size(); i++) {
+		Point esPoint = intersects2.at(i);
+		int positive = 0;
+		vector<Point> lms = findLandmarks(refPoint, esPoint, refLandmarks,
+				width, height, positive);
+		if (positive > max) {
+			estLM.clear();
+			estLM.push_back(esPoint);
+			angles.clear();
+			angles.push_back(angle4);
+			max = positive;
+		} else {
+			if (positive == max) {
+				estLM.push_back(esPoint);
+				angles.push_back(angle4);
+			}
+		}
+	}
+
+	qDebug() << "Size of intersections: " << estLM.size();
+	if (estLM.size() == 1) {
+		inter = estLM.at(0);
+		angleDiff = angles.at(0);
 	} else {
-		if (angleDiff2 > angleDiff)
-			angleDiff = angleDiff2;
+		double angleds = 180;
+		for (size_t i = 0; i < estLM.size(); i++) {
+			Point es = estLM.at(i);
+			double angle = angles.at(i);
+			if (angle <= angleds) {
+				angleds = angle;
+				angleDiff = angleds;
+				inter = es;
+			}
+		}
 	}
 
-	cv::Point intersect;
-
-	intersect = objl1.interParallel(objl1, objl2, hs1.getDistance(),
-			hs2.getDistance(), width, height);
-
-	qDebug() << "Point intersection: " << intersect.x << ", " << intersect.y;
-	return intersect;
+	qDebug() << "Angle diff: " << angleDiff;
+	qDebug() << "Point intersection: " << inter.x << ", " << inter.y;
+	return inter;
 }
 
-Point PHoughTransform::refPointInScene(Image modelImage, Image sceneImage) {
-	cv::Mat modelMat = modelImage.getMatrixImage();
-	cv::Mat sceneMat = sceneImage.getMatrixImage();
-	vector<PHTEntry> tableEntry = constructTable(modelImage.lineSegment(),
-			cv::Point(modelMat.cols / 2, modelMat.rows / 2));
-	vector<Line> maxVector;
-	PHTEntry entry = matchingInScene(tableEntry, sceneImage.lineSegment(),
-			sceneMat.cols, sceneMat.rows, maxVector);
-	double angleDiff;
-	return refPointInScene(entry, maxVector, angleDiff, modelMat.cols,
-			modelMat.rows);
-}
 Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
-		string reflmPath) {
+		string reflmPath, vector<Point> &esLandmarks) {
 
-	//QString scenelmDir = "/home/linh/Desktop/mg/landmarks";
 	QString scenename = sceneImage.getName();
-	//QString scenelmPath = scenelmDir + "/" + scenename + ".TPS";
-	//vector<Point> orglandmarks = sceneImage.readLandmarksFile(scenelmPath.toStdString());
 	double angleDiff;
 	Point ePoint;
-	vector<Point> esLandmarks = estimateLandmarks(refImage, sceneImage,
-			reflmPath, angleDiff, ePoint);
+	esLandmarks = estimateLandmarks(refImage, sceneImage, reflmPath, angleDiff,
+			ePoint);
 
 	Mat sceneMat = sceneImage.getMatrixImage();
 	cv::Mat mat(sceneMat.clone());
-	/*for (size_t t = 0; t < esLandmarks.size(); t++) {
-		Point landm = orglandmarks.at(t);
-		circle(mat, cv::Point(landm.x, mat.rows - landm.y), 7,
-				Scalar(0, 0, 255), 2, 4);
-	}*/
 
 	qDebug() << "angle Diff: " << angleDiff;
 	for (size_t t = 0; t < esLandmarks.size(); t++) {
-		circle(mat, esLandmarks.at(t), 2, Scalar(0, 255, 255), 2, 8);
-		//qDebug()<<"x, y"<<esLandmarks.at(t).x<<", "<< esLandmarks.at(t).y;
+		circle(mat, esLandmarks.at(t), 3, Scalar(0, 255, 255), 2, 8);
+		stringstream ss;
+		ss << t;
+		string s;
+		s = ss.str();
+		cv::putText(mat, s, esLandmarks.at(t), FONT_HERSHEY_COMPLEX, 1,
+				Scalar(255, 0, 0), 1, 8);
+
 	}
 	return mat;
 }
@@ -278,21 +315,23 @@ vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
 	PHTEntry entry = matchingInScene(entryTable, sLines, width, height,
 			maxVector);
 	if (maxVector.size() > 0) {
-		ePoint = refPointInScene(entry, maxVector, angleDiff, width, height);
+		ePoint = refPointInScene(entry, maxVector, angleDiff, mLandmarks, width,
+				height);
 
 		double angle1 = entry.getLine1().angleBetweenLines(entry.getLine2());
 		double angle2 = maxVector.at(0).angleBetweenLines(maxVector.at(1));
 		angleDiff += abs(angle1 - angle2);
-
-		eLandmarks = findLandmarks(mPoint, ePoint, angleDiff, mLandmarks, width,
-				height);
+		int positive = 0;
+		eLandmarks = findLandmarks(mPoint, ePoint, mLandmarks, width, height,
+				positive);
 	}
 	return eLandmarks;
 
 }
 vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
-		double angleDiff, vector<Point> refLandmarks, int width, int height) {
+		vector<Point> refLandmarks, int width, int height, int &positive) {
 	vector<Point> esLandmarks;
+	positive = 0;
 	for (size_t t = 0; t < refLandmarks.size(); t++) {
 		Point temp = refLandmarks.at(t);
 		Point lm(temp.x, height - temp.y);
@@ -301,15 +340,18 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 		int x;
 		int y;
 		x = lm.x - px;
-		if (y > 0)
+		if (py > 0)
 			y = lm.y - py;
 		else
 			y = lm.y + py;
-		//}
 		esLandmarks.push_back(Point(x, y));
+		if (x >= 0 && x <= width && y >= 0 && y <= height) {
+			positive += 1;
+		}
 	}
 	return esLandmarks;
 }
+
 Point PHoughTransform::newLocation(Point point, double angleDiff,
 		Point refPoint) {
 	int x, y;
@@ -338,30 +380,32 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 
 		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
-		/*
-		 Mat mat = phtPresentation(refImage, sceneImage,
-		 reflmPath.toStdString());*/
-		Point ePoint;
-		double angle;
-		Mat mat = testPHT(refImage, sceneImage, reflmPath.toStdString().c_str(),
-				angle, ePoint);
+
+		vector<Point> esLandmarks;
+		Mat mat = phtPresentation(refImage, sceneImage, reflmPath.toStdString(),
+				esLandmarks);
+		QString fileTPS(saveDir + "/" + scenename + ".TPS");
+		ofstream of(fileTPS.toStdString().c_str());
+		of << "LM = " << esLandmarks.size() << "\n";
+		for (size_t t = 0; t < esLandmarks.size(); t++) {
+			of << esLandmarks.at(t).x << " " << esLandmarks.at(t).y << "\n";
+		}
+		of << "IMAGE = " << scenename.toStdString().c_str() << ".JPG";
+		of.close();
 		QString savePath = saveDir + "/" + scenename + ".JPG";
 		imwrite(savePath.toStdString().c_str(), mat);
+		if (i == 293)
+			break;
 	}
 }
 double PHoughTransform::angleDifference(Line refLine, Line sceneLine) {
 	double angle = refLine.angleBetweenLines(sceneLine);
 	if (angle > 90)
 		angle = 180 - angle;
-
-	/*Point p1 = sceneLine.getP1();
-	 Point p2 = sceneLine.getP2();
-	 if (p1.x < refLine.getP1().x || p2.x < refLine.getP2().x)
-	 return -angle;*/
 	return angle;
 }
 
-Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
+/*Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 		double &angleDiff, Point &ePoint) {
 	vector<Point> eLandmarks;
 	Mat mMatrix = mImage.getMatrixImage();
@@ -369,6 +413,7 @@ Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 	int height = mMatrix.rows;
 
 	vector<Point> mLandmarks = mImage.readLandmarksFile(mlmPath);
+	qDebug() << "total ref landmarks: " << mLandmarks.size();
 
 	vector<Line> mLines = mImage.lineSegment();
 	vector<Line> sLines = sImage.lineSegment();
@@ -396,7 +441,10 @@ Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 				Scalar(0, 255, 0), 2, 8);
 		cv::putText(result, "line 2", maxVector[1].getP1(),
 				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
-		ePoint = refPointInScene(entry, maxVector, angleDiff, width, height);
+		vector<double> angles;
+		ePoint = refPointInScene(entry, maxVector, angleDiff, mLandmarks, width,
+				height);
+
 		double angle1 = entry.getLine1().angleBetweenLines(entry.getLine2());
 		double angle2 = maxVector.at(0).angleBetweenLines(maxVector.at(1));
 
@@ -404,22 +452,21 @@ Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
 				<< abs(angle1 - angle2);
 		angleDiff += abs(angle1 - angle2);
 		circle(result, ePoint, 5, Scalar(0, 255, 255), 5, 8);
-		eLandmarks = findLandmarks(mPoint, ePoint, angleDiff, mLandmarks, width,
-				height);
-		//LandmarkDetection lmd;
-		//result = lmd.rotateImage(result,angleDiff, ePoint);
 
-		for (size_t j = 0; j < mLines.size(); j++) {
-			Line line = mLines.at(j);
-			if (line.length() > 50)
-				line.drawing(result);
-		}
+		int positive = 0;
+		eLandmarks = findLandmarks(mPoint, ePoint, mLandmarks, width, height,
+				positive);
 
 		for (size_t i = 0; i < eLandmarks.size(); i++) {
 			circle(result, eLandmarks.at(i), 3, Scalar(0, 255, 255), 2, 8);
+			stringstream ss;
+			ss << i;
+			string s;
+			s = ss.str();
+			cv::putText(result, s, eLandmarks.at(i), FONT_HERSHEY_COMPLEX, 1,
+					Scalar(255, 0, 0), 1, 8);
 		}
 	}
 	return result;
-
-}
+}*/
 } /* namespace impls_2015 */

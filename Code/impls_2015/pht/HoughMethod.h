@@ -51,7 +51,8 @@ class HoughMethod {
 public:
 	HoughMethod();
 	virtual ~HoughMethod();
-	virtual Point refPointInScene(Image modelImage, Image sceneImage) = 0;
+	virtual vector<Point> estimateLandmarks(Image mImage, Image sImage, string mlmPath,
+			double &angleDiff, Point &ePoint) = 0;
 };
 
 } /* namespace impls_2015 */

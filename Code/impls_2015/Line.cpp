@@ -197,27 +197,41 @@ cv::Point Line::intersection(Line objectLine) {
  */
 double Line::angleBetweenLines(Line objectLine) {
 
-	cv::Point inter = intersection(objectLine);
-	if (inter.x == -1 && inter.y == -1) // parallel line
-		return 0;
-	cv::Point ref2, obj2;
+	int x1 = this->getP2().x - this->getP1().x;
+	int y1 = this->getP2().y - this->getP1().y;
+	int x2 = objectLine.getP2().x - objectLine.getP1().x;
+	int y2 = objectLine.getP2().y - objectLine.getP1().y;
 
-	if ((Line(inter, p1)).length() < (Line(inter, p2)).length())
-		ref2 = p2;
-	else
-		ref2 = p1;
-	if ((Line(inter, objectLine.getP1())).length()
-			< (Line(inter, objectLine.getP2())).length())
-		obj2 = objectLine.getP2();
-	else
-		obj2 = objectLine.getP1();
-	cv::Point u(ref2.x - inter.x, ref2.y - inter.y);
-	cv::Point v(obj2.x - inter.x, obj2.y - inter.y);
-	double ulength = sqrt((u.x * u.x) + (u.y * u.y));
-	double vlength = sqrt((v.x * v.x) + (v.y * v.y));
-	double uv = (u.x * v.x) + (u.y * v.y);
-	double angle = acos(uv / (ulength * vlength)) * 180 / M_PI;
-	return angle;
+	double slope1 = 0, slope2 = 0;
+	if (x1 == 0 && x2 == 0)
+		return 0;
+	if (x1 == 0 && x2 != 0) {
+		slope2 = (double)y2 / (double)x2;
+		return atan(abs(1 / slope2)) * 180 / M_PI;
+	}
+	if (x1 != 0 && x2 == 0) {
+		slope1 = (double)y1 / (double)x1;
+		return atan(abs(1 / slope1)) * 180 / M_PI;
+	}
+
+	slope1 = (double)y1 / (double)x1;
+	slope2 = (double)y2 / (double)x2;
+	double angle = 0;
+	if (slope1 == 0 && slope2 == 0) {
+		return 0;
+	}
+	if (slope1 * slope2 == -1)
+		return 90;
+	if (slope1 == 0 && slope2 != 0) {
+		return atan(abs(slope2)) * 180 / M_PI;
+	}
+	if (slope1 != 0 && slope2 == 0) {
+		return atan(abs(slope1)) * 180 / M_PI;
+	}
+	if (slope1 != 0 && slope2 != 0 && !isnan(slope1) && !isnan(slope2)) {
+		return atan(abs((slope1 - slope2) / (1 + slope1 * slope2))) * 180 / M_PI;
+	}
+	return 0;
 }
 
 /**
@@ -310,7 +324,7 @@ vector<vector<double> > Line::parallelLine(double distance) {
 	return equations;
 }
 
-Point Line::interParallel(Line line1, Line line2, double distance1,
+vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 		double distance2, int width, int height) {
 	vector<double> equation1 = line1.equationOfLine();
 	vector<double> equation2 = line2.equationOfLine();
@@ -321,6 +335,8 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 	double e = distance1 * (sqrt((a * a) + 1));
 	double f = distance2 * (sqrt((c * c) + 1));
 
+	vector<Point> result;
+
 	Point refPoint(width / 2, height / 2);
 	double minDistance = width;
 
@@ -330,13 +346,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 		y0 = a * x0 + b - e;
 		if (y0 >= 0 && y0 < height) {
 			//qDebug() << "1 nghiem " << x0 << "," << y0;
-			Line l1(refPoint, Point(x0, y0));
-			if (l1.length() < minDistance) {
-				minDistance = l1.length();
-				x = x0;
-				y = y0;
-
-			}
+			result.push_back(Point(x0, y0));
 		}
 	}
 	x0 = (b - e - f - d) / (c - a);
@@ -344,12 +354,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 		y0 = a * x0 + b - e;
 		if (y0 >= 0 && y0 < height) {
 			//qDebug() << "2 nghiem " << x0 << "," << y0;
-			Line l2(refPoint, Point(x0, y0));
-			if (l2.length() < minDistance) {
-				minDistance = l2.length();
-				x = x0;
-				y = y0;
-			}
+			result.push_back(Point(x0, y0));
 		}
 	}
 	x0 = (f + b - d + e) / (c - a);
@@ -357,12 +362,7 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 		y0 = a * x0 + b + e;
 		if (y0 >= 0 && y0 < height) {
 			//qDebug() << "3 nghiem " << x0 << "," << y0;
-			Line l3(refPoint, Point(x0, y0));
-			if (l3.length() < minDistance) {
-				minDistance = l3.length();
-				x = x0;
-				y = y0;
-			}
+			result.push_back(Point(x0, y0));
 		}
 	}
 	x0 = (b + e - f - d) / (c - a);
@@ -370,15 +370,10 @@ Point Line::interParallel(Line line1, Line line2, double distance1,
 		y0 = a * x0 + b + e;
 		if (y0 >= 0 && y0 < height) {
 			//qDebug() << "4 nghiem " << x0 << "," << y0;
-			Line l4(refPoint, Point(x0, y0));
-			if (l4.length() < minDistance) {
-				minDistance = l4.length();
-				x = x0;
-				y = y0;
-			}
+			result.push_back(Point(x0, y0));
 		}
 	}
-	return Point(round(x), round(y));
+	return result;
 }
 
 void Line::toString() {

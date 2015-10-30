@@ -58,19 +58,18 @@ public:
 	LandmarkDetection();
 	virtual ~LandmarkDetection();
 	void setNoise(double noise);
-	vector<Landmark> getLandmarks(Image image);
 	Mat createTemplate(Mat matImage, Point landmark, int tsize, Point &location,
 			Point &distance);
 	Point matCrossCorrelation(Mat templ, Mat scene);
 	vector<Point> crossCorrelation(Image refImage, Image sceneImage,
 			QString lmPath, int templSize);
-	void cCorelationByDirectory(Image refImage, QString folderpath,
+	void cCorrelationByDirectory(Image refImage, QString folderpath,
 			QString savepath, QString lmPath);
-	double centroidCCorelation(Image refImage, Image sceneImage, QString lmPath,
+	double centroidCCorrelation(Image refImage, Image sceneImage, QString lmPath,
 			int size, Point &ebary);
-	void centroidCCorelations(Image refImage, QString lmPath,
+	void centroidCCorrelations(Image refImage, QString lmPath,
 			QString folderImages);
-	void centroidCCorelations(Image refImage, QString lmPath,
+	void centroidCCorrelations(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
 	Mat rotateImage(Mat source, double angle, Point center);
 	Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,

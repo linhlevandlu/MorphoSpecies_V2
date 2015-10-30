@@ -34,7 +34,9 @@ class LandmarkMethod {
 public:
 	LandmarkMethod();
 	virtual ~LandmarkMethod();
-	virtual vector<Landmark> getLandmarks(Image image) = 0;
+	virtual Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
+			int templSize, int sceneSize, double angleDiff,
+			vector<Point> &mcResult) = 0;
 };
 
 } /* namespace impls_2015 */

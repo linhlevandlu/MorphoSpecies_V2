@@ -114,7 +114,11 @@ void Scenario::matchingDirectory(QString directoryPath,
 Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage,
 		QString reflmPath) {
 	PHoughTransform pht;
-	return pht.phtPresentation(refImage, sceneImage, reflmPath.toStdString());
+	vector<Point> esLandmarks;
+	double angle;
+	Point ePoint;
+	//return pht.testPHT(refImage,sceneImage,reflmPath.toStdString(),angle,ePoint);
+	return pht.phtPresentation(refImage, sceneImage, reflmPath.toStdString(),esLandmarks);
 }
 void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
 		QString scenelmDir, QString saveDir) {
@@ -138,13 +142,13 @@ vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 void Scenario::cCorelationDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {
 	LandmarkDetection lmdetection;
-	lmdetection.cCorelationByDirectory(refImage, path, savePath, lmPath);
+	lmdetection.cCorrelationByDirectory(refImage, path, savePath, lmPath);
 }
 
 double Scenario::mDistanceByCrossCorrelation(Image image, QString lmpath,
 		Image sceneImage, int size, Point &ebary) {
 	LandmarkDetection lmdetection;
-	double rs = lmdetection.centroidCCorelation(image, sceneImage, lmpath, size,
+	double rs = lmdetection.centroidCCorrelation(image, sceneImage, lmpath, size,
 			ebary);
 	return rs;
 }
@@ -156,7 +160,7 @@ void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 	QString lmfolder = "/home/linh/Desktop/mg/landmarks";
 	LandmarkDetection lmdetection;
 //	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder);
-	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder,lmfolder);
+	lmdetection.centroidCCorrelations(refImage, lmpath, imgFolder,lmfolder);
 }
 Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		QString reflmPath, int templSize, int scnSize) {
