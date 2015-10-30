@@ -1,0 +1,1 @@
+IMAGE = Mg 112.JPG

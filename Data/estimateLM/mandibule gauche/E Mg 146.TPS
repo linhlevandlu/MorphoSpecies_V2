@@ -1,0 +1,2 @@
+LM = 0
+IMAGE = Mg 146.JPG

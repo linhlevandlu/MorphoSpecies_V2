@@ -1,0 +1,1 @@
+IMAGE = Mg 105.JPG
