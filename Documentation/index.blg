@@ -12,44 +12,57 @@ A level-1 auxiliary file: includes/implementation.aux
 A level-1 auxiliary file: includes/conclusion.aux
 The style file: plain.bst
 Database file #1: includes/references.bib
-You've used 2 entries,
+Too many commas in name 1 of "Gloria Bueno García, Oscar Deniz Suarez, José Luis Espinosa Aranda, Jesus Salido Tercero, Ismael Serrano Gracia, Noelia Vállez Enano" for entry oscarbook
+while executing---line 1049 of file plain.bst
+Too many commas in name 1 of "Gloria Bueno García, Oscar Deniz Suarez, José Luis Espinosa Aranda, Jesus Salido Tercero, Ismael Serrano Gracia, Noelia Vállez Enano" for entry oscarbook
+while executing---line 1049 of file plain.bst
+Too many commas in name 1 of "Gloria Bueno García, Oscar Deniz Suarez, José Luis Espinosa Aranda, Jesus Salido Tercero, Ismael Serrano Gracia, Noelia Vállez Enano" for entry oscarbook
+while executing---line 1049 of file plain.bst
+Too many commas in name 1 of "Gloria Bueno García, Oscar Deniz Suarez, José Luis Espinosa Aranda, Jesus Salido Tercero, Ismael Serrano Gracia, Noelia Vállez Enano" for entry oscarbook
+while executing---line 1090 of file plain.bst
+Too many commas in name 1 of "Gloria Bueno García, Oscar Deniz Suarez, José Luis Espinosa Aranda, Jesus Salido Tercero, Ismael Serrano Gracia, Noelia Vállez Enano" for entry oscarbook
+while executing---line 1090 of file plain.bst
+Too many commas in name 1 of "Gloria Bueno García, Oscar Deniz Suarez, José Luis Espinosa Aranda, Jesus Salido Tercero, Ismael Serrano Gracia, Noelia Vállez Enano" for entry oscarbook
+while executing---line 1090 of file plain.bst
+You've used 5 entries,
             2118 wiz_defined-function locations,
-            519 strings with 4569 characters,
-and the built_in function-call counts, 801 in all, are:
-= -- 77
-> -- 36
-< -- 1
-+ -- 15
-- -- 12
-* -- 59
-:= -- 132
-add.period$ -- 6
-call.type$ -- 2
-change.case$ -- 12
+            541 strings with 5130 characters,
+and the built_in function-call counts, 1996 in all, are:
+= -- 200
+> -- 84
+< -- 4
++ -- 34
+- -- 28
+* -- 141
+:= -- 314
+add.period$ -- 16
+call.type$ -- 5
+change.case$ -- 28
 chr.to.int$ -- 0
-cite$ -- 2
-duplicate$ -- 30
-empty$ -- 64
-format.name$ -- 12
-if$ -- 167
+cite$ -- 5
+duplicate$ -- 80
+empty$ -- 159
+format.name$ -- 28
+if$ -- 429
 int.to.chr$ -- 0
-int.to.str$ -- 2
-missing$ -- 2
-newline$ -- 13
-num.names$ -- 4
-pop$ -- 13
+int.to.str$ -- 5
+missing$ -- 6
+newline$ -- 28
+num.names$ -- 10
+pop$ -- 33
 preamble$ -- 1
-purify$ -- 10
+purify$ -- 24
 quote$ -- 0
-skip$ -- 21
+skip$ -- 60
 stack$ -- 0
-substring$ -- 55
-swap$ -- 8
-text.length$ -- 1
+substring$ -- 140
+swap$ -- 27
+text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 8
+type$ -- 18
 warning$ -- 0
-while$ -- 9
-width$ -- 3
-write$ -- 24
+while$ -- 20
+width$ -- 6
+write$ -- 59
+(There were 6 error messages)

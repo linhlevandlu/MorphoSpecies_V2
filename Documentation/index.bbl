@@ -1,14 +1,31 @@
 \begin{thebibliography}{1}
 
+\bibitem{ashbrook1995robust}
+Anthony Ashbrook, Neil~A Thacker, Peter Rockett, and CI~Brown.
+\newblock Robust recognition of scaled shapes using pairwise geometric
+  histograms.
+\newblock In {\em BMVC}, volume~95, pages 503--512, 1995.
+
+\bibitem{evans1993use}
+Alun Evans, Neil~A Thacker, and John~EW Mayhew.
+\newblock The use of geometric histograms for model-based object recognition.
+\newblock In {\em BMVC}, volume~93, pages 429--438. Citeseer, 1993.
+
+\bibitem{oscarbook}
+José Luis Espinosa Aranda Jesus Salido Tercero Ismael Serrano Gracia Noelia
+  Vállez~Enano Gloria Bueno~García, Oscar Deniz~Suarez.
+\newblock {\em Learning Image Processing with OpenCV}.
+\newblock Packt Publishing, 2015.
+
 \bibitem{palaniswamy2010automatic}
 Sasirekha Palaniswamy, Neil~A Thacker, and Christian~Peter Klingenberg.
 \newblock Automatic identification of landmarks in digital images.
 \newblock {\em IET Computer Vision}, 4(4):247--260, 2010.
 
-\bibitem{riocreux1994analysis}
-PA~Riocreux, Neil~A Thacker, and RB~Yates.
-\newblock An analysis of pairwise geometric histograms for view-based object
-  recognition.
-\newblock In {\em BMVC}, pages 1--10, 1994.
+\bibitem{thacker1995assessing}
+Neil~A Thacker, PA~Riocreux, and RB~Yates.
+\newblock Assessing the completeness properties of pairwise geometric
+  histograms.
+\newblock {\em Image and Vision Computing}, 13(5):423--429, 1995.
 
 \end{thebibliography}

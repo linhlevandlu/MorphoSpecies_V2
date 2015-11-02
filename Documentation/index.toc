@@ -11,7 +11,7 @@
 \contentsline {section}{\numberline {2.2}Image filtering}{8}
 \contentsline {section}{\numberline {2.3}Histogram}{9}
 \contentsline {section}{\numberline {2.4}Segmentation}{9}
-\contentsline {section}{\numberline {2.5}Color processing}{10}
+\contentsline {section}{\numberline {2.5}Color processing$^{\cite {oscarbook}}$}{10}
 \contentsline {chapter}{\numberline {3}Preprocessing image}{12}
 \contentsline {section}{\numberline {3.1}Problem}{12}
 \contentsline {section}{\numberline {3.2}Analysis}{12}
@@ -35,37 +35,11 @@
 \contentsline {subsubsection}{Template matching}{29}
 \contentsline {chapter}{\numberline {5}Implementation}{31}
 \contentsline {section}{\numberline {5.1}Software architecture}{31}
-\contentsline {section}{\numberline {5.2}Image preprocessing}{32}
-\contentsline {subsection}{\numberline {5.2.1}Line class}{32}
-\contentsline {subsubsection}{The attributes}{32}
-\contentsline {subsubsection}{The methods}{32}
-\contentsline {subsection}{\numberline {5.2.2}Edge class}{33}
-\contentsline {subsubsection}{The attributes}{33}
-\contentsline {subsection}{\numberline {5.2.3}The methods}{33}
-\contentsline {subsection}{\numberline {5.2.4}Image class}{34}
-\contentsline {subsubsection}{The attributes}{34}
-\contentsline {subsubsection}{The methods}{34}
-\contentsline {section}{\numberline {5.3}Edge segmentation }{35}
-\contentsline {section}{\numberline {5.4}Construct pairwise geometric histogram}{35}
-\contentsline {subsection}{\numberline {5.4.1}GFeatures class}{35}
-\contentsline {subsubsection}{The attributes}{35}
-\contentsline {subsubsection}{The methods}{36}
-\contentsline {subsection}{\numberline {5.4.2}LocalHistogram class}{36}
-\contentsline {subsubsection}{The attributes}{36}
-\contentsline {subsubsection}{The methods}{36}
-\contentsline {subsection}{\numberline {5.4.3}ShapeHistogram class}{37}
-\contentsline {subsubsection}{The attributes}{37}
-\contentsline {subsubsection}{The methods}{37}
-\contentsline {subsection}{\numberline {5.4.4}GeometricHistogram class}{38}
-\contentsline {section}{\numberline {5.5}Estimate the global pose}{38}
-\contentsline {subsection}{\numberline {5.5.1}HoughSpace class}{38}
-\contentsline {subsubsection}{The attributes}{38}
-\contentsline {subsubsection}{The methods}{38}
-\contentsline {subsection}{\numberline {5.5.2}PHTEntry class}{39}
-\contentsline {subsubsection}{The attributes}{39}
-\contentsline {subsubsection}{The methods}{39}
-\contentsline {subsection}{\numberline {5.5.3}PHoughTransform class}{39}
-\contentsline {subsubsection}{The methods}{39}
-\contentsline {section}{\numberline {5.6}Refine the landmarks}{40}
-\contentsline {section}{\numberline {5.7}Result}{41}
-\contentsline {chapter}{\numberline {6}Conclusion}{42}
+\contentsline {section}{\numberline {5.2}Image preprocessing}{31}
+\contentsline {section}{\numberline {5.3}The abstract classes}{33}
+\contentsline {section}{\numberline {5.4}Edge segmentation }{33}
+\contentsline {section}{\numberline {5.5}Construct pairwise geometric histogram}{33}
+\contentsline {section}{\numberline {5.6}Estimate the global pose}{34}
+\contentsline {section}{\numberline {5.7}Refine the landmarks}{34}
+\contentsline {chapter}{\numberline {6}Result}{35}
+\contentsline {chapter}{\numberline {7}Conclusion}{36}
