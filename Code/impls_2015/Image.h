@@ -38,7 +38,6 @@
 #include <math.h>
 
 #include "Edge.h"
-#include "Landmark.h"
 #include "ShapeHistogram.h"
 
 using namespace std;

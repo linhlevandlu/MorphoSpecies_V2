@@ -32,6 +32,15 @@ GeometricHistogram::GeometricHistogram() {
 GeometricHistogram::~GeometricHistogram() {
 	// TODO Auto-generated destructor stub
 }
+
+/*
+ * Construct the PGH of an image followed an accuracy
+ * @parameter 1: image - the input image
+ * @parameter 2: angleAcc - the angle accuracy
+ * @parameter 3: columns - the distance accuracy
+ * @parameter 4 - output: result - the matrix presented the PGH
+ * @return: list of local histogram
+ */
 vector<LocalHistogram> GeometricHistogram::shapeHistogram(Image image,
 		LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result) {
 	ShapeHistogram pghHistogram = image.getShapeHistogram();
@@ -48,6 +57,15 @@ vector<LocalHistogram> GeometricHistogram::shapeHistogram(Image image,
 	return listLocalPGH;
 }
 
+/*
+ * Compute the measure distance between two images
+ * @parameter 1: refImage - the first (reference) image
+ * @parameter 2: sceneImage - the second (scene) image
+ * @parameter 3: matchingMethod - the matching method
+ * @parameter 4: angleAcc - the angle accuracy
+ * @parameter 5: distanceAcc - the distance accuracy
+ * @return: the measure distance between two images
+ */
 double GeometricHistogram::pghHistogramMatching(Image refImage,
 		Image sceneImage, MatchingMethod matchingMethod,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
@@ -72,6 +90,14 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 			<< " seconds";
 	return distance;
 }
+
+/*
+ * Compute the measure distance between two PGHs
+ * @parameter 1: refHist - reference PGH
+ * @parameter 2: sceneHist - scene PGH
+ * @parameter 3: matching - matching method
+ * @return: the measure distance between two PGHs followed the matching method
+ */
 double GeometricHistogram::getDistanceMetric(ShapeHistogram refHist,
 		ShapeHistogram sceneHist, MatchingMethod matching) {
 	double distance = 0;
@@ -92,6 +118,13 @@ double GeometricHistogram::getDistanceMetric(ShapeHistogram refHist,
 	return distance;
 }
 
+/*
+ * Compute the measure distance between pairs of images in a folder
+ * @parameter 1: folderPath - the path of images folder
+ * @parameter 2: method - the matching method
+ * @parameter 3: angleAcc - the angle accuracy
+ * @parameter 4: distanceAcc - the distance accuracy
+ */
 void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 		MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
 		int distanceAcc) {
@@ -151,6 +184,14 @@ void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 
 }
 
+/*
+ * Compute the measure distance between an image and the images in a folder
+ * @parameter 1: refImage - reference image
+ * @parameter 2: folderPath - path of scene images folder
+ * @parameter 3: matchingMethod - the matching method
+ * @parameter 4: angleAcc - the angle accuracy
+ * @parameter 5: distanceAcc - the distance accuracy
+ */
 void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
 		QString folderPath, MatchingMethod matchingMethod,
 		LocalHistogram::AccuracyPGH angleAcc,int distanceAcc) {
@@ -200,6 +241,12 @@ void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
 	of.close();
 }
 
+/*
+ * Construct the PGH for the images in a folder
+ * @parameter 1: folderPath - the images folder
+ * @parameter 2: angleAcc -the angle accuracy
+ * @parameter 3: columns - the distance accuracy
+ */
 void GeometricHistogram::pairwiseHistogramDirectory(QString folderPath,
 		LocalHistogram::AccuracyPGH angleAcc, int columns) {
 	QDir qdir;
@@ -226,25 +273,6 @@ void GeometricHistogram::pairwiseHistogramDirectory(QString folderPath,
 		listLocalPGH = sceneHist.constructPGH(lines);
 		sceneHist.constructMatPGH(angleAcc, columns);
 		sceneHist.writeMatrix(scenename);
-	}
-}
-void GeometricHistogram::copyFile(QString folderPath, QString savePath) {
-	QDir qdir;
-	qdir.setPath(folderPath);
-	qdir.setFilter(QDir::Files);
-	qdir.setNameFilters(QStringList("*.PGH"));
-	QFileInfoList files = qdir.entryInfoList();
-	for (int i = 0; i < files.size(); i++) {
-		QFileInfo file = files.at(i);
-		QString _name = file.absoluteFilePath();
-		int index2 = _name.lastIndexOf("/");
-		if (_name.contains("L1080_C1000")) {
-
-			QString scenename = savePath
-					+ _name.mid(index2 + 1, _name.length() - index2).replace(
-							" ", "");
-			QFile::copy(_name, scenename);
-		}
 	}
 }
 

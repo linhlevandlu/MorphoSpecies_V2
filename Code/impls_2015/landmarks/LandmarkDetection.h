@@ -43,7 +43,6 @@
 
 #include "LandmarkMethod.h"
 #include "../Image.h"
-#include "../Landmark.h"
 #include "../pht/PHoughTransform.h"
 
 using namespace cv;
@@ -52,12 +51,9 @@ using namespace std;
 namespace impls_2015 {
 
 class LandmarkDetection: public LandmarkMethod {
-private:
-	double noise;
 public:
 	LandmarkDetection();
 	virtual ~LandmarkDetection();
-	void setNoise(double noise);
 	Mat createTemplate(Mat matImage, Point landmark, int tsize, Point &location,
 			Point &distance);
 	Point matCrossCorrelation(Mat templ, Mat scene);

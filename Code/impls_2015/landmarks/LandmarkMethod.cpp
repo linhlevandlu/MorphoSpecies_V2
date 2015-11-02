@@ -2,7 +2,6 @@
  * LandmarkMethod.cpp
  *
  *  Created on: Sep 17, 2015
- *      Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *

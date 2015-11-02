@@ -2,7 +2,6 @@
  * PHoughTransform.cpp
  *
  *  Created on: Sep 23, 2015
- *  Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -32,8 +31,11 @@ PHoughTransform::~PHoughTransform() {
 	// TODO Auto-generated destructor stub
 }
 
-/**
- * Construct the table to store the angle and distance of pair lines to a reference point
+/*
+ * Construct the reference table around a reference point
+ * @parameter 1: lines - list of lines
+ * @parameter 2: refPoint - the reference point
+ * @return: the list of entry contains the hough information of model
  */
 vector<PHTEntry> PHoughTransform::constructTable(vector<Line> lines,
 		Point refPoint) {
@@ -74,6 +76,12 @@ vector<PHTEntry> PHoughTransform::constructTable(vector<Line> lines,
 	return phtransform;
 }
 
+/*
+ * Check the closet lines
+ * @parameter 1: line1  - the first line
+ * @parameter 2: line2 - the second line
+ * @return: the first line and the second line are closet or not
+ */
 bool PHoughTransform::closetLine(Line line1, Line line2) {
 
 	double distance1 = line2.perpendicularDistance(line1.getP1());
@@ -86,7 +94,12 @@ bool PHoughTransform::closetLine(Line line1, Line line2) {
 }
 
 /**
- * Indicate the similarity of two pair lines
+ * Check the similarity between two pair of lines (ref1, ref2) and (scene1, scene2)
+ * @parameter 1: ref1 - the first reference line
+ * @parameter 2: ref2 - the second reference line
+ * @parameter 3: scene1 - the first scene line
+ * @parameter 4: scene2 - the second scene line
+ * @return: check pair (ref1, ref2) similar with (scene1, scene2) or not
  */
 bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 		Line scene2) {
@@ -113,7 +126,11 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 }
 
 /**
- * Find a similar pair lines in table
+ * Find the best similar pair of reference lines in table with pair of scene lines
+ * @parameter 1: entryTable - the reference table
+ * @parameter 2: line1 - the first scene line
+ * @parameter 3: line2 - the second scene line
+ * @return: the entry in table, which have best similarity
  */
 PHTEntry PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
 		Line line1, Line line2) {
@@ -127,6 +144,15 @@ PHTEntry PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
 	return entry;
 }
 
+/*
+ * Find the pair of scene lines have the best matching with a pair of reference lines
+ * @parameter 1: entryTable - the reference table
+ * @parameter 2: sceneLines - list of scene lines
+ * @parameter 3: width - width of image
+ * @parameter 4: height - height of image
+ * @parameter 5 - output: maxVector - pair of scene lines
+ * @return: the entry in reference table, which have best match.
+ */
 PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 		vector<Line> sceneLines, int width, int height,
 		vector<Line> &maxVector) {
@@ -179,6 +205,16 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 	return maxEntry;
 }
 
+/*
+ * Estimate the reference point in a scene image
+ * @parameter 1: entry - the matching entry
+ * @parameter 2: matchLines - the pair of scene lines
+ * @parameter 3 - output: angleDiff - the difference angle between two images
+ * @parameter 4: refLandmarks - list of reference landmarks
+ * @parameter 5: width - width of image
+ * @parameter 6: height - height of image
+ * @return: the location of reference point on scene image
+ */
 Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
 		double &angleDiff, vector<Point> refLandmarks, int width, int height) {
 
@@ -269,6 +305,14 @@ Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	return inter;
 }
 
+/*
+ * Presentation the estimated landmarks
+ * @parameter 1: refImage - reference image
+ * @parameter 2: sceneImage - scene image
+ * @parameter 3: reflmPath - the reference landmarks file
+ * @parameter 4 - output: esLandmarks - list of estimated landmarks
+ * @return: the matrix presented the estimated landmarks
+ */
 Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 		string reflmPath, vector<Point> &esLandmarks) {
 
@@ -295,6 +339,15 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 	return mat;
 }
 
+/*
+ * Estimate the reference landmarks on a scene image
+ * @parameter 1: mImage - model image
+ * @parameter 2: sImage - scene image
+ * @parameter 3: mlmPath - reference landmarks file
+ * @parameter 4 - output: angleDiff - the angle difference between two images
+ * @paremeter 5 - output: ePoint - the reference point on scene image
+ * @return: list of estimated landmarks
+ */
 vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
 		string mlmPath, double &angleDiff, Point &ePoint) {
 	vector<Point> eLandmarks;
@@ -326,6 +379,17 @@ vector<Point> PHoughTransform::estimateLandmarks(Image mImage, Image sImage,
 	return eLandmarks;
 
 }
+
+/*
+ * Find the estimated landmarks based on the relative of reference landmarks and reference point
+ * @parameter 1: refPoint - the reference point
+ * @parameter 2: esPoint - the reference point on the scene image
+ * @parameter 3: refLandmarks - list of reference landmarks
+ * @parameter 4: width - width of image
+ * @parameter 5: height - height of image
+ * @parameter 6 - output: positive - number of estimated landmarks, which have positive coordinate
+ * @return: list of estimated landmarks
+ */
 vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 		vector<Point> refLandmarks, int width, int height, int &positive) {
 	vector<Point> esLandmarks;
@@ -350,6 +414,13 @@ vector<Point> PHoughTransform::findLandmarks(Point refPoint, Point esPoint,
 	return esLandmarks;
 }
 
+/*
+ * Find the new location of a point when image rotated
+ * @parameter 1: point - the object point
+ * @parameter 2: angleDiff - the angle rotate
+ * @parameter 3: refPoint - the center to rotate
+ * @return: new coordinate of object point
+ */
 Point PHoughTransform::newLocation(Point point, double angleDiff,
 		Point refPoint) {
 	int x, y;
@@ -367,6 +438,15 @@ Point PHoughTransform::newLocation(Point point, double angleDiff,
 	}
 	return Point(x, y);
 }
+
+/*
+ * Estimate the landmarks of a reference image on a list of image in folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: reflmPath - the reference landmarks file
+ * @parameter 3: sceneDir - the scene images folder
+ * @parameter 4: scenelmDir - the folder contains the original landmarks file of scene images
+ * @parameter 5: saveDir - the save folder
+ */
 void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		QString sceneDir, QString scenelmDir, QString saveDir) {
 
@@ -394,6 +474,13 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		imwrite(savePath.toStdString().c_str(), mat);
 	}
 }
+
+/*
+ * Compute the angle difference between two lines
+ * @parameter 1: refLine - the reference line
+ * @parameter 2: sceneLine - the scene line
+ * @return: angle between two lines
+ */
 double PHoughTransform::angleDifference(Line refLine, Line sceneLine) {
 	double angle = refLine.angleBetweenLines(sceneLine);
 	if (angle > 90)

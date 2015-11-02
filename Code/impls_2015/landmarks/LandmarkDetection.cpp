@@ -32,14 +32,16 @@ LandmarkDetection::LandmarkDetection() {
 LandmarkDetection::~LandmarkDetection() {
 	// TODO Auto-generated destructor stub
 }
-/**
- * Set the noise when find the landmarks
- * @parameter: noise - the noise
- */
-void LandmarkDetection::setNoise(double noise) {
-	this->noise = noise;
-}
 
+/*
+ * Create the bounding box around a point
+ * @parameter 1: matImage - the image
+ * @parameter 2: landmark - the point
+ * @parameter 3: tsize - the size of bounding box
+ * @parameter 4: location - the real location of box on image
+ * @parameter 5: distance - the distance (x,y) from the point to the box position
+ * @return: the matrix presented bounding box around a point
+ */
 Mat LandmarkDetection::createTemplate(Mat matImage, Point landmark, int tsize,
 		Point &location, Point &distance) {
 	Mat temp(matImage.clone());
@@ -62,6 +64,12 @@ Mat LandmarkDetection::createTemplate(Mat matImage, Point landmark, int tsize,
 	return refTemplate;
 }
 
+/*
+ * Cross-correlation between two matrix
+ * @parameter 1: templ - the template matrix
+ * @parameter 2: scene - the scene matrix(image)
+ * @return: point on scene, where have the best matching of template on image
+ */
 Point LandmarkDetection::matCrossCorrelation(Mat templ, Mat scene) {
 	int width = scene.cols - templ.cols + 1;
 	int height = scene.rows - templ.rows + 1;
@@ -76,6 +84,14 @@ Point LandmarkDetection::matCrossCorrelation(Mat templ, Mat scene) {
 	return Point(0, 0);
 }
 
+/*
+ * Cross-correlation between two images
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImage - the scene image
+ * @parameter 3: lmPath - the reference landmarks file
+ * @parameter 4: templSize - the size of bounding box
+ * @return: a list estimated landmarks of reference landmarks on scene image
+ */
 vector<Point> LandmarkDetection::crossCorrelation(Image refImage,
 		Image sceneImage, QString lmPath, int templSize) {
 	vector<Point> refLandmarks = refImage.readLandmarksFile(
@@ -95,6 +111,13 @@ vector<Point> LandmarkDetection::crossCorrelation(Image refImage,
 	return sceneLandmarks;
 }
 
+/*
+ * Cross-correlation between a reference image and the images in a folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: folderpath - the images folder
+ * @parameter 3: savepath - the saving folder
+ * @parameter 4: lmPath - the reference landmarks file
+ */
 void LandmarkDetection::cCorrelationByDirectory(Image refImage,
 		QString folderpath, QString savepath, QString lmPath) {
 
@@ -121,6 +144,16 @@ void LandmarkDetection::cCorrelationByDirectory(Image refImage,
 	}
 	//meanDiff.close();
 }
+
+/*
+ * Compute the centroid of estimated landmarks based on cross-correlation
+ * @parameter 1: refImage - reference image
+ * @parameter 2: sceneImage - scene image
+ * @parameter 3: lmPath - the reference landmarks file
+ * @parameter 4: size - the size of bounding box
+ * @parameter 5 - output: ebary - the position of estimated center point
+ * @return: the centroid of estimated landmarks on scene image
+ */
 double LandmarkDetection::centroidCCorrelation(Image refImage, Image sceneImage,
 		QString lmPath, int size, Point &ebary) {
 
@@ -137,6 +170,14 @@ double LandmarkDetection::centroidCCorrelation(Image refImage, Image sceneImage,
 
 	return eCentroid;
 }
+
+/*
+ * Compute the centroid of estimated landmarks based on cross-correlation of the images folders
+ * @parameter 1: refImage - reference image
+ * @parameter 2: lmPath - the reference landmarks file
+ * @parameter 3: folderImages - the images folder
+ * @parameter 4: folderlandmarks - the original landmarks folder
+ */
 void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 		QString folderImages, QString folderlandmarks) {
 
@@ -167,6 +208,12 @@ void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 	}
 	of.close();
 }
+/*
+ * Compute the centroid of estimated landmarks based on cross-correlation of the images folders
+ * @parameter 1: refImage - reference image
+ * @parameter 2: lmPath - the reference landmarks file
+ * @parameter 3: folderImages - the images folder
+ */
 void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 		QString folderImages) {
 	qDebug() << "Compute centroid by correlation";
@@ -190,6 +237,13 @@ void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 	}
 	of.close();
 }
+
+/*
+ * Compute the centroid of a list of points
+ * @parameter 1: landmarks - list of points
+ * @parameter 2 - output: bary - the center point
+ * @return: the centroid of list points
+ */
 double LandmarkDetection::measureDistance(vector<Point> landmarks,
 		Point &bary) {
 
@@ -215,6 +269,17 @@ double LandmarkDetection::measureDistance(vector<Point> landmarks,
 	}
 	return sqrt(totalDistance);
 }
+
+/*
+ * Compute the difference between original centroid and estimated centroid
+ * @parameter 1: orgLandmarks - the original landmarks
+ * @parameter 2: esLandmarks - the estimated landmarks
+ * @parameter 3 - output: mCentroid - the original centroid
+ * @parameter 4 - output: eCentroid - the estiamted centroid
+ * @parameter 5 - output: mBary - the original center point
+ * @parameter 6 - output: eBary - the estimated center point
+ * @return: the difference between original centroid and estimated centroid
+ */
 double LandmarkDetection::measureDistance(vector<Point> orgLandmarks,
 		vector<Point> esLandmarks, double &mCentroid, double &eCentroid,
 		Point &mBary, Point &eBary) {
@@ -223,6 +288,14 @@ double LandmarkDetection::measureDistance(vector<Point> orgLandmarks,
 	double subtraction = abs(mCentroid - eCentroid);
 	return subtraction;
 }
+
+/*
+ * Rotate an image
+ * @parameter 1: source - the input image (presented by matrix)
+ * @parameter 2: angle - the angle rotate
+ * @parameter 3: center - the center point
+ * @return: the input image after rotate a value of angle around center point
+ */
 Mat LandmarkDetection::rotateImage(Mat source, double angle, Point center) {
 	if (angle > 0)
 		angle = -angle;
@@ -233,6 +306,17 @@ Mat LandmarkDetection::rotateImage(Mat source, double angle, Point center) {
 	return dest;
 }
 
+/*
+ * Estimate the landmarks based on the proposed method between two images
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImaeg - the scene image
+ * @parameter 3: lmPath - the reference landmarks file
+ * @parameter 4: templSize - size of box around reference landmarks
+ * @parameter 5: sceneSize - size of box around estimated landmarks
+ * @parameter 6: angleDiff - the difference angle between two images
+ * @parameter 7 - output: mcResult - list of estimated landmarks
+ * @return: the list of estimated landmarks and present it on the scene image
+ */
 Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize, double angleDiff,
 		vector<Point> &mcResult) {
@@ -272,6 +356,17 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	return result;
 }
 
+/*
+ * Estimate the landmarks based on the proposed method between reference image an the images in folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: folderImages - the images folder
+ * @parameter 3: lmPath - the reference landmarks file
+ * @parameter 4: savePath - the save folder path
+ * @parameter 5: templSize - size of box around reference landmarks
+ * @parameter 6: sceneSize - size of box around estimated landmarks
+ * @parameter 7: angleDiff - the difference angle between two images
+ * @return: the list of estimated landmarks and present it on the scene image
+ */
 void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		QString lmPath, QString savePath, int templSize, int sceneSize,
 		double angleDiff) {
@@ -323,6 +418,16 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 	}
 }
 
+/*
+ * Compute the centroid of estimated landmarks
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImage - the scene image
+ * @parameter 3: lmPath - the reference landmarks file
+ * @parameter 4: templSize - size of box around reference landmarks
+ * @parameter 5: sceneSize - size of box around estimated landmarks
+ * @parameter 6: ebary - the esimated center point
+ * @return: the list of estimated landmarks and present it on the scene image
+ */
 double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize, Point &ebary) {
 	double angleDiff = 0, eCentroid = 0;
@@ -332,7 +437,16 @@ double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage,
 	eCentroid = measureDistance(mcResult, ebary);
 	return eCentroid;
 }
-
+/*
+ * Compute the centroid of estimated landmarks (on directory)
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: lmPath - the reference landmarks file
+ * @parameter 3: folderImages - the images folder
+ * @parameter 4: folderlandmarks - the original landmarks folder
+ * @parameter 5: templSize - size of box around reference landmarks
+ * @parameter 6: sceneSize - size of box around estimated landmarks
+ * @return: the list of estimated landmarks and present it on the scene image
+ */
 void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		QString lmPath, QString folderImages, QString folderlandmarks,
 		int templSize, int sceneSize) {
@@ -369,6 +483,15 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 	of.close();
 }
 
+/*
+ * Compute the centroid of estimated landmarks (on directory)
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: lmPath - the reference landmarks file
+ * @parameter 3: folderImages - the images folder
+ * @parameter 4: templSize - size of box around reference landmarks
+ * @parameter 5: sceneSize - size of box around estimated landmarks
+ * @return: the list of estimated landmarks and present it on the scene image
+ */
 void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		QString lmPath, QString folderImages, int templSize, int sceneSize) {
 	QFileInfoList files = Image::readImagesFolder(folderImages);

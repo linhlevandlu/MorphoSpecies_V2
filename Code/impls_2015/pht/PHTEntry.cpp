@@ -2,7 +2,6 @@
  * PHTEntry.cpp
  *
  *  Created on: Sep 27, 2015
- *      Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -32,22 +31,49 @@ PHTEntry::PHTEntry() {
 PHTEntry::~PHTEntry() {
 	// TODO Auto-generated destructor stub
 }
+
+/*
+ * Set the first reference line
+ * @paramter: line - the first reference line
+ */
 void PHTEntry::setLine1(Line line){
 	this->line1 = line;
 }
+
+/*
+ * Set the second reference line
+ * @paramter: line - the second reference line
+ */
 void PHTEntry::setLine2(Line line){
 	this->line2 = line;
 }
+
+/*
+ * Get the first reference line
+ * @return: the first reference line
+ */
 Line PHTEntry::getLine1(){
 	return this->line1;
 }
+
+/*
+ * Get the second reference line
+ * @return: the second reference line
+ */
 Line PHTEntry::getLine2(){
 	return this->line2;
 }
+
+/*
+ * Get the list hough information
+ */
 vector<HoughSpace> PHTEntry::getHoughSpaces(){
 	return this->listHoughSpace;
 }
 
+/*
+ * Add an hough information into entry
+ */
 void PHTEntry::addHoughSpace(HoughSpace houghSpace) {
 	this->listHoughSpace.push_back(houghSpace);
 }

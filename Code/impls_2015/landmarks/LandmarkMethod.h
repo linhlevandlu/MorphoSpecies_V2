@@ -2,7 +2,6 @@
  * LandmarkMethod.h
  *
  *  Created on: Sep 17, 2015
- *      Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -24,7 +23,6 @@
 #define LANDMARKMETHOD_H_
 
 #include "../Image.h"
-#include "../Landmark.h"
 using namespace std;
 using namespace cv;
 

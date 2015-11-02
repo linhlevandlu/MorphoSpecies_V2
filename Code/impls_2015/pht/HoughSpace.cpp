@@ -2,7 +2,6 @@
  * HoughSpace.cpp
  *
  *  Created on: Sep 27, 2015
- *      Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -33,8 +32,12 @@ HoughSpace::~HoughSpace() {
 	// TODO Auto-generated destructor stub
 }
 
-/**
- * Tim giao diem cua objectLine va duong thang di qua diem origin, vuong goc voi objectLine
+/*
+ * Find the intersection on line between line and the perpendicular line with line via a point
+ * @parameter 1: objectLine - the object line
+ * @parameter 2: origin - the point
+ * @return: point on object line, which was intersected
+ * 			between line and its perpendicular via origin point
  */
 cv::Point HoughSpace::closestPoint(Line objectLine, Point origin) {
 	vector<double> equation = objectLine.equationOfLine();
@@ -57,25 +60,52 @@ cv::Point HoughSpace::closestPoint(Line objectLine, Point origin) {
 	}
 	return Point(x, y);
 }
+
+/*
+ * Set the distance information
+ * @parameter: distance - the distance
+ */
 void HoughSpace::setDistance(double distance) {
 	this->distance = distance;
 }
+
+/*
+ * Set the angle information
+ * @parameter: angle - the angle
+ */
 void HoughSpace::setAngle(double angle) {
 	this->angle = angle;
 }
+
+/*
+ * Get the distance information
+ * @return: the distance
+ */
 double HoughSpace::getDistance() {
 	return this->distance;
 }
+
+/*
+ * Get the angle information
+ */
 double HoughSpace::getAngle() {
 	return this->angle;
 }
 
+/*
+ * Compute the perpendicular distance from a point to a line
+ * @parameter 1: objectLine - the reference line
+ * @parameter 2: refPoint - the point
+ * @return: the distance from the point to reference line
+ */
 double HoughSpace::computeDistance(Line objectLine, Point refPoint) {
 	return abs(objectLine.perpendicularDistance(refPoint));
 }
 
-/**
- * Tinh goc tu refPoint toi objectLine (Ox la di qua refPoint)
+/*
+ * Angle between object line and a line via reference point and parallel with Ox
+ * @parameter 1: objectLine - the object line
+ * @parameter 2: refPoint - the point
  */
 double HoughSpace::computeAngle(Line objectLine, Point refPoint) {
 	Line oX(refPoint, cv::Point(refPoint.x + 100, refPoint.y));

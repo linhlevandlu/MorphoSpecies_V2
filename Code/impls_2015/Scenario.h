@@ -43,7 +43,6 @@
 #include "Edge.h"
 #include "segmentation/EdgeSegmentation.h"
 #include "histograms/GeometricHistogram.h"
-#include "IExtraction.h"
 #include "ShapeHistogram.h"
 #include "pht/PHoughTransform.h"
 #include "landmarks/LandmarkDetection.h"

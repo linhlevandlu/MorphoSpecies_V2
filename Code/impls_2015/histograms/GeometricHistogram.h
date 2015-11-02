@@ -2,7 +2,6 @@
  * GeometricHistogram.h
  *
  *  Created on: Sep 17, 2015
- *      Author: linh
  *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
@@ -29,6 +28,7 @@
 #include <QtCore/qdir.h>
 #include <QtCore/qstringlist.h>
 #include <iostream>
+#include <time.h>
 
 #include "../Image.h"
 #include "../Line.h"
@@ -52,7 +52,6 @@ public:
 	virtual ~GeometricHistogram();
 	vector<LocalHistogram> shapeHistogram(Image image,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc, cv::Mat &result);
-	//cv::Mat representShapeHistogram(ShapeHistogram shapeHistogram, ShapeHistogram::AccuracyPGH angleAcc);
 	double pghHistogramMatching(Image refImage, Image sceneImage,
 			MatchingMethod matchingMethod,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
@@ -64,8 +63,6 @@ public:
 			int distanceAcc);
 	void pairwiseHistogramDirectory(QString folderPath,
 			LocalHistogram::AccuracyPGH angleAcc, int columns);
-
-	void copyFile(QString folderPath, QString savePath);
 
 };
 
