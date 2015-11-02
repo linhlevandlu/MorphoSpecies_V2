@@ -381,7 +381,7 @@ cv::Point Image::findReplacePoint() {
  * @return: the insect part
  */
 Image::InsectPart Image::getPart() {
-	Image::InsectPart sType;
+	Image::InsectPart sType = ELYTRE;
 	QString temp = this->fileName.toLower();
 	if (temp.contains("ely"))
 		sType = ELYTRE;
@@ -450,8 +450,7 @@ cv::Mat Image::removingGrid(int minBrightness) {
 								&& hsv_planes[0].at<uchar>(i, j + 50) <= 170
 								&& hsv_planes[1].at<uchar>(i, j + 50) >= 30
 								&& hsv_planes[1].at<uchar>(i, j + 50) <= 95
-								&& hsv_planes[2].at<uchar>(i, j + 50) >= 35
-								&& hsv_planes[2].at<uchar>(i, j + 50) <= 255)))
+								&& hsv_planes[2].at<uchar>(i, j + 50) >= 35)))
 					break;
 			}
 			if (insectPart == TETE) {

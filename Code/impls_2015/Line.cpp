@@ -132,7 +132,7 @@ double Line::perpendicularDistance(cv::Point point) {
 	double a = equation.at(0);
 	double b = equation.at(1);
 	double c = equation.at(2);
-	double distance;
+	double distance = 0;
 	if (b != 0 && a != 0) {
 		distance = ((a * point.x) + (b * point.y) + c)
 				/ (sqrt(pow(a, 2) + pow(b, 2)));
@@ -162,8 +162,8 @@ cv::Point Line::intersection(vector<double> equation1,
 
 	double a; // = a1 - a2;
 	double c; // = c2 - c1;
-	double x; // = c / a;
-	double y; // = (a1 * x) + c1;
+	double x = 0; // = c / a;
+	double y = 0; // = (a1 * x) + c1;
 
 	if (b1 == 0 && b2 != 0) {
 		x = c1;
@@ -216,7 +216,6 @@ double Line::angleBetweenLines(Line objectLine) {
 
 	slope1 = (double)y1 / (double)x1;
 	slope2 = (double)y2 / (double)x2;
-	double angle = 0;
 	if (slope1 == 0 && slope2 == 0) {
 		return 0;
 	}
@@ -338,9 +337,8 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 	vector<Point> result;
 
 	Point refPoint(width / 2, height / 2);
-	double minDistance = width;
 
-	double x0 = 0, y0 = 0, x = 0, y = 0;
+	double x0 = 0, y0 = 0;
 	x0 = (f + b - d - e) / (c - a);
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b - e;

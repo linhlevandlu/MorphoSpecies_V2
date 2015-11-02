@@ -2545,19 +2545,36 @@ void ImageViewer::correctMorphAction() {
 }
 
 // ====== add by LE Van Linh
-void ImageViewer::edgeSegementDirectory(QString path) {
+/*
+ * Edge segmentation on a directory
+ * @parameter: path - path of images directory
+ * @return: The images contains the segmentation result
+ */
+void ImageViewer::edgeSegmentDirectory(QString path) {
 	qDebug() << "Edge segmentation in directory";
-	QString outputPath = "/home/linh/Desktop/segmentation_rotation15/";
-	Scenario::edgeSegmentationDirectory(path, outputPath);
+	QMessageBox msgbox;
+	msgbox.setText("Select the save folder.");
+	msgbox.exec();
+	QString folderOutput = QFileDialog::getExistingDirectory(this);
+	Scenario::edgeSegmentationDirectory(path, folderOutput);
 }
 
+/*
+ * Compute the PGH measure distance by matching method and accuracy of angle and distance
+ * between an image and a images folder
+ * @parameter 1: image - the reference image
+ * @paramter 2: path - the images folder
+ */
 void ImageViewer::matchingDirectory(Image image, QString path) {
-	/*Scenario::matchingDirectory(image, path, GeometricHistogram::Bhattacharyya,
-	 LocalHistogram::TwoTimeDegree,250);*/
-	Scenario::matchingDirectory(path, GeometricHistogram::Bhattacharyya,
-			LocalHistogram::HaftDegree, 250);
-
+	Scenario::matchingDirectory(image, path, GeometricHistogram::Bhattacharyya,
+			LocalHistogram::TwoTimeDegree, 500);
+	/*Scenario::matchingDirectory(path, GeometricHistogram::Bhattacharyya,
+	 LocalHistogram::HaftDegree, 250);*/
 }
+
+/*
+ * Remove the yellow grid on an image
+ */
 void ImageViewer::removeYLinesAction() {
 
 	// run on all directory
@@ -2572,15 +2589,16 @@ void ImageViewer::removeYLinesAction() {
 
 	// run on a image
 	Image image(fileName);
-	cv::Mat enddest = image.removingGrid(90); // = YellowGrid::removeYellowLines(matImage, 90, fileName);
+	cv::Mat enddest = image.removingGrid(90);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Removing the yellow grid -- " + this->fileName);
-	//other->addParameterPanel(new impls_2015::Lines(other), x() + 40, y() + 40);
 	other->show();
 }
 
-// remove yellow grid by using Histogram
+/*
+ * Indentify the landmarks on an image by a model
+ */
 void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
@@ -2593,7 +2611,9 @@ void ImageViewer::getLandmarks() {
 
 	QString lpath = QFileDialog::getOpenFileName(this);
 
-	// by directory
+	/*
+	 * Working on directory
+	 */
 
 	/*msgbox.setText("Select the images folder.");
 	 msgbox.exec();
@@ -2605,7 +2625,9 @@ void ImageViewer::getLandmarks() {
 	 Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder, 400,
 	 1400);*/
 
-	// teplate matching an image
+	/*
+	 * Working on an image
+	 */
 	msgbox.setText("Select the scene image.");
 	msgbox.exec();
 
@@ -2623,10 +2645,25 @@ void ImageViewer::getLandmarks() {
 	other->show();
 	qDebug() << "Done";
 }
+
+/*
+ * Line segmentation from an image
+ */
 void ImageViewer::edgeSegmentation() {
 	qDebug() << "Edge segmentation.";
-	//edgeSegementDirectory("/home/linh/Desktop/mandibule");
 
+	/*
+	 * Working on directory
+	 */
+	/*QMessageBox msgbox;
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+	 edgeSegementDirectory(folder);*/
+
+	/*
+	 * Working on an image
+	 */
 	Image image(fileName);
 	cv::Mat enddest(image.getMatrixImage().clone());
 	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest);
@@ -2637,17 +2674,32 @@ void ImageViewer::edgeSegmentation() {
 	other->show();
 	qDebug() << "Done";
 }
+
+/*
+ * Compute the pairwise geometric histogram of an image
+ */
 void ImageViewer::pairwiseHistogram() {
-	qDebug() << "Calculate the pairwise histogram of an image";
+	qDebug() << "Calculate the pairwise geometric histogram of an image";
 
 	Image image(fileName);
 	cv::Mat enddest;
 
-	Scenario::pairwiseHistogram(image, LocalHistogram::Degree, 250, enddest);
+	Scenario::pairwiseHistogram(image, LocalHistogram::TwoTimeDegree, 500,
+			enddest);
+	/*
+	 * Working on directory (compute PGH on set of image in a folder and save the result into PGH file)
+	 */
 
-	// compute PGH on set of image in a folder and save the result into PGH file
-	/*QString folderPath = "/home/linh/Desktop/mandibule";
+	/*
+	 QMessageBox msgbox;
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folderPath = QFileDialog::getExistingDirectory(this);
 	 Scenario::pairwiseHistogramDirectory(folderPath,LocalHistogram::Degree,250);
+	 */
+
+	/*
+	 * Working on an image
 	 */
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
@@ -2655,13 +2707,27 @@ void ImageViewer::pairwiseHistogram() {
 	other->show();
 	qDebug() << "Done";
 }
+
+/*
+ * Compute the PGH measure distance between two images by Bhattacharyya method
+ */
 void ImageViewer::pwBhattacharyyaMatching() {
 	qDebug() << "Pairwise histogram matching using Bhattacharyya metric...";
 	Image image(fileName);
 
-	/*QString path = "/home/linh/Desktop/mandibule";
-	 matchingDirectory(image, path);*/
+	/*
+	 * Working on directory
+	 */
+	/*
+	 QMessageBox msgbox;
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folderPath = QFileDialog::getExistingDirectory(this);
+	 matchingDirectory(image, folderPath);*/
 
+	/*
+	 * Working on an image
+	 */
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
@@ -2673,6 +2739,10 @@ void ImageViewer::pwBhattacharyyaMatching() {
 			<< QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
+
+/*
+ * Compute the PGH measure distance between two images by Chi-squared method
+ */
 void ImageViewer::pwChiSquaredMatching() {
 	qDebug() << "Pairwise histogram matching using Chi-squared metric...";
 	Image image(fileName);
@@ -2686,6 +2756,10 @@ void ImageViewer::pwChiSquaredMatching() {
 	qDebug() << "Chi-squared metric: " << QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
+
+/*
+* Compute the PGH measure distance between two images by Intersection method
+ */
 void ImageViewer::pwIntersectionMatching() {
 	qDebug() << "Pairwise histogram matching using Intersection metric...";
 	Image image(fileName);
@@ -2701,6 +2775,9 @@ void ImageViewer::pwIntersectionMatching() {
 	qDebug() << "Done";
 }
 
+/*
+ * Estimate the landmark on scene image based on a model
+ */
 void ImageViewer::pHoughTransform() {
 	qDebug() << "Probabilistic Hough Transform...";
 
@@ -2712,6 +2789,18 @@ void ImageViewer::pHoughTransform() {
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 
+	/*
+	 * Working on directory
+	 */
+	/*QString sceneImageDir = "/home/linh/Desktop/mg/images";
+	 QString sceneLMDir = "/home/linh/Desktop/mg/landmarks";
+	 QString saveDir = "/home/linh/Desktop/29Oct/mg_pht";
+	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
+	 saveDir);*/
+
+	/*
+	 * Working on an image
+	 */
 	msgbox.setText("Select the scene image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -2725,17 +2814,12 @@ void ImageViewer::pHoughTransform() {
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
 	other->show();
-
-	/*
-	 * Working on directory
-	 */
-	/*QString sceneImageDir = "/home/linh/Desktop/mg/images";
-	 QString sceneLMDir = "/home/linh/Desktop/mg/landmarks";
-	 QString saveDir = "/home/linh/Desktop/29Oct/mg_pht";
-	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-	 saveDir);*/
 	qDebug() << "Done";
 }
+
+/*
+ * Identify the landmarks of an image base on cross-correlation
+ */
 void ImageViewer::crossCorrelation() {
 
 	qDebug() << "Cross correlation";
@@ -2745,9 +2829,25 @@ void ImageViewer::crossCorrelation() {
 
 	msgbox.setText("Select the landmark file of reference image.");
 	msgbox.exec();
-	QString lpath = QFileDialog::getOpenFileName(this); //"/home/linh/Desktop/landmarks/Md 028.TPS";
+	QString lpath = QFileDialog::getOpenFileName(this);
 
-	// cross correlation on an image
+	/*
+	 * Working on directory
+	 */
+	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
+
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+
+	 msgbox.setText("Select the saving folder.");
+	 msgbox.exec();
+	 QString saveFolder = QFileDialog::getExistingDirectory(this) ;
+	 Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);*/
+
+	/*
+	 * Working on an image
+	 */
 	msgbox.setText("Select the second image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -2760,36 +2860,22 @@ void ImageViewer::crossCorrelation() {
 	QString scenename = sceneImage.getName();
 	qDebug() << scenename;
 
-	//QString spath = "/home/linh/Desktop/landmarks/" + scenename + ".TPS";
-	//vector<Point> sceneLandmarks = sceneImage.readLandmarksFile(
-	//		spath.toStdString());
-
 	Mat enddest(sceneImage.getMatrixImage().clone());
 	for (size_t i = 0; i < landmarks.size(); i++) {
 		Point lm = landmarks.at(i);
 		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 255, 255), 2, 4);
-		//Point orglm = sceneLandmarks.at(i);
-		//circle(enddest,Point(orglm.x, sceneImage.getMatrixImage().rows - orglm.y), 5,
-		//		Scalar(0, 255, 0), 2, 4);
 	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
 	other->show();
-
-	// cross-corelation directory
-	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
-
-	 msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-
-	 msgbox.setText("Select the saving folder.");
-	 msgbox.exec();
-	 QString saveFolder = QFileDialog::getExistingDirectory(this) ;
-	 Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);*/
 	qDebug() << "Done";
 }
+
+/*
+ * Compute the measure distance (centroid) of an image based on the landmarks,
+ * which was estimated by cross-correlation method
+ */
 void ImageViewer::crossCorrelationDistance() {
 
 	qDebug() << "Compute the measure distance by cross correlation";
@@ -2801,7 +2887,18 @@ void ImageViewer::crossCorrelationDistance() {
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
 
-	// On an image
+	/*
+	 * Working on directory
+	 */
+	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
+	 Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);*/
+
+	/*
+	 * Working on an image
+	 */
 	msgbox.setText("Select the scene image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -2814,15 +2911,13 @@ void ImageViewer::crossCorrelationDistance() {
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
 	qDebug() << "Measure distance estimated: " << eCentroid;
 
-	// on directory
-	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
-	 msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-	 Scenario::mDistanceByCrossCorrelationDir(image, lpath, folder);*/
-
 	qDebug() << "Done";
 }
+
+/*
+ * Compute the measure distance (centroid) of an image based on the landmarks,
+ * which was estimated by template matching method (followed article)
+ */
 void ImageViewer::tplMatchingDistance() {
 	qDebug() << "Measure distance by article";
 
@@ -2834,7 +2929,9 @@ void ImageViewer::tplMatchingDistance() {
 
 	QString lpath = QFileDialog::getOpenFileName(this);
 
-	// by directory
+	/*
+	 * Working on directory
+	 */
 	/*msgbox.setText("Select the images folder.");
 	 msgbox.exec();
 	 QString folder = QFileDialog::getExistingDirectory(this);
@@ -2842,7 +2939,9 @@ void ImageViewer::tplMatchingDistance() {
 	 Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400,
 	 1400);*/
 
-	// an image
+	/*
+	 * Working on an image
+	 */
 	msgbox.setText("Select the scene image.");
 	msgbox.exec();
 

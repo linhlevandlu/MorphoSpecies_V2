@@ -325,7 +325,7 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 
 double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize, Point &ebary) {
-	double angleDiff, eCentroid;
+	double angleDiff = 0, eCentroid = 0;
 	vector<Point> mcResult;
 	matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
 			angleDiff, mcResult);
@@ -348,7 +348,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
 		vector<Point> mcResult;
-		double angle;
+		double angle= 0;
 		matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
 				angle, mcResult);
 		of << scenename.toStdString().c_str() << ".JPG" << "\t";
@@ -380,7 +380,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 
 		QString scenename = sceneImage.getName();
 		vector<Point> mcResult;
-		double angle;
+		double angle = 0;
 		matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
 				angle, mcResult);
 		of << scenename.toStdString().c_str() << ".JPG" << "\t";

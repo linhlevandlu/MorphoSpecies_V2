@@ -93,7 +93,7 @@ public:
 
 	//add by LE Van Linh
 	//void removeYLinesAction(int minBrightness, QString pathImage);
-	void edgeSegementDirectory(QString path);
+	void edgeSegmentDirectory(QString path);
 	void matchingDirectory(impls_2015::Image image, QString path);
 	//void landmarksByDirectory(impls_2015::Image refImage, QString path,QString savePath, QString lmPath);
 	//end

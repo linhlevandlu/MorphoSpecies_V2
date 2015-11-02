@@ -32,13 +32,12 @@ Scenario::Scenario() {
 Scenario::~Scenario() {
 
 }
-/*vector<Line> Scenario::segment(Image image) {
- EdgeSegmentation* edSegment =
- dynamic_cast<EdgeSegmentation *>(this->extraction);
- vector<Edge> listEdges = edSegment->getEdges(image); // get step edges from image
- vector<Line> appLines = edSegment->lineSegment(listEdges);
- return appLines;
- }*/
+/*
+ * Edge segmentation an image
+ * @parameter 1: image - the input image
+ * @parameter 2 - output: result - the matrix presented the segmentation result
+ * @return: List of approximate line of edge segmentation
+ */
 vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
 	vector<Line> appLines;
 	EdgeSegmentation sgMethod;
@@ -47,44 +46,57 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
 	return appLines;
 }
 
+/*
+ * Edge segmentation on a directory
+ * @parameter 1: inputFolder - the images folder path
+ * @parameter 2: saveFolder - the saving folder path
+ * @return: the segmentation result presented on Mat (convert into image)
+ * 			and save in the saving folder
+ */
 void Scenario::edgeSegmentationDirectory(QString inputFolder,
 		QString saveFolder) {
 	EdgeSegmentation edgeSegment;
 	edgeSegment.segmentDirectory(inputFolder, saveFolder);
 }
+
+/*
+ * Compute the pairwise geometric histogram of an image
+ * @parameter 1: image - the input image
+ * @parameter 2: angleAcc - the accuracy of angle axis (90, 180, 360, 720, 1080, 2160, 10800)
+ * @parameter 3: columns - the accuracy of distance axis (250, 500, 1000)
+ * @parameter 4: result - the matrix presented the result
+ * @return: the list of local PGH
+ */
 vector<LocalHistogram> Scenario::pairwiseHistogram(Image image,
 		LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result) {
 	GeometricHistogram geomHistogram;
 	vector<LocalHistogram> pghHist = geomHistogram.shapeHistogram(image,
 			angleAcc, columns, result);
-
 	return pghHist;
 }
+
+/*
+ * Compute the PGH of images in a directory with an accuracy
+ * @parameter 1: folderPath - the image folder path
+ * @parameter 2: angleAcc - the accuracy of angle axis (90, 180, 360, 720, 1080, 2160, 10800)
+ * @parameter 3: columns - the accuracy of distance axis (250, 500, 1000)
+ */
 void Scenario::pairwiseHistogramDirectory(QString folderPath,
-		LocalHistogram::AccuracyPGH angleAcc, int colums) {
+		LocalHistogram::AccuracyPGH angleAcc, int columns) {
 	qDebug() << "Pairwise for directory: ";
 	GeometricHistogram geomHistogram;
-
-	vector<LocalHistogram::AccuracyPGH> angleAccs;
-	angleAccs.push_back(LocalHistogram::HaftDegree);
-	angleAccs.push_back(LocalHistogram::Degree);
-	angleAccs.push_back(LocalHistogram::TwoTimeDegree);
-	angleAccs.push_back(LocalHistogram::FourTimeDegree);
-	angleAccs.push_back(LocalHistogram::SixTimeDegree);
-
-	vector<int> columns;
-	columns.push_back(250);
-	columns.push_back(500);
-	columns.push_back(1000);
-	for (size_t t = 0; t < angleAccs.size(); t++) {
-		LocalHistogram::AccuracyPGH acc = angleAccs.at(t);
-		for (size_t k = 0; k < columns.size(); k++) {
-			int cl = columns.at(k);
-			geomHistogram.pairwiseHistogramDirectory(folderPath, acc, cl);
-		}
-	}
+	geomHistogram.pairwiseHistogramDirectory(folderPath, angleAcc, columns);
 }
 
+/*
+ * Compute the PGH measure distance between two images
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImage - the scene image
+ * @parameter 3: matching - the matching method (Bhattacharyya, Chi-squared, intersection)
+ * @parameter 4: angleAcc - the accuracy of angle axis (90, 180, 360, 720, 1080, 2160, 10800)
+ * @parameter 5: columns - the accuracy of distance axis (250, 500, 1000)
+ * @return: the value presented for the agree between two images
+ */
 double Scenario::pghMatching(Image refImage, Image sceneImage,
 		GeometricHistogram::MatchingMethod matching,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
@@ -93,6 +105,14 @@ double Scenario::pghMatching(Image refImage, Image sceneImage,
 			angleAcc, distanceAcc);
 }
 
+/*
+ * Compute the PGH measure distance between a reference image and the images in a folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: directoryPath - the images folder path
+ * @parameter 3: matching - the matching method (Bhattacharyya, Chi-squared, intersection)
+ * @parameter 4: angleAcc - the accuracy of angle axis (90, 180, 360, 720, 1080, 2160, 10800)
+ * @parameter 5: columns - the accuracy of distance axis (250, 500, 1000)
+ */
 void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 		GeometricHistogram::MatchingMethod matching,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
@@ -102,6 +122,13 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 			matching, angleAcc, distanceAcc);
 }
 
+/*
+ * Compute the PGH measure distance between pair of images in folders
+ * @parameter 1: directoryPath - the images folder path
+ * @parameter 2: matching - the matching method (Bhattacharyya, Chi-squared, intersection)
+ * @parameter 3: angleAcc - the accuracy of angle axis (90, 180, 360, 720, 1080, 2160, 10800)
+ * @parameter 4: columns - the accuracy of distance axis (250, 500, 1000)
+ */
 void Scenario::matchingDirectory(QString directoryPath,
 		GeometricHistogram::MatchingMethod matching,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
@@ -111,15 +138,28 @@ void Scenario::matchingDirectory(QString directoryPath,
 			distanceAcc);
 }
 
+/*
+ * Estimated the landmarks of scene image based on a reference image and its landmarks
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImage - the scene image
+ * @parameter 3: reflmPath - the path of file contains the reference landmarks
+ * @return: the matrix presented the estimated landmarks on the scene image
+ */
 Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage,
 		QString reflmPath) {
 	PHoughTransform pht;
 	vector<Point> esLandmarks;
-	double angle;
-	Point ePoint;
-	//return pht.testPHT(refImage,sceneImage,reflmPath.toStdString(),angle,ePoint);
 	return pht.phtPresentation(refImage, sceneImage, reflmPath.toStdString(),esLandmarks);
 }
+
+/*
+ * Estimated the landmarks of a reference image on the images in a folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: reflmPath - the path of reference landmarks file
+ * @parameter 3: sceneDir - the path of scene images folder
+ * @parameter 4: scenelmDir - the path of scene landmarks folder
+ * @parameter 5: saveDir - the path of saving directory
+ */
 void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
 		QString scenelmDir, QString saveDir) {
 	PHoughTransform pht;
@@ -127,8 +167,11 @@ void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
 }
 
 /**
- * Detect the landmarks on image automatically
- * @return: the image contains the landmarks
+ * Estimated the landmarks based on the cross-correlation method
+ * @parameter 1: image - the reference image
+ * @parameter 2: lpath - the path of reference landmarks file
+ * @parameter 3: sceneImage - the scene image
+ * @return: the list of estimated landmarks of reference image on the scene image
  */
 vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 		Image sceneImage) {
@@ -139,12 +182,28 @@ vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 	return landmarks;
 }
 
+/*
+ * Estimated the landmarks of a reference image on the images in a folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: path - the scene images folder path
+ * @parameter 3: savePath - the path of folder save the result
+ * @parameter 4: lmPath - the path of reference landmarks file
+ */
 void Scenario::cCorelationDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {
 	LandmarkDetection lmdetection;
 	lmdetection.cCorrelationByDirectory(refImage, path, savePath, lmPath);
 }
 
+/*
+ * Compute the centroid of estimated landmarks.
+ * The estimated landmarks based on the cross-correlation method
+ * @parameter 1: image - the reference image
+ * @parameter 2: lmpath - the path of reference landmarks file
+ * @parameter 3: sceneImage - the scene image
+ * @parameter 4 - output: ebary - the bary point of the landmarks
+ * @return: the centroid of estimated landmarks
+ */
 double Scenario::mDistanceByCrossCorrelation(Image image, QString lmpath,
 		Image sceneImage, int size, Point &ebary) {
 	LandmarkDetection lmdetection;
@@ -153,6 +212,13 @@ double Scenario::mDistanceByCrossCorrelation(Image image, QString lmpath,
 	return rs;
 }
 
+/*
+ * Compute the centroid measure distance of a reference image and the scene images in a folder.
+ * The estimated landmarks based on the cross-correlation method
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: lmpath - the path of reference landmarks file
+ * @parameter 3: imgFolder - the scene images folder
+ */
 void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 		QString imgFolder) {
 	// centroid point with folder
@@ -162,24 +228,52 @@ void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 //	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder);
 	lmdetection.centroidCCorrelations(refImage, lmpath, imgFolder,lmfolder);
 }
+
+/*
+ * Estimate the reference landmarks on scene image based on the template matching (followed article)
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImage - the scene image
+ * @parameter 3: reflmPath - the path of reference landmarks file
+ * @parameter 4: templSize - size of reference landmark bounding box
+ * @parameter 5: scnSize - size of estimated landmark bounding box
+ * @return: the matrix presented the estimated landmarks
+ */
 Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		QString reflmPath, int templSize, int scnSize) {
 	LandmarkDetection lmdetection;
-	double angle;
+	double angle = 0;
 	vector<Point> mcResult;
 	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath,
 			templSize, scnSize, angle, mcResult);
 }
+
+/*
+ * Estimate the reference landmarks on each image in scene images folder based on the template matching
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: folderImage - the scene images folder
+ * @parameter 3: lmPath - the reference landmarks path
+ * @parameter 4: savePath - the saving folder path
+ * @parameter 5: templSize - size of reference landmarks bounding box
+ * @parameter 6: sceneSize - size of estimated landmark bounding box
+ */
 void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
 		QString lmPath, QString savePath, int templSize, int sceneSize) {
 
 	LandmarkDetection lmdetection;
-	double angle;
+	double angle = 0;
 	lmdetection.matchingDirectory(refImage, folderImages, lmPath, savePath,
 			templSize, sceneSize, angle);
 
 }
 
+/*
+  * Compute centroid of estimated landmarks. The estimated landmarks based on the template matching
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: sceneImage - the reference image
+ * @parameter 3: lmPath - the reference landmarks path
+ * @parameter 4 - output: ebary - the bary point of the landmarks
+ * @return: the centroid of estimated landmarks
+ */
 double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize, Point &ebary) {
 	LandmarkDetection lmdetection;
@@ -187,6 +281,14 @@ double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
 			sceneSize, ebary);
 }
 
+/*
+ * Compute the centroid of estimated landmarks of the images in a folder
+ * @parameter 1: refImage - the reference image
+ * @parameter 2: lmPath - the reference landmarks path
+ * @parameter 3: folderImages - the scene images folder
+ * @parameter 4: templSize - size of reference landmarks bounding box
+ * @parameter 5: sceneSize - size of estimated landmark bounding box
+ */
 void Scenario::mDistanceByTemplateMatchingDirectory(Image refImage,
 		QString lmPath, QString folderImages, int templSize, int sceneSize) {
 	// compute the centroid

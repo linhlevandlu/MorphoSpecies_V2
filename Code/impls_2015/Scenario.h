@@ -55,10 +55,6 @@ namespace impls_2015 {
 
 class Scenario {
 
-private:
-	//IExtraction* extraction;
-	//vector<Line> segment(Image image);
-	//ShapeHistogram pwHistogram(Image image);
 public:
 
 	Scenario();
@@ -90,7 +86,7 @@ public:
 			GeometricHistogram::MatchingMethod matching,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	static void pairwiseHistogramDirectory(QString folderPath,
-			LocalHistogram::AccuracyPGH angleAcc, int colums);
+			LocalHistogram::AccuracyPGH angleAcc, int columns);
 	static Mat probabilisticHoughTransform(Image refImage, Image sceneImage,
 			QString reflmPath);
 	static void phtDirectory(Image refImage, QString reflmPath,

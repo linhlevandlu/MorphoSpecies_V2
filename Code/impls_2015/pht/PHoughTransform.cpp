@@ -92,13 +92,11 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 		Line scene2) {
 
 	double refAngle = ref1.angleBetweenLines(ref2);
-	Line temp(ref1.getP1(), ref2.getP1());
 	double rd1 = ref1.perpendicularDistance(ref2.getP1());
 	double rd2 = ref1.perpendicularDistance(ref2.getP2());
 	double rd = rd1 + rd2;
 
 	double sceneAngle = scene1.angleBetweenLines(scene2);
-	Line temp2(scene1.getP1(), scene2.getP1());
 	double sd1 = scene1.perpendicularDistance(scene2.getP1());
 	double sd2 = scene1.perpendicularDistance(scene2.getP2());
 	double sd = sd1 + sd2;
@@ -394,8 +392,6 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		of.close();
 		QString savePath = saveDir + "/" + scenename + ".JPG";
 		imwrite(savePath.toStdString().c_str(), mat);
-		if (i == 293)
-			break;
 	}
 }
 double PHoughTransform::angleDifference(Line refLine, Line sceneLine) {
@@ -404,69 +400,4 @@ double PHoughTransform::angleDifference(Line refLine, Line sceneLine) {
 		angle = 180 - angle;
 	return angle;
 }
-
-/*Mat PHoughTransform::testPHT(Image mImage, Image sImage, string mlmPath,
-		double &angleDiff, Point &ePoint) {
-	vector<Point> eLandmarks;
-	Mat mMatrix = mImage.getMatrixImage();
-	int width = mMatrix.cols;
-	int height = mMatrix.rows;
-
-	vector<Point> mLandmarks = mImage.readLandmarksFile(mlmPath);
-	qDebug() << "total ref landmarks: " << mLandmarks.size();
-
-	vector<Line> mLines = mImage.lineSegment();
-	vector<Line> sLines = sImage.lineSegment();
-
-	Point mPoint(width / 2, height / 2);
-	vector<PHTEntry> entryTable = constructTable(mLines, mPoint);
-	vector<Line> maxVector;
-	PHTEntry entry = matchingInScene(entryTable, sLines, width, height,
-			maxVector);
-	Mat result(sImage.getMatrixImage().clone());
-
-	entry.getLine1().drawing(result);
-	cv::putText(result, "line 1", entry.getLine1().getP1(),
-			FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1, 8);
-	entry.getLine2().drawing(result);
-	cv::putText(result, "line 2", entry.getLine2().getP1(),
-			FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1, 8);
-	circle(result, mPoint, 5, Scalar(0, 0, 255), 5, 8);
-	if (maxVector.size() > 0) {
-		cv::line(result, maxVector[0].getP1(), maxVector[0].getP2(),
-				Scalar(0, 255, 0), 2, 8);
-		cv::putText(result, "line 1", maxVector[0].getP1(),
-				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
-		cv::line(result, maxVector[1].getP1(), maxVector[1].getP2(),
-				Scalar(0, 255, 0), 2, 8);
-		cv::putText(result, "line 2", maxVector[1].getP1(),
-				FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 1, 8);
-		vector<double> angles;
-		ePoint = refPointInScene(entry, maxVector, angleDiff, mLandmarks, width,
-				height);
-
-		double angle1 = entry.getLine1().angleBetweenLines(entry.getLine2());
-		double angle2 = maxVector.at(0).angleBetweenLines(maxVector.at(1));
-
-		qDebug() << "angle Difference: " << angleDiff << ", subtraction: "
-				<< abs(angle1 - angle2);
-		angleDiff += abs(angle1 - angle2);
-		circle(result, ePoint, 5, Scalar(0, 255, 255), 5, 8);
-
-		int positive = 0;
-		eLandmarks = findLandmarks(mPoint, ePoint, mLandmarks, width, height,
-				positive);
-
-		for (size_t i = 0; i < eLandmarks.size(); i++) {
-			circle(result, eLandmarks.at(i), 3, Scalar(0, 255, 255), 2, 8);
-			stringstream ss;
-			ss << i;
-			string s;
-			s = ss.str();
-			cv::putText(result, s, eLandmarks.at(i), FONT_HERSHEY_COMPLEX, 1,
-					Scalar(255, 0, 0), 1, 8);
-		}
-	}
-	return result;
-}*/
 } /* namespace impls_2015 */

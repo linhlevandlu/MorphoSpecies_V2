@@ -59,9 +59,9 @@ int LocalHistogram::accuracyToTimeDegree(double angle, AccuracyPGH angleAcc) {
 		m = 60;
 		break;
 	}
-	int minute = convertAngleToMinute(angle);
-	double bins = minute / m;
-	double bin;
+	int minutes = convertAngleToMinute(angle);
+	double bins = minutes / m;
+	double bin = 0;
 	double mod = modf(bins, &bin);
 	if (mod > 0)
 		bin += 1;
@@ -126,7 +126,7 @@ double LocalHistogram::bhattacharyyaMetric(LocalHistogram sceneHistogram,
 	int h_Matrix = heightOfAngleAxis(angleAcc);
 	vector<vector<int> > sceneMatrix = sceneHistogram.constructorMatrix(
 			angleAcc, distanceAxis, sceneTotalEntries);
-	for (size_t i = 0; i < h_Matrix; i++) {
+	for (int i = 0; i < h_Matrix; i++) {
 		for (int j = 0; j < w_Matrix; j++) {
 			double value1 = sqrt(
 					(double) refMatrix[i][j] / (double) refTotalEntries);
