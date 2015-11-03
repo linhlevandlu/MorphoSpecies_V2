@@ -31,20 +31,47 @@ LocalHistogram::LocalHistogram() {
 LocalHistogram::~LocalHistogram() {
 	// TODO Auto-generated destructor stub
 }
+
+/*
+ * Get the list of feature information(angle, dmin, dmax)
+ * @return: list of features information
+ */
 vector<GFeatures> LocalHistogram::getPWHistgoram() {
 	return this->pwHistogram;
 }
+
+/*
+ * Set the list of feature information
+ * @parameter: gfeatures - list of feature information
+ */
 void LocalHistogram::setpwHistogram(vector<GFeatures> gfeatures) {
 	this->pwHistogram = gfeatures;
 }
+
+/*
+ * Get the maximum distance in local PGH
+ * @return: the maximum distance
+ */
 double LocalHistogram::getMaxDistance() {
 	return this->maxDistance;
 }
+
+/*
+ * Add a feature information into the list
+ * @parameter: features - the feature information
+ */
 void LocalHistogram::addGFeatures(GFeatures features) {
 	pwHistogram.push_back(features);
 	if (features.getDmax() > maxDistance)
 		maxDistance = features.getDmax();
 }
+
+/*
+ * Indicate the row in matrix of an angle with an angle accuracy
+ * @parameter 1: angle - the angle
+ * @parameter 2: angleAcc - the angle accuracy
+ * @return: the order of row, where the angle located in PGH
+ */
 int LocalHistogram::accuracyToTimeDegree(double angle, AccuracyPGH angleAcc) {
 	int m = 60;
 	switch (angleAcc) {
@@ -81,16 +108,36 @@ int LocalHistogram::accuracyToTimeDegree(double angle, AccuracyPGH angleAcc) {
 		bin += 1;
 	return bin;
 }
+
+/*
+ * Get the height of angle axis followed the angle accuracy
+ * @parameter: angleAcc - the angle accuracy
+ * @return: the height of matrix, which presented PGH
+ */
 int LocalHistogram::heightOfAngleAxis(AccuracyPGH angleAcc) {
 	if (angleAcc == HaftDegree)
 		return 90;
 	return angleAcc * 180;
 }
+
+/*
+ * Indicate the column of a distance followed distance accuracy
+ * @parameter 1: maxDistance - the maximum distance
+ * @parameter 2: distance - the distance
+ * @parameter 3: cols - the distance accuracy
+ * @return: the position of distance in matrix (which presented PGH)
+ */
 int LocalHistogram::distanceOffset(double maxDistance,double distance, int cols) {
 	double binSize = maxDistance / cols;
 	double bin = round(distance / binSize);
 	return (bin > 0) ? (bin - 1) : bin;
 }
+
+/*
+ * Convert the angle into minute
+ * @parameter: angle - the angle
+ * @return: the minute of angle after converting
+ */
 int LocalHistogram::convertAngleToMinute(double angle) {
 	double degree;
 	modf(angle, &degree);
@@ -101,6 +148,14 @@ int LocalHistogram::convertAngleToMinute(double angle) {
 	return (degree * 60) + minute;
 
 }
+
+/*
+ * Construct the matrix of a local PGH
+ * @parameter 1: angleAcc - the angle accuracy
+ * @parameter 2: distanceAxis - the distance accuracy
+ * @parameter 3: totalEntries - the total entries in matrix
+ * @return: the matrix presented for PGH
+ */
 vector<vector<int> > LocalHistogram::constructorMatrix(AccuracyPGH angleAcc,
 		int distanceAxis, int &totalEntries) {
 	int height = heightOfAngleAxis(angleAcc);
@@ -129,6 +184,14 @@ vector<vector<int> > LocalHistogram::constructorMatrix(AccuracyPGH angleAcc,
 	}
 	return matrix;
 }
+
+/*
+ * Compute the measure distance between two local PGHs by Bhattacharrya metric
+ * @parameter 1: sceneHistogram - the scene local PGH
+ * @parameter 2: distanceAxis - the distance accuracy
+ * @parameter 3: angleAcc - the angle accuracy
+ * @return: the measure distance between two local PGH
+ */
 double LocalHistogram::bhattacharyyaMetric(LocalHistogram sceneHistogram,
 		int distanceAxis,AccuracyPGH angleAcc) {
 	double result = 0;

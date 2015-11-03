@@ -31,30 +31,60 @@ ShapeHistogram::~ShapeHistogram() {
 	// TODO Auto-generated destructor stub
 }
 
+/*
+ * Get total entries of shape PGH
+ */
 double ShapeHistogram::getTotalEntries() {
 	return this->totalEntries;
 }
+
+/*
+ * Set the total entries of shape PGH
+ */
 void ShapeHistogram::setTotalEntries(double entries) {
 	this->totalEntries = entries;
 }
+
+/*
+ * Get the maximum distance of shape PGH
+ */
 double ShapeHistogram::getMaxDistance() {
 	return this->max_distance;
 }
+
+/*
+ * Set the maximum distance of shape PGH
+ */
 void ShapeHistogram::setMaxDistance(double distance) {
 	this->max_distance = distance;
 }
 
+/*
+ * Set the matrix presented shape PGH
+ */
 void ShapeHistogram::setMatrix(vector<vector<int> > matrix) {
 	this->matrix = matrix;
 }
+
+/*
+ * Get the matrix presented shape PGH
+ */
 vector<vector<int> > ShapeHistogram::getMatrix() {
 	return this->matrix;
 }
+
+/*
+ * Get the list of local PGH
+ */
 vector<LocalHistogram> ShapeHistogram::getListLocalHistogram() {
 	return listLocalHistogram;
 }
 
-// xay dung the pairwise histogram of shape
+/*
+ * Construct the shape PGH from a list of lines
+ * @parameter: prLines - list of lines
+ * @return: list of local histogram
+ */
 vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
 	vector<LocalHistogram> shapeHistogram;
 	double maxDistance = 0;
@@ -78,6 +108,11 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
 	return shapeHistogram;
 }
 
+/*
+ * Construct the matrix present for shape PGH
+ * @parameter 1: angleAcc - angle accuracy
+ * @parameter 2: cols - distance accuracy
+ */
 void ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
 		int cols) {
 	int rows = heightAngleAxis(angleAcc);
@@ -112,6 +147,11 @@ void ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
 	}
 	this->setTotalEntries(entries);
 }
+
+/*
+ * Save the presented matrix into file
+ * @parameter: fileName - save file path
+ */
 void ShapeHistogram::writeMatrix(QString fileName) {
 	vector<vector<int> > matrixPGH = this->matrix;
 	ofstream of(fileName.toStdString().c_str());
@@ -126,19 +166,45 @@ void ShapeHistogram::writeMatrix(QString fileName) {
 	of.close();
 }
 
+/*
+ * Get the height of presented matrix
+ * @parameter: angleAcc - the angle accurarcy
+ * @return: height of matrix
+ */
 int ShapeHistogram::heightAngleAxis(LocalHistogram::AccuracyPGH angleAcc) {
 	return LocalHistogram::heightOfAngleAxis(angleAcc);
 }
+
+/*
+ * Find the offset of angle in matrix
+ * @parameter 1: angle - the angle
+ * @parameter 2: angleAcc - the angle accuracy
+ * @return: the offset of angle in matrix
+ */
 int ShapeHistogram::angleOffset(double angle,
 		LocalHistogram::AccuracyPGH angleAcc) {
 	int bin;
 	bin = LocalHistogram::accuracyToTimeDegree(angle, angleAcc);
 	return bin;
 }
+
+/*
+ * Find the offset of distance in matrix
+ * @parameter 1: distance - the distance
+ * @parameter 2: cols - the distance accuaracy
+ * @return: the offset of distance in matrix
+ */
 int ShapeHistogram::distanceOffset(double distance, int cols) {
 	return LocalHistogram::distanceOffset(this->max_distance, distance, cols);
 }
 
+/*
+ * Presentation the shape PGH
+ * @parameter 1: pghHistogram - list of local PGHs
+ * @parameter 2: angleAcc - angle accuracy
+ * @parameter 3: cols - distance accuracy
+ * @return: image present for shape PGH
+ */
 cv::Mat ShapeHistogram::presentation(vector<LocalHistogram> pghHistograms,
 		LocalHistogram::AccuracyPGH angleAcc, int cols) {
 	int t_width = cols;
@@ -158,6 +224,12 @@ cv::Mat ShapeHistogram::presentation(vector<LocalHistogram> pghHistograms,
 	}
 	return result;
 }
+
+/*
+ * Compute the measure distance between two shape PGHs by Bhattacharyya metric
+ * @parameter: sceneHist - the scene shape PGH
+ * @return: the distance between two shape PGH
+ */
 double ShapeHistogram::bhattacharyaMetric(ShapeHistogram sceneHist) {
 	vector<vector<int> > pointer_ref = this->matrix;
 	vector<vector<int> > pointer_scene = sceneHist.getMatrix();
@@ -175,6 +247,12 @@ double ShapeHistogram::bhattacharyaMetric(ShapeHistogram sceneHist) {
 	}
 	return distance;
 }
+
+/*
+ * Compute the measure distance between two shape PGHs by Chi-Squared metric
+ * @parameter: sceneHist - the scene shape PGH
+ * @return: the distance between two shape PGH
+ */
 double ShapeHistogram::chiSquaredMetric(ShapeHistogram sceneHist) {
 	vector<vector<int> > pointer_ref = this->matrix;
 	vector<vector<int> > pointer_scene = sceneHist.getMatrix();
@@ -194,6 +272,12 @@ double ShapeHistogram::chiSquaredMetric(ShapeHistogram sceneHist) {
 	}
 	return distance / 2;
 }
+
+/*
+ * Compute the measure distance between two shape PGHs by Intersection metric
+ * @parameter: sceneHist - the scene shape PGH
+ * @return: the distance between two shape PGH
+ */
 double ShapeHistogram::intersectionMetric(ShapeHistogram sceneHist) {
 	vector<vector<int> > pointer_ref = this->matrix;
 	vector<vector<int> > pointer_scene = sceneHist.getMatrix();

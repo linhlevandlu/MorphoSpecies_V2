@@ -31,21 +31,51 @@ GFeatures::GFeatures() {
 GFeatures::~GFeatures() {
 	// TODO Auto-generated destructor stub
 }
+
+/*
+ * Get the angle
+ * @return: angle between two lines
+ */
 double GFeatures::getAngle() {
 	return this->angle;
 }
+
+/*
+ * Get the minimum distance between two lines
+ * @return: minimum distance between two lines
+ */
 double GFeatures::getDmin() {
 	return this->dmin;
 }
+
+/*
+ * Get the maximum distance between two lines
+ * @return: maximum distance between two lines
+ */
 double GFeatures::getDmax() {
 	return this->dmax;
 }
+
+/*
+ * Set the angle between two lines
+ *
+ */
 void GFeatures::setAngle(double angle) {
 	this->angle = angle;
 }
+
+/*
+ * Set the minimum distance between two lines
+ *
+ */
 void GFeatures::setDmin(double dmin) {
 	this->dmin = dmin;
 }
+
+/*
+ * Set the maximum between two lines
+ *
+ */
 void GFeatures::setDmax(double dmax) {
 	this->dmax = dmax;
 }

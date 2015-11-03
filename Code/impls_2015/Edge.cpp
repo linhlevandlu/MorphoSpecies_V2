@@ -94,7 +94,7 @@ void Edge::addLine(Line line) {
 }
 
 /**
- * Break edge into several straight line
+ * Break edge into list of approximate lines
  *
  */
 void Edge::breakEdge() {
@@ -140,6 +140,11 @@ void Edge::breakEdge() {
 	}
 }
 
+/*
+ * Break edge into list of approximate lines
+ * @paramter: contours - list of point on edge
+ * @return: list of break points on edge
+ */
 vector<Point> Edge::breakEdge(vector<Point> contours){
 	vector<Point> appContour;
 	approxPolyDP(contours,appContour,3,false);
@@ -223,6 +228,11 @@ void Edge::drawing(cv::Mat &outputImage) {
 	}
 }
 
+/*
+ * Get the lines from a file
+ * @parameter: filePath - path of file contains the lines
+ * @return: list of lines
+ */
 vector<Line> Edge::readFile(QString filePath) {
 	ifstream openFile(filePath.toStdString().c_str());
 	string lineText;

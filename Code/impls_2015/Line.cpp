@@ -183,6 +183,12 @@ cv::Point Line::intersection(vector<double> equation1,
 	return cv::Point(round(x), round(y));
 
 }
+
+/*
+ * Find the intersection point between this line and object line
+ * @parameter: objectLine - the object line
+ * @return: the intersection point between this and object line
+ */
 cv::Point Line::intersection(Line objectLine) {
 	vector<double> equation1 = this->equationOfLine();
 
@@ -268,6 +274,12 @@ GFeatures Line::pairwiseHistogram(Line objectLine) {
 void Line::drawing(cv::Mat &outputImage) {
 	cv::line(outputImage, this->p1, this->p2, cv::Scalar(0, 0, 255), 2, 8);
 }
+
+/*
+ * Redefine the equal between two lines
+ * @parameter: line - the object line
+ * @return: compare this line equal with object
+ */
 bool Line::operator==(Line &line) {
 	cv::Point lp1 = line.p1;
 	cv::Point lp2 = line.p2;
@@ -278,6 +290,12 @@ bool Line::operator==(Line &line) {
 		return true;
 	return false;
 }
+
+/*
+ * Find the parallel line with this line and distance between them is distance
+ * @parameter: distance - the distance between two lines
+ * @return: the lines, which parallel with this line, presented in list of parameters
+ */
 vector<vector<double> > Line::parallelLine(double distance) {
 	int x0 = (this->p1.x + this->p2.x) / 2;
 	vector<double> eq = this->equationOfLine();
@@ -323,6 +341,17 @@ vector<vector<double> > Line::parallelLine(double distance) {
 	return equations;
 }
 
+/*
+ * Find the intersection between two perpendicular lines with line1 and line2
+ * and distance from this point to line1, line2 are distance1, distance2, respectively.
+ * @parameter 1: line1 - the first reference line
+ * @parameter 2: line2 - the second reference line
+ * @parameter 3: distance1 - distance to line 1
+ * @parameter 4: distance2 - distance to line 2
+ * @parameter 5: width - width of image
+ * @parameter 6: height - height of image
+ * @return: list of intersection points
+ */
 vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 		double distance2, int width, int height) {
 	vector<double> equation1 = line1.equationOfLine();
@@ -374,16 +403,28 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 	return result;
 }
 
+/*
+ * Write the value of two endpoints of line
+ */
 void Line::toString() {
 	qDebug() << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y
 			<< "))";
 }
 
+/*
+ * Redefine the operator <
+ * @paramter: l2 - object line
+ * @return: this line is less than object line or not
+ */
 bool Line::operator<(const Line& l2) const {
 	if (p1.x < l2.p1.x)
 		return true;
 	return false;
 }
+
+/*
+ * Check the line is null or not
+ */
 bool Line::isNull() {
 	if (p1.x == p2.x && p1.y == p2.y)
 		return true;

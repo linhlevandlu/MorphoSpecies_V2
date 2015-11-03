@@ -45,7 +45,7 @@ Image::~Image() {
 }
 
 /*
- * Get the file name of image
+ * Get the full name of image
  * @return: the file path of image
  */
 QString Image::getFileName() {
@@ -135,22 +135,6 @@ void Image::setEdges(vector<Edge> edges) {
 }
 
 /**
- * Get the landmarks of image
- * @return: list of landmarks of image
- */
-/*QList<Landmark> Image::getLandmarks() {
- return this->listOfLandmarks;
- }*/
-
-/**
- * Set the landmarks of image
- * @parameter: landmarks - the landmarks of image
- */
-/*void Image::setLandmarks(QList<Landmark> landmarks) {
- this->listOfLandmarks = landmarks;
- }*/
-
-/**
  * Get the bins of histogram
  * @return: the number of bins
  */
@@ -165,6 +149,11 @@ int Image::getHistSize() {
 void Image::setHistSize(int histSize) {
 	this->histogramSize = histSize;
 }
+
+/*
+ * Get the matrix presented image
+ * @return: the matrix of image
+ */
 cv::Mat Image::getMatrixImage() {
 	return this->matrixImage;
 }
@@ -183,14 +172,6 @@ cv::Mat Image::getMatImage() {
 void Image::addEdge(Edge edge) {
 	this->listOfEdges.push_back(edge);
 }
-
-/**
- * Add a landmarks into the list of landmarks
- * @parameter: landmark - the landmark need to add into the list of landmarks
- */
-/*void Image::addLandmark(Landmark landmark) {
- this->listOfLandmarks.append(landmark);
- }*/
 
 /**
  * Compute the histogram of image
@@ -221,7 +202,7 @@ cv::Mat Image::histogram() {
 }
 
 /**
- * Compute the median of histogram
+ * Compute the median of image's histogram
  * @return: the value of median
  */
 double Image::medianHistogram() {
@@ -244,7 +225,7 @@ double Image::medianHistogram() {
 }
 
 /**
- * Compute the mean of histogram
+ * Compute the mean of image's histogram
  * @return: mean value of histogram
  */
 float Image::meanHistogram() {
@@ -515,6 +496,11 @@ vector<cv::Mat> Image::splitChannels() {
 	cv::split(hsvImage, hsv_planes);
 	return hsv_planes;
 }
+
+/*
+ * Segment the image into list of approximate lines
+ * @return: list of approximate lines presented image
+ */
 vector<Line> Image::lineSegment() {
 	vector<Line> totalLines;
 	for (size_t i = 0; i < this->listOfEdges.size(); i++) {
@@ -526,12 +512,28 @@ vector<Line> Image::lineSegment() {
 	qDebug() << "Total lines: " << totalLines.size();
 	return totalLines;
 }
+
+/*
+ * Set the pairwise geometric histogram of image
+ * @parameter: shapeHistogram - PGH of image
+ */
 void Image::setShapeHistogram(ShapeHistogram shapeHistogram) {
 	this->pghHistogram = shapeHistogram;
 }
+
+/*
+ * Get the pairwise geometric histogram of image
+ * @return: PGH of image
+ */
 ShapeHistogram Image::getShapeHistogram() {
 	return this->pghHistogram;
 }
+
+/*
+ * Read the landmarks from a TPS file
+ * @parameter: filePath - the landmarks file
+ * @return: list of landmarks (points)
+ */
 vector<Point> Image::readLandmarksFile(string filePath) {
 	ifstream openFile(filePath.c_str());
 	string lineText;
@@ -555,6 +557,12 @@ vector<Point> Image::readLandmarksFile(string filePath) {
 	this->listOfLandmarks = landmarks;
 	return landmarks;
 }
+
+/*
+ * Get the images from a folder
+ * @parameter: folderPath - the images folder
+ * @return: list of images in folder
+ */
 QFileInfoList Image::readImagesFolder(QString folderPath) {
 	QDir qdir;
 	qdir.setPath(folderPath);
@@ -565,6 +573,11 @@ QFileInfoList Image::readImagesFolder(QString folderPath) {
 	QFileInfoList files = qdir.entryInfoList();
 	return files;
 }
+
+/*
+ * Get the name of image
+ * @return: the name of image
+ */
 QString Image::getName() {
 	int index = this->fileName.lastIndexOf("/");
 	QString scenename = this->fileName.mid(index + 1,

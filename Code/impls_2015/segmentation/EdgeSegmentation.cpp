@@ -31,9 +31,21 @@ namespace impls_2015 {
 EdgeSegmentation::EdgeSegmentation() {
 }
 
+/*
+ * Segment the image into a list of approximate lines
+ * @parameter: image - the input image
+ * @return: list of approximate lines
+ */
 vector<Line> EdgeSegmentation::lineSegment(Image image) {
 	return image.lineSegment();
 }
+
+/*
+ * Presentation the result of segmentation
+ * @parameter 1: resultImage - the result image (on Matrix)
+ * @parameter 2: lines - list of approximate lines
+ * @return: the image present for list of approximate lines
+ */
 cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 		vector<Line> lines) {
 	for (size_t i = 0; i < lines.size(); i++) {
@@ -42,6 +54,12 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 	}
 	return resultImage;
 }
+
+/*
+ * Segment the images in a directory
+ * @parameter 1: inputPath - the images folder
+ * @parameter 2: savePath - the ouput folder
+ */
 void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
 	QFileInfoList files = Image::readImagesFolder(inputPath);
 
