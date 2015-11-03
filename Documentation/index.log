@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.6.23)  2 NOV 2015 16:02
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.6.23)  3 NOV 2015 15:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -263,6 +263,54 @@ Package caption3 Info: TeX engine: e-TeX on input line 57.
 \c@lotdepth=\count120
 \sf@top=\skip71
 \sf@bottom=\skip72
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/multicol.sty
+Package: multicol 2011/06/27 v1.7a multicolumn formatting (FMi)
+\c@tracingmulticols=\count121
+\mult@box=\box38
+\multicol@leftmargin=\dimen130
+\c@unbalance=\count122
+\c@collectmore=\count123
+\doublecol@number=\count124
+\multicoltolerance=\count125
+\multicolpretolerance=\count126
+\full@width=\dimen131
+\page@free=\dimen132
+\premulticols=\dimen133
+\postmulticols=\dimen134
+\multicolsep=\skip73
+\multicolbaselineskip=\skip74
+\partial@page=\box39
+\last@line=\box40
+\mult@rightbox=\box41
+\mult@grightbox=\box42
+\mult@gfirstbox=\box43
+\mult@firstbox=\box44
+\@tempa=\box45
+\@tempa=\box46
+\@tempa=\box47
+\@tempa=\box48
+\@tempa=\box49
+\@tempa=\box50
+\@tempa=\box51
+\@tempa=\box52
+\@tempa=\box53
+\@tempa=\box54
+\@tempa=\box55
+\@tempa=\box56
+\@tempa=\box57
+\@tempa=\box58
+\@tempa=\box59
+\@tempa=\box60
+\@tempa=\box61
+\c@columnbadness=\count127
+\c@finalcolumnbadness=\count128
+\last@try=\dimen135
+\multicolovershoot=\dimen136
+\multicolundershoot=\dimen137
+\mult@nat@firstbox=\box62
+\colbreak@box=\box63
+\multicol@sort@counter=\count129
 ) (./index.aux
 (./includes/cover.aux) (./includes/acknowledgement.aux)
 (./includes/abstract.aux) (./includes/introduction.aux) (./includes/theory.aux
@@ -326,32 +374,32 @@ LaTeX Warning: Label `fig:figure_31' multiply defined.
 ) (./includes/conclusion.aux))
 \openout1 = `index.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
-LaTeX Font Info:    ... okay on input line 9.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 9.
-LaTeX Font Info:    ... okay on input line 9.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 9.
-LaTeX Font Info:    ... okay on input line 9.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 9.
-LaTeX Font Info:    ... okay on input line 9.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 9.
-LaTeX Font Info:    ... okay on input line 9.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 9.
-LaTeX Font Info:    ... okay on input line 9.
-\AtBeginShipoutBox=\box38
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+\AtBeginShipoutBox=\box64
 
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count121
-\scratchdimen=\dimen130
-\scratchbox=\box39
-\nofMPsegments=\count122
-\nofMParguments=\count123
+\scratchcounter=\count130
+\scratchdimen=\dimen138
+\scratchbox=\box65
+\nofMPsegments=\count131
+\nofMParguments=\count132
 \everyMPshowfont=\toks21
-\MPscratchCnt=\count124
-\MPscratchDim=\dimen131
-\MPnumerator=\count125
-\makeMPintoPDFobject=\count126
+\MPscratchCnt=\count133
+\MPscratchDim=\dimen139
+\MPnumerator=\count134
+\makeMPintoPDFobject=\count135
 \everyMPtoPDFconversion=\toks22
 ) (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
 Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
@@ -575,7 +623,7 @@ Overfull \hbox (17.09436pt too wide) in paragraph at lines 343--343
  []
 
 [29])
-Underfull \hbox (badness 10000) in paragraph at lines 378--27
+Underfull \hbox (badness 10000) in paragraph at lines 378--28
 
  []
 
@@ -608,30 +656,32 @@ th-ods to re-fine the land-marks. It use cross-correlation
 ) [34]
 \openout2 = `includes/result.aux'.
 
- (./includes/result.tex
+ (./includes/result.tex [35
+
+
+]
 Chapter 6.
-<./images/md32.JPG, id=164, 3276.24pt x 2457.18pt>
+[36
+
+] <./images/md32.JPG, id=170, 3276.24pt x 2457.18pt>
 File: ./images/md32.JPG Graphic file (type jpg)
- <use ./images/md32.JPG>
-Package pdftex.def Info: ./images/md32.JPG used on input line 6.
-(pdftex.def)             Requested size: 203.83417pt x 152.861pt.
 
-<./images/est32.JPG, id=165, 3276.24pt x 2457.18pt>
+<use ./images/md32.JPG>
+Package pdftex.def Info: ./images/md32.JPG used on input line 51.
+(pdftex.def)             Requested size: 203.83417pt x 152.861pt.
+ <./images/est32.JPG, id=171, 3276.24pt x 2457.18pt>
 File: ./images/est32.JPG Graphic file (type jpg)
- <use ./images/est32.JPG>
-Package pdftex.def Info: ./images/est32.JPG used on input line 7.
+
+<use ./images/est32.JPG>
+Package pdftex.def Info: ./images/est32.JPG used on input line 52.
 (pdftex.def)             Requested size: 203.83417pt x 152.861pt.
-)
-[35
-
-
-
- <./images/md32.JPG> <./images/est32.JPG>]
+) [37 <./images/md32.JPG> <./images/est32.JPG>]
 \openout2 = `includes/conclusion.aux'.
 
- (./includes/conclusion.tex
+
+(./includes/conclusion.tex
 Chapter 7.
-) [36
+) [38
 
 
 
@@ -642,7 +692,7 @@ Missing character: There is no Ã in font cmr10!
 Missing character: There is no ¡ in font cmr10!
 Missing character: There is no Ã in font cmr10!
 Missing character: There is no ­ in font cmr10!
-) [37
+) [39
 
 
 ] (./index.aux (./includes/cover.aux)
@@ -659,10 +709,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6269 strings out of 493304
- 92593 string characters out of 6139871
- 198295 words of memory out of 5000000
- 9547 multiletter control sequences out of 15000+600000
+ 6361 strings out of 493304
+ 93973 string characters out of 6139871
+ 202200 words of memory out of 5000000
+ 9636 multiletter control sequences out of 15000+600000
  16677 words of font info for 59 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  44i,26n,49p,1075b,553s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -683,10 +733,10 @@ e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on index.pdf (42 pages, 5355882 bytes).
+Output written on index.pdf (44 pages, 5359173 bytes).
 PDF statistics:
- 235 PDF objects out of 1000 (max. 8388607)
- 153 compressed objects within 2 object streams
+ 242 PDF objects out of 1000 (max. 8388607)
+ 158 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  76 words of extra memory for PDF output out of 10000 (max. 10000000)
 

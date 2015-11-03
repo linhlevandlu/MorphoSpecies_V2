@@ -41,5 +41,9 @@
 \contentsline {section}{\numberline {5.5}Construct pairwise geometric histogram}{33}
 \contentsline {section}{\numberline {5.6}Estimate the global pose}{34}
 \contentsline {section}{\numberline {5.7}Refine the landmarks}{34}
-\contentsline {chapter}{\numberline {6}Result}{35}
-\contentsline {chapter}{\numberline {7}Conclusion}{36}
+\contentsline {chapter}{\numberline {6}Result}{36}
+\contentsline {section}{\numberline {6.1}Experimentations}{36}
+\contentsline {subsection}{\numberline {6.1.1}The bad files}{36}
+\contentsline {subsection}{\numberline {6.1.2}Parameters}{36}
+\contentsline {section}{\numberline {6.2}Results}{37}
+\contentsline {chapter}{\numberline {7}Conclusion}{38}
