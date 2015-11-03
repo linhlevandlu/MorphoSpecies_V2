@@ -63,17 +63,16 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
 void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
 	QFileInfoList files = Image::readImagesFolder(inputPath);
 
+	QString spath = savePath + "/thresholdValues.txt";
+	ofstream of(spath.toStdString().c_str());
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image image(_name);
-
+		of << image.getName().toStdString().c_str() << "\t" << image.getThresholdValue() << "\n";
 		qDebug() << _name;
-		int index2 = _name.lastIndexOf("/");
-		QString scenename =
-				_name.mid(index2 + 1, _name.length() - index2 - 5).replace(" ",
-						"");
-		QString pghName = savePath + scenename + ".PGH";
+
+		QString pghName = savePath + "/" + image.getName() + ".PGH";
 		vector<Line> lines = image.lineSegment();
 
 		//write the coordinates
@@ -97,10 +96,11 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
 		 of.close();*/
 
 		//save the image
-		/*cv::Mat segImg(image.getMatrixImage().size(),image.getMatrixImage().type(),Scalar::all(0));
-		 segImg = rePresentation(segImg,lines);
-		 QString path = savePath + scenename + ".JPG";
-		 imwrite(path.toStdString().c_str(),segImg);*/
+		cv::Mat segImg(image.getMatrixImage().clone());
+		segImg = rePresentation(segImg, lines);
+		QString path = savePath + "/" + image.getName() + ".JPG";
+		imwrite(path.toStdString().c_str(), segImg);
 	}
+	of.close();
 }
 } /* namespace impls_2015 */

@@ -37,13 +37,19 @@ Image::Image(QString filePath) {
 	this->fileName = filePath;
 	this->histogramSize = 256;
 	this->matrixImage = getMatImage();
-	getEdges();
+	getEdges(this->thresholdValue);
 }
 
 Image::~Image() {
 	// TODO Auto-generated destructor stub
 }
 
+/*
+ * Get the threshold value
+ */
+int Image::getThresholdValue(){
+	return this->thresholdValue;
+}
 /*
  * Get the full name of image
  * @return: the file path of image
@@ -64,7 +70,7 @@ void Image::setFileName(QString filePath) {
  * Get the edges of image
  * @return: the list of edges of image
  */
-vector<Edge> Image::getEdges() {
+vector<Edge> Image::getEdges(int &thresholdValue) {
 	cv::Mat grayImg, orgImg = this->matrixImage;
 
 	cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
@@ -105,6 +111,9 @@ vector<Edge> Image::getEdges() {
 	int mid1 = (imin + imax) / 2;
 	int mid2 = (imin + imax2) / 2;
 	int mid = (mid1 + mid2) / 2;
+
+	thresholdValue = mid;
+	//qDebug()<<mid;
 
 	cv::threshold(grayImg, grayImg, mid, 255, CV_THRESH_BINARY);
 

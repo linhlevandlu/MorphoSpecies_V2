@@ -2659,12 +2659,14 @@ void ImageViewer::edgeSegmentation() {
 	 msgbox.setText("Select the images folder.");
 	 msgbox.exec();
 	 QString folder = QFileDialog::getExistingDirectory(this);
-	 edgeSegementDirectory(folder);*/
+	 edgeSegmentDirectory(folder);*/
 
 	/*
 	 * Working on an image
 	 */
 	Image image(fileName);
+	image.drawingHistogram();
+	qDebug() << image.getName();
 	cv::Mat enddest(image.getMatrixImage().clone());
 	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest);
 
@@ -2791,29 +2793,41 @@ void ImageViewer::pHoughTransform() {
 	/*
 	 * Working on directory
 	 */
-	/*QString sceneImageDir = "/home/linh/Desktop/mg/images";
-	 QString sceneLMDir = "/home/linh/Desktop/mg/landmarks";
-	 QString saveDir = "/home/linh/Desktop/29Oct/mg_pht";
-	 Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-	 saveDir);*/
+	msgbox.setText("Select the scene images folder.");
+	msgbox.exec();
+	QString sceneImageDir = QFileDialog::getExistingDirectory(this);
+	//QString sceneImageDir = "/home/linh/Desktop/md/images";
+
+	msgbox.setText("Select the scene landmarks folder.");
+	msgbox.exec();
+	QString sceneLMDir = QFileDialog::getExistingDirectory(this);
+	//QString sceneLMDir = "/home/linh/Desktop/md/landmarks";
+
+	msgbox.setText("Select the save folder.");
+	msgbox.exec();
+	QString saveDir = QFileDialog::getExistingDirectory(this);
+	//QString saveDir = "/home/linh/Desktop/03Nov/md_pht";
+
+	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
+			saveDir);
 
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the scene image.");
-	msgbox.exec();
-	QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	qDebug() << fileName2;
-	Image image2(fileName2);
-	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
-			reflmPath);
+	/*msgbox.setText("Select the scene image.");
+	 msgbox.exec();
+	 QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 qDebug() << fileName2;
+	 Image image2(fileName2);
+	 Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
+	 reflmPath);
 
-	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-			"Probabilistic Hough Transform");
-	other->show();
+	 ImageViewer *other = new ImageViewer;
+	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+	 "Probabilistic Hough Transform");
+	 other->show();*/
 	qDebug() << "Done";
 }
 
@@ -2834,41 +2848,41 @@ void ImageViewer::crossCorrelation() {
 	/*
 	 * Working on directory
 	 */
-	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	qDebug() << "Landmarks detected by cross-correlation (in directory)";
 
-	 msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
+	msgbox.setText("Select the images folder.");
+	msgbox.exec();
+	QString folder = QFileDialog::getExistingDirectory(this);
 
-	 msgbox.setText("Select the saving folder.");
-	 msgbox.exec();
-	 QString saveFolder = QFileDialog::getExistingDirectory(this) ;
-	 Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);*/
+	msgbox.setText("Select the saving folder.");
+	msgbox.exec();
+	QString saveFolder = QFileDialog::getExistingDirectory(this);
+	Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);
 
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the second image.");
-	msgbox.exec();
-	QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	Image sceneImage(fileName2);
+	/*msgbox.setText("Select the second image.");
+	 msgbox.exec();
+	 QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 Image sceneImage(fileName2);
 
-	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
-			sceneImage,400);
-	QString scenename = sceneImage.getName();
-	qDebug() << scenename;
+	 vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
+	 sceneImage, 400);
+	 QString scenename = sceneImage.getName();
+	 qDebug() << scenename;
 
-	Mat enddest(sceneImage.getMatrixImage().clone());
-	for (size_t i = 0; i < landmarks.size(); i++) {
-		Point lm = landmarks.at(i);
-		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 255, 255), 2, 4);
-	}
-	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-			"Landmark -- " + this->fileName);
-	other->show();
+	 Mat enddest(sceneImage.getMatrixImage().clone());
+	 for (size_t i = 0; i < landmarks.size(); i++) {
+	 Point lm = landmarks.at(i);
+	 circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 255, 255), 2, 4);
+	 }
+	 ImageViewer *other = new ImageViewer;
+	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+	 "Landmark -- " + this->fileName);
+	 other->show();*/
 	qDebug() << "Done";
 }
 

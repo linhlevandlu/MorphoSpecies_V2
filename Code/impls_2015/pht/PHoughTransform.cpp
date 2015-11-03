@@ -86,7 +86,7 @@ bool PHoughTransform::closetLine(Line line1, Line line2) {
 
 	double distance1 = line2.perpendicularDistance(line1.getP1());
 	double distance2 = line2.perpendicularDistance(line1.getP2());
-	if (line1.length() > 60 && line2.length() > 60
+	if (line1.length() > 50 && line2.length() > 50 //60
 			&& line1.angleBetweenLines(line2) >= 15
 			&& (distance1 <= 5 || distance2 <= 5))
 		return true;
