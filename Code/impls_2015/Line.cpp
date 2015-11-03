@@ -87,7 +87,7 @@ void Line::setP2(cv::Point p) {
  */
 double Line::length() {
 	double distance = sqrt(
-			pow(this->p2.x - this->p1.x, 2) + pow(this->p2.y - this->p1.y, 2));
+			pow((float)(this->p2.x - this->p1.x), 2) + pow((float)(this->p2.y - this->p1.y), 2));
 	return distance;
 }
 

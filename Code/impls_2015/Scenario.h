@@ -64,7 +64,7 @@ public:
 	static vector<LocalHistogram> pairwiseHistogram(Image image,
 			LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
 	static vector<Point> landmarksByCrossCorelation(Image image, QString lpath,
-			Image sceneImage);
+			Image sceneImage, int tsize);
 	static double mDistanceByCrossCorrelation(Image image, QString lmpath,
 			Image sceneImage, int size, Point &ebary);
 	static void mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,

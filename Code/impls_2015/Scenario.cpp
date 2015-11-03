@@ -174,11 +174,11 @@ void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
  * @return: the list of estimated landmarks of reference image on the scene image
  */
 vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
-		Image sceneImage) {
+		Image sceneImage, int tsize) {
 
 	vector<Point> landmarks;
 	LandmarkDetection lmdetection;
-	landmarks = lmdetection.crossCorrelation(image, sceneImage, lpath, 200);
+	landmarks = lmdetection.crossCorrelation(image, sceneImage, lpath, tsize);
 	return landmarks;
 }
 

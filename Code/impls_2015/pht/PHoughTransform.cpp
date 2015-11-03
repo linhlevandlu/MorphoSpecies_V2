@@ -237,6 +237,7 @@ Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	//double angle2 = objl1.angleBetweenLines(objl2);
 	double angle3 = lineEntry1.angleBetweenLines(objl1);
 	double angle4 = lineEntry1.angleBetweenLines(objl2);
+	qDebug()<<"angle 3, angle 4: "<<angle3<<", "<<angle4;
 
 	vector<Point> intersects1 = objl1.interParallel(objl1, objl2,
 			hs1.getDistance(), hs2.getDistance(), width, height);

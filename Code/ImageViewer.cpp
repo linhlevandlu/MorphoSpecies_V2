@@ -2674,7 +2674,6 @@ void ImageViewer::edgeSegmentation() {
 	other->show();
 	qDebug() << "Done";
 }
-
 /*
  * Compute the pairwise geometric histogram of an image
  */
@@ -2758,7 +2757,7 @@ void ImageViewer::pwChiSquaredMatching() {
 }
 
 /*
-* Compute the PGH measure distance between two images by Intersection method
+ * Compute the PGH measure distance between two images by Intersection method
  */
 void ImageViewer::pwIntersectionMatching() {
 	qDebug() << "Pairwise histogram matching using Intersection metric...";
@@ -2810,6 +2809,7 @@ void ImageViewer::pHoughTransform() {
 	Image image2(fileName2);
 	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
 			reflmPath);
+
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
@@ -2856,7 +2856,7 @@ void ImageViewer::crossCorrelation() {
 	Image sceneImage(fileName2);
 
 	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
-			sceneImage);
+			sceneImage,400);
 	QString scenename = sceneImage.getName();
 	qDebug() << scenename;
 

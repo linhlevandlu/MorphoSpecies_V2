@@ -336,6 +336,7 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	//		spath.toStdString().c_str());
 
 	Mat sRotateImg = rotateImage(sMatrix, angleDiff, ePoint);
+
 	for (size_t i = 0; i < esLandmarks.size(); i++) {
 		Point lm(refLandmarks.at(i).x, mMatrix.rows - refLandmarks.at(i).y);
 		Point tLocation, tDistance, iLocation, iDistance;
@@ -346,7 +347,7 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 		Point maxLoc = matCrossCorrelation(templ, sceneM);
 		mcResult.push_back(iLocation + maxLoc + tDistance);
 	}
-	Mat sDisplay(sMatrix.clone());
+	Mat sDisplay(sceneImage.getMatrixImage().clone());
 
 	Mat result(rotateImage(sDisplay, angleDiff, ePoint).clone());
 	//Mat result(sRotateImg.clone());
@@ -371,7 +372,7 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		QString lmPath, QString savePath, int templSize, int sceneSize,
 		double angleDiff) {
 	QFileInfoList files = Image::readImagesFolder(folderImages);
-	QString sceneLMPath = "/home/linh/Desktop/mg/landmarks";
+	QString sceneLMPath = "/home/linh/Desktop/md/landmarks";
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
@@ -390,7 +391,7 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
 
-		QString estTPS(savePath + "/E " + scenename + ".TPS");
+		QString estTPS(savePath + "/E_" + scenename + ".TPS");
 		ofstream of(estTPS.toStdString().c_str());
 		of << "LM = " << mcresult.size() << "\n";
 
@@ -462,7 +463,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
 		vector<Point> mcResult;
-		double angle= 0;
+		double angle = 0;
 		matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
 				angle, mcResult);
 		of << scenename.toStdString().c_str() << ".JPG" << "\t";
