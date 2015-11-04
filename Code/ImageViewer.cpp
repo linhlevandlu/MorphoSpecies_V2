@@ -2665,7 +2665,7 @@ void ImageViewer::edgeSegmentation() {
 	 * Working on an image
 	 */
 	Image image(fileName);
-	image.drawingHistogram();
+	//image.drawingHistogram();
 	qDebug() << image.getName();
 	cv::Mat enddest(image.getMatrixImage().clone());
 	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest);
@@ -2673,8 +2673,24 @@ void ImageViewer::edgeSegmentation() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Edge segmentation");
-	other->show();
+	other->addParameterPanel(new impls_2015::EdgeSegmentationPanel(other,fileName,image.getThresholdValue()),x() + 20,y()+20);
 	qDebug() << "Done";
+}
+void ImageViewer::edgeSegmentation(int thresholdValue,QString filePath) {
+
+	Image image(filePath);
+	vector<Edge> edges = image.getEdges(thresholdValue);
+	vector<Line> lines = image.lineSegment();
+	Mat enddest(matImage.clone());
+	for(size_t i = 0; i < lines.size();i++){
+		Line line = lines.at(i);
+		line.drawing(enddest);
+	}
+
+	qImage = ImageConvert::cvMatToQImage(enddest);
+	imageLabel->setPixmap(QPixmap::fromImage(qImage));
+	statusBar()->showMessage(
+			tr("Threshold value: ") + QString::number(thresholdValue));
 }
 /*
  * Compute the pairwise geometric histogram of an image

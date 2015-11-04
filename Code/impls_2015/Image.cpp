@@ -37,19 +37,14 @@ Image::Image(QString filePath) {
 	this->fileName = filePath;
 	this->histogramSize = 256;
 	this->matrixImage = getMatImage();
-	getEdges(this->thresholdValue);
+	int threshold = getThresholdValue();
+	getEdges(threshold);
 }
 
 Image::~Image() {
 	// TODO Auto-generated destructor stub
 }
 
-/*
- * Get the threshold value
- */
-int Image::getThresholdValue(){
-	return this->thresholdValue;
-}
 /*
  * Get the full name of image
  * @return: the file path of image
@@ -66,15 +61,14 @@ void Image::setFileName(QString filePath) {
 	this->fileName = filePath;
 }
 
-/*
- * Get the edges of image
- * @return: the list of edges of image
- */
-vector<Edge> Image::getEdges(int &thresholdValue) {
-	cv::Mat grayImg, orgImg = this->matrixImage;
+int Image::getThresholdValue() {
+	int thresholdValue = 0;
 
-	cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
-	//cv::cvtColor(this->matrixImage, grayImg, CV_BGR2GRAY);
+	cv::Mat grayImg, orgImg = this->matrixImage;
+	if(orgImg.channels() > 1)
+		cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
+	else
+		grayImg = orgImg;
 
 	cv::Mat histImg = histogram();
 	// calculate the median
@@ -110,16 +104,26 @@ vector<Edge> Image::getEdges(int &thresholdValue) {
 
 	int mid1 = (imin + imax) / 2;
 	int mid2 = (imin + imax2) / 2;
-	int mid = (mid1 + mid2) / 2;
+	thresholdValue = (mid1 + mid2) / 2;
 
-	thresholdValue = mid;
-	//qDebug()<<mid;
+	return thresholdValue;
+}
+/*
+ * Get the edges of image
+ * @return: the list of edges of image
+ */
+vector<Edge> Image::getEdges(int thresholdValue) {
+	cv::Mat grayImg, orgImg = this->matrixImage;
+	if(orgImg.channels() == 3)
+		cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
+	else
+		grayImg = orgImg;
 
-	cv::threshold(grayImg, grayImg, mid, 255, CV_THRESH_BINARY);
+	cv::threshold(grayImg, grayImg, thresholdValue, 255, CV_THRESH_BINARY);
 
 	//qDebug() << "middle value: " << mid;
 	Mat cannyImage;
-	cv::Canny(grayImg, cannyImage, mid, 3 * mid, 5);
+	cv::Canny(grayImg, cannyImage, thresholdValue, 3 * thresholdValue, 5);
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 	RNG rng(12345);

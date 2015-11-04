@@ -42,6 +42,7 @@
 #include "impls_2015/IDrawOperation.h"
 #include "impls_2015/LocalHistogram.h"
 #include "impls_2015/pht/PHoughTransform.h"
+#include "impls_2015/segmentation/EdgeSegmentationPanel.h"
 
 class QAction;
 class QLabel;
@@ -92,7 +93,7 @@ public:
 	//void removeYLinesAction(int minBrightness, QString pathImage);
 	void edgeSegmentDirectory(QString path);
 	void matchingDirectory(impls_2015::Image image, QString path);
-	//void landmarksByDirectory(impls_2015::Image refImage, QString path,QString savePath, QString lmPath);
+	void edgeSegmentation(int thresholdValue, QString filePath);
 	//end
 
 protected:

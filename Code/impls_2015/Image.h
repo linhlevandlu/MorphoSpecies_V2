@@ -54,7 +54,6 @@ private:
 	cv::Mat matrixImage;
 	ShapeHistogram pghHistogram;
 	cv::Mat getMatImage();
-	int thresholdValue;
 public:
 	enum InsectPart {
 		ELYTRE, MDROITE, MGAUCHE, PRONOTUM, TETE
@@ -66,7 +65,7 @@ public:
 
 	QString getFileName();
 	void setFileName(QString filePath);
-	vector<Edge> getEdges(int &thresholdValue);
+	vector<Edge> getEdges(int thresholdValue);
 	void setEdges(vector<Edge> edges);
 	int getThresholdValue();
 	int getHistSize();
