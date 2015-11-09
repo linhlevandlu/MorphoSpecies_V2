@@ -33,8 +33,8 @@ public:
 	LandmarkMethod();
 	virtual ~LandmarkMethod();
 	virtual Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
-			int templSize, int sceneSize, double angleDiff,
-			vector<Point> &mcResult) = 0;
+			int templSize, int sceneSize, double &angleDiff, Image::SegmentMethod sgmethod,
+			vector<Point> &mcResult, Point &ePoint) = 0;
 };
 
 } /* namespace impls_2015 */

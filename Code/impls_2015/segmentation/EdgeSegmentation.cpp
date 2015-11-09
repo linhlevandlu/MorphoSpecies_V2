@@ -36,8 +36,9 @@ EdgeSegmentation::EdgeSegmentation() {
  * @parameter: image - the input image
  * @return: list of approximate lines
  */
-vector<Line> EdgeSegmentation::lineSegment(Image image) {
-	return image.lineSegment();
+vector<Line> EdgeSegmentation::lineSegment(Image image, Image::SegmentMethod sgmethod) {
+	int thresh = 0;
+	return image.lineSegment(sgmethod,thresh);
 }
 
 /*
@@ -60,46 +61,45 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
  * @parameter 1: inputPath - the images folder
  * @parameter 2: savePath - the ouput folder
  */
-void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath) {
+void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
+		Image::SegmentMethod method, int save) {
 	QFileInfoList files = Image::readImagesFolder(inputPath);
-
 	QString spath = savePath + "/thresholdValues.txt";
 	ofstream of(spath.toStdString().c_str());
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image image(_name);
-		of << image.getName().toStdString().c_str() << "\t" << image.getThresholdValue() << "\n";
-		qDebug() << _name;
 
+		int tvalue = 0;
+		vector<Line> lines = image.lineSegment(method,tvalue);
+		of << image.getName().toStdString().c_str() << "\t"
+						<< tvalue << "\n";
+
+		// save PGH files
 		QString pghName = savePath + "/" + image.getName() + ".PGH";
-		vector<Line> lines = image.lineSegment();
+		if(save == 1)
+			savePGHFile(lines,pghName);
 
-		//write the coordinates
-		/*int x1, y1, x2, y2;
-		 ofstream of(pghName.toStdString().c_str());
-		 for (size_t i = 0; i < lines.size(); i++) {
-		 Line line = lines.at(i);
-		 // rotation 15 degree
-		 x1 = line.getP1().x * cos(round(15) * M_PI / 180)
-		 - line.getP1().y * sin(round(15) * M_PI / 180);
-		 y1 = line.getP1().x * sin(round(15) * M_PI / 180)
-		 + line.getP1().y * cos(round(15) * M_PI / 180);
-		 x2 = line.getP2().x * cos(round(15) * M_PI / 180)
-		 - line.getP2().y * sin(round(15) * M_PI / 180);
-		 y2 = line.getP2().x * sin(round(15) * M_PI / 180)
-		 + line.getP2().y * cos(round(15) * M_PI / 180);
-		 of << "(" << x1 << "," << y1 << ")"
-		 << " (" << x2 << "," << y2
-		 << ")" << "\n";
-		 }
-		 of.close();*/
-
-		//save the image
+		//save the images
 		cv::Mat segImg(image.getMatrixImage().clone());
 		segImg = rePresentation(segImg, lines);
 		QString path = savePath + "/" + image.getName() + ".JPG";
 		imwrite(path.toStdString().c_str(), segImg);
+	}
+	of.close();
+}
+void EdgeSegmentation::savePGHFile(vector<Line> lines, QString savePath) {
+	int x1, y1, x2, y2;
+	ofstream of(savePath.toStdString().c_str());
+	for (size_t i = 0; i < lines.size(); i++) {
+		Line line = lines.at(i);
+		x1 = line.getP1().x;
+		y1 = line.getP1().y;
+		x2 = line.getP2().x;
+		y2 = line.getP2().y;
+		of << "(" << x1 << "," << y1 << ")" << " (" << x2 << "," << y2 << ")"
+				<< "\n";
 	}
 	of.close();
 }

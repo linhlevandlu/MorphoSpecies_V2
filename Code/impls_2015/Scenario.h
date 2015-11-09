@@ -58,11 +58,14 @@ public:
 
 	Scenario();
 	virtual ~Scenario();
-	static vector<Line> edgeSegmentation(Image image, cv::Mat &result);
+	static vector<Line> edgeSegmentation(Image image, cv::Mat &result,
+			Image::SegmentMethod sgmethod);
 	static void edgeSegmentationDirectory(QString inputFolder,
-			QString saveFolder);
+			QString saveFolder, Image::SegmentMethod segmentMethod, int save);
 	static vector<LocalHistogram> pairwiseHistogram(Image image,
-			LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result);
+			LocalHistogram::AccuracyPGH angleAcc, int columns,
+			Image::SegmentMethod sgmethod, cv::Mat &result,
+			vector<vector<int> > &matrix);
 	static vector<Point> landmarksByCrossCorelation(Image image, QString lpath,
 			Image sceneImage, int tsize);
 	static double mDistanceByCrossCorrelation(Image image, QString lmpath,
@@ -70,31 +73,39 @@ public:
 	static void mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 			QString imgFolder);
 	static Mat landmarksMatching(Image refImage, Image sceneImage,
-			QString reflmPath, int templSize, int scnSize);
+			QString reflmPath, int templSize, int scnSize,
+			Image::SegmentMethod sgmethod, vector<Point> &mcResult, double &angle, Point &ePoint);
 	static void landmarksMatchingDirectory(Image refImage, QString folderImages,
-			QString lmPath, QString savePath, int templSize, int sceneSize);
+			QString lmPath, QString savePath, int templSize, int sceneSize,
+			Image::SegmentMethod sgmethod, int save);
 	static void cCorelationDirectory(Image refImage, QString path,
 			QString savePath, QString lmPath);
 	static double pghMatching(Image refImage, Image sceneImage,
 			GeometricHistogram::MatchingMethod matching,
-			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,
+			Image::SegmentMethod sgmethod);
 	static void matchingDirectory(Image refImage, QString directoryPath,
 			GeometricHistogram::MatchingMethod matching,
-			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,QString fileSave, Image::SegmentMethod sgmethod);
 	static void matchingDirectory(QString directoryPath,
 			GeometricHistogram::MatchingMethod matching,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	static void pairwiseHistogramDirectory(QString folderPath,
 			LocalHistogram::AccuracyPGH angleAcc, int columns);
 	static Mat probabilisticHoughTransform(Image refImage, Image sceneImage,
-			QString reflmPath);
+			QString reflmPath, Image::SegmentMethod sgmethod,
+			vector<Point> &esLandmarks);
 	static void phtDirectory(Image refImage, QString reflmPath,
-			QString sceneDir, QString scenelmDir, QString saveDir);
+			QString sceneDir, QString scenelmDir, QString saveDir,
+			impls_2015::Image::SegmentMethod sgmethod, int save);
 
 	static double mDistanceByTemplateMatching(Image refImage, Image sceneImage,
-			QString lmPath, int templSize, int sceneSize, Point &ebary);
+			QString lmPath, int templSize, int sceneSize,
+			Image::SegmentMethod sgmethod, Point &ebary);
 	static void mDistanceByTemplateMatchingDirectory(Image refImage,
-			QString lmPath, QString folderImages, int templSize, int sceneSize);
+			QString lmPath, QString folderImages, QString lmFolder,
+			int templSize, int sceneSize, QString savePath,
+			Image::SegmentMethod sgmethod);
 };
 
 } /* namespace impls_2015 */

@@ -33,7 +33,9 @@ class HistogramMethod {
 public:
 	HistogramMethod();
 	virtual ~HistogramMethod();
-	virtual vector<LocalHistogram> shapeHistogram(Image image, LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,cv::Mat &result) = 0;
+	virtual vector<LocalHistogram> shapeHistogram(Image image,
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,
+			Image::SegmentMethod sgmethod, cv::Mat &result, vector<vector<int> > &matrix) = 0;
 };
 
 } /* namespace impls_2015 */

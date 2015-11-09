@@ -26,6 +26,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <math.h>
+#include <QtGui/qradiobutton.h>
 
 #include <fstream>
 #include <iostream>
@@ -43,6 +44,7 @@
 #include "impls_2015/LocalHistogram.h"
 #include "impls_2015/pht/PHoughTransform.h"
 #include "impls_2015/segmentation/EdgeSegmentationPanel.h"
+#include "impls_2015/ReadResouces.h"
 
 class QAction;
 class QLabel;
@@ -91,14 +93,26 @@ public:
 
 	//add by LE Van Linh
 	//void removeYLinesAction(int minBrightness, QString pathImage);
-	void edgeSegmentDirectory(QString path);
-	void matchingDirectory(impls_2015::Image image, QString path);
-	void edgeSegmentation(int thresholdValue, QString filePath);
-	//end
 
+	void matchingDirectory(impls_2015::Image image, QString path, QString fileSave, impls_2015::Image::SegmentMethod sgmethod);
+	void edgeSegmentation_Value_Changed(QString filePath, int thresholdValue);
+	void edgeSegmentation_Method_Changed(QString filePath,
+			impls_2015::Image::SegmentMethod sgmethod);
+
+	impls_2015::Image::SegmentMethod chooseSegMethod();
+	int saveOrNot();
+
+	vector<Point> esLandmarks;
+	vector<Point> orgLandmarks;
+	vector<impls_2015::Line> lines;
+	double angleDiff;
+	Point ePoint;
+
+	//end
 protected:
 	void closeEvent(QCloseEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
+
 private slots:
 	void open();
 	void print();
@@ -175,6 +189,18 @@ private slots:
 	void crossCorrelation();
 	void crossCorrelationDistance();
 	void tplMatchingDistance();
+	void edgeSegmentDirectory();
+	void bhattacharyyaDistanceDirectory();
+	void phtOnDirectory();
+	void estlmOnDirectory();
+	void computeSizeOnDirectory();
+
+	// context menu
+	void estContextMenu(const QPoint& pos);
+	void putInOrgLandmarks();
+	void putInLines();
+	void putOutOrgLandmarks();
+	void putOutLines();
 private:
 	void createActions();
 	void createMenus();
@@ -189,6 +215,11 @@ private:
 	QLabel *imageLabel;
 	QScrollArea *scrollArea;
 	double scaleFactor;
+
+	// Linh
+	void optionDisplay(impls_2015::Image image, vector<Point> esLM,
+			vector<Point> orgLM, vector<impls_2015::Line> lines, double angle, Point ePoint);
+	bool checkPresent(impls_2015::Image mImage, impls_2015::Image sImage,impls_2015::Image::SegmentMethod sgmethod);
 
 #ifndef QT_NO_PRINTER
 	QPrinter printer;
@@ -271,6 +302,13 @@ private:
 	QAction *cCorrelation; // cross correlation
 	QAction *ccMeasureDistance;
 	QAction *tmMeasureDistance;
+
+	// working with directory
+	QAction *segmentationDir;
+	QAction *bhattcharyyaDir;
+	QAction *proHoughTransformDir;
+	QAction *lmExtractionDir;
+	QAction *sizeLandmarksDir;
 
 // end
 	QMenu *fileMenu;

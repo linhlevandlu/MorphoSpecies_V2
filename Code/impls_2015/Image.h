@@ -39,6 +39,7 @@
 
 #include "Edge.h"
 #include "ShapeHistogram.h"
+#include "ReadResouces.h"
 
 using namespace std;
 using namespace cv;
@@ -55,6 +56,10 @@ private:
 	ShapeHistogram pghHistogram;
 	cv::Mat getMatImage();
 public:
+	enum SegmentMethod{
+		Otsu = 0,
+		Other = 1
+	};
 	enum InsectPart {
 		ELYTRE, MDROITE, MGAUCHE, PRONOTUM, TETE
 	};
@@ -67,7 +72,9 @@ public:
 	void setFileName(QString filePath);
 	vector<Edge> getEdges(int thresholdValue);
 	void setEdges(vector<Edge> edges);
+	int getThresholdValue_Otsu();
 	int getThresholdValue();
+	int thresholdBadFiles();
 	int getHistSize();
 	void setHistSize(int histSize);
 	cv::Mat getMatrixImage();
@@ -88,6 +95,8 @@ public:
 	cv::Mat removingGrid(int minBrightness);
 
 	vector<Line> lineSegment();
+	vector<Line> lineSegment(SegmentMethod method,int &thresholdValue);
+	vector<Line> getApproximateLines(vector<Edge> edges);
 	void setShapeHistogram(ShapeHistogram shapeHistogram);
 	ShapeHistogram getShapeHistogram();
 	vector<Point> readLandmarksFile(string filePath);
@@ -95,6 +104,8 @@ public:
 
 	static QFileInfoList readImagesFolder(QString folderPath);
 	QString getName();
+	static QString getTimeName();
+	static Mat rotateImage(Mat source, double angle, Point center);
 };
 
 } /* namespace impls_2015 */

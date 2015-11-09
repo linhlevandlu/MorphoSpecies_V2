@@ -41,6 +41,7 @@
 #include "../Image.h"
 #include "HoughMethod.h"
 #include "PHTEntry.h"
+#include "../ReadResouces.h"
 
 using namespace std;
 using namespace cv;
@@ -49,6 +50,7 @@ namespace impls_2015 {
 
 class PHoughTransform: public HoughMethod {
 public:
+	map<string,int> resources;
 	PHoughTransform();
 	virtual ~PHoughTransform();
 
@@ -62,19 +64,20 @@ public:
 			vector<Line> sceneLines, int width, int height,
 			vector<Line> &maxVector);
 	Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
-			double &angleDiff, vector<Point> refLandmarks, int width, int height);
+			double &angleDiff, vector<Point> refLandmarks, int width,
+			int height);
 	vector<Point> findLandmarks(Point refPoint, Point esPoint,
 			vector<Point> refLandmarks, int width, int height, int &positive);
 	vector<Point> estimateLandmarks(Image mImage, Image sImage, string mlmPath,
-			double &angleDiff, Point &ePoint);
+			double &angleDiff, Point &ePoint, Image::SegmentMethod sgmethod);
 	Mat phtPresentation(Image refImage, Image sceneImage, string reflmPath,
-			vector<Point> &esLandmarks);
+			vector<Point> &esLandmarks, Image::SegmentMethod sgmethod);
 	void phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
-			QString scenelmDir, QString saveDir);
+			QString scenelmDir, QString saveDir, Image::SegmentMethod sgmethod,
+			int save);
 	double angleDifference(Line refLine, Line sceneLine);
 	Point newLocation(Point point, double angleDiff, Point refPoint);
-	//Mat testPHT(Image mImage, Image sImage, string mlmPath, double &angleDiff,
-	//		Point &ePoint);
+	void saveEstLandmarks(vector<Point> esLandmarks, QString savePath);
 };
 
 } /* namespace impls_2015 */

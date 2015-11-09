@@ -61,28 +61,36 @@ public:
 			QString lmPath, int templSize);
 	void cCorrelationByDirectory(Image refImage, QString folderpath,
 			QString savepath, QString lmPath);
-	double centroidCCorrelation(Image refImage, Image sceneImage, QString lmPath,
-			int size, Point &ebary);
+	double centroidCCorrelation(Image refImage, Image sceneImage,
+			QString lmPath, int size, Point &ebary);
 	void centroidCCorrelations(Image refImage, QString lmPath,
 			QString folderImages);
 	void centroidCCorrelations(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
-	Mat rotateImage(Mat source, double angle, Point center);
+	//Mat rotateImage(Mat source, double angle, Point center);
 	Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
-			int templSize, int sceneSize, double angleDiff,
-			vector<Point> &mcResult);
+			int templSize, int sceneSize, double &angleDiff,
+			Image::SegmentMethod sgmethod, vector<Point> &mcResult, Point &ePoint);
 	void matchingDirectory(Image refImage, QString folderImages, QString lmPath,
-			QString savePath, int templSize, int sceneSize, double angleDiff);
+			QString savePath, int templSize, int sceneSize, double angleDiff,
+			Image::SegmentMethod sgmethod, int save);
 	double measureDistance(vector<Point> landmarks, Point &bary);
 	double measureDistance(vector<Point> refLandmarks,
 			vector<Point> esLandmarks, double &mCentroid, double &eCentroid,
 			Point &mBary, Point &eBary);
 	void centroidMatchingDirectory(Image refImage, QString lmPath,
-			QString folderImages, QString folderlandmarks,int templSize, int sceneSize);
+			QString folderImages, QString folderlandmarks, int templSize,
+			int sceneSize, QString savePath, Image::SegmentMethod sgmethod);
 	double centroidMatching(Image refImage, Image sceneImage, QString lmPath,
-			int templSize, int sceneSize, Point &ebary);
+			int templSize, int sceneSize,Image::SegmentMethod sgmethod, Point &ebary);
 	void centroidMatchingDirectory(Image refImage, QString lmPath,
-			QString folderImages, int templSize, int sceneSize);
+			QString folderImages, int templSize, int sceneSize,
+			QString savePath, Image::SegmentMethod sgmethod);
+	void save_Estimated_Landmarks_To_File(vector<Point> esLandmarks,
+			QString path);
+	void save_Original_And_Estimated_Landmarks_To_File(
+			vector<Point> orgLandmarks, vector<Point> esLandmarks,
+			QString path);
 };
 
 } /* namespace impls_2015 */

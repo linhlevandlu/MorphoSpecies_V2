@@ -75,8 +75,8 @@ public:
 
 	vector<LocalHistogram> constructPGH(vector<Line> prLines);
 	int distanceOffset(double distance, int cols);
-	void constructMatPGH(LocalHistogram::AccuracyPGH angleAcc, int cols);
-	void writeMatrix(QString fileName);
+	vector<vector<int> > constructMatPGH(LocalHistogram::AccuracyPGH angleAcc, int cols);
+	void writeMatrix(vector<vector<int> > matrixPGH, QString fileName);
 
 };
 

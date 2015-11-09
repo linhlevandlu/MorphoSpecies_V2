@@ -51,16 +51,16 @@ public:
 	GeometricHistogram();
 	virtual ~GeometricHistogram();
 	vector<LocalHistogram> shapeHistogram(Image image,
-			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc, cv::Mat &result);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,
+			Image::SegmentMethod sgmethod, cv::Mat &result, vector<vector<int> > &matrix);
 	double pghHistogramMatching(Image refImage, Image sceneImage,
-			MatchingMethod matchingMethod,
-			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
+			MatchingMethod matchingMethod, LocalHistogram::AccuracyPGH angleAcc,
+			int distanceAcc,Image::SegmentMethod sgmethod);
 	void pghHistogramDirectoryMatching(Image refImage, QString folderPath,
-			MatchingMethod matchingMethod,
-			LocalHistogram::AccuracyPGH angleAcc,int distanceAcc);
-	void phgHistogramDirMatching(QString folderPath,
-			MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
-			int distanceAcc);
+			MatchingMethod matchingMethod, LocalHistogram::AccuracyPGH angleAcc,
+			int distanceAcc, QString fileSave, Image::SegmentMethod sgmethod);
+	void phgHistogramDirMatching(QString folderPath, MatchingMethod method,
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	void pairwiseHistogramDirectory(QString folderPath,
 			LocalHistogram::AccuracyPGH angleAcc, int columns);
 

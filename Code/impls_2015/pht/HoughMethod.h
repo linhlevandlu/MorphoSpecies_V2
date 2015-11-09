@@ -51,7 +51,7 @@ public:
 	HoughMethod();
 	virtual ~HoughMethod();
 	virtual vector<Point> estimateLandmarks(Image mImage, Image sImage, string mlmPath,
-			double &angleDiff, Point &ePoint) = 0;
+			double &angleDiff, Point &ePoint,Image::SegmentMethod sgmethod) = 0;
 };
 
 } /* namespace impls_2015 */

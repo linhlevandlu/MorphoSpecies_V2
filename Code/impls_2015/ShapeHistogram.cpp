@@ -113,7 +113,7 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
  * @parameter 1: angleAcc - angle accuracy
  * @parameter 2: cols - distance accuracy
  */
-void ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
+vector<vector<int> > ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
 		int cols) {
 	int rows = heightAngleAxis(angleAcc);
 	//qDebug() << "Matrix r-c: " << rows << ", " << cols;
@@ -121,9 +121,9 @@ void ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
 
 	//Initialization the matrix
 	vector<vector<int> > matrixResult;
-	this->matrix.resize(rows + 1);
+	matrixResult.resize(rows + 1);
 	for (int i = 0; i <= rows; i++) {
-		matrix[i].resize(cols, 0);
+		matrixResult[i].resize(cols, 0);
 	}
 
 	vector<LocalHistogram> shapeHistogram = this->listLocalHistogram;
@@ -138,7 +138,7 @@ void ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
 			if (!isnan(rowId)) {
 				for (int k = dmin; k <= dmax; k++) {
 					if (rowId >= 0 && k < cols) {
-						matrix[rowId][k] += 1;
+						matrixResult[rowId][k] += 1;
 						entries++;
 					}
 				}
@@ -146,14 +146,15 @@ void ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
 		}
 	}
 	this->setTotalEntries(entries);
+	this->matrix = matrixResult;
+	return matrixResult;
 }
 
 /*
  * Save the presented matrix into file
  * @parameter: fileName - save file path
  */
-void ShapeHistogram::writeMatrix(QString fileName) {
-	vector<vector<int> > matrixPGH = this->matrix;
+void ShapeHistogram::writeMatrix(vector<vector<int> > matrixPGH,QString fileName) {
 	ofstream of(fileName.toStdString().c_str());
 	int rows = matrixPGH.size();
 	int cols = matrixPGH[0].size();
@@ -210,7 +211,7 @@ cv::Mat ShapeHistogram::presentation(vector<LocalHistogram> pghHistograms,
 	int t_width = cols;
 	int height = heightAngleAxis(angleAcc);
 	cv::Mat result(cv::Size(t_width + 10, height + 1), CV_8UC3,
-			cv::Scalar(0, 0, 0));
+			cv::Scalar(0, 0, 255));
 	for (size_t t = 0; t < pghHistograms.size(); t++) {
 		LocalHistogram pwh = pghHistograms[t];
 		for (size_t i = 0; i < pwh.getPWHistgoram().size(); i++) {

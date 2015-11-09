@@ -37,8 +37,9 @@ Image::Image(QString filePath) {
 	this->fileName = filePath;
 	this->histogramSize = 256;
 	this->matrixImage = getMatImage();
+
 	int threshold = getThresholdValue();
-	getEdges(threshold);
+	this->listOfEdges = getEdges(threshold);
 }
 
 Image::~Image() {
@@ -61,11 +62,23 @@ void Image::setFileName(QString filePath) {
 	this->fileName = filePath;
 }
 
+int Image::getThresholdValue_Otsu() {
+
+	cv::Mat grayImg, orgImg = this->matrixImage;
+	if (orgImg.channels() > 1)
+		cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
+	else
+		grayImg = orgImg;
+
+	double otsuValue = cv::threshold(grayImg, grayImg, 0, 255,
+			CV_THRESH_BINARY | CV_THRESH_OTSU);
+	return otsuValue;
+}
 int Image::getThresholdValue() {
 	int thresholdValue = 0;
 
 	cv::Mat grayImg, orgImg = this->matrixImage;
-	if(orgImg.channels() > 1)
+	if (orgImg.channels() > 1)
 		cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
 	else
 		grayImg = orgImg;
@@ -106,7 +119,43 @@ int Image::getThresholdValue() {
 	int mid2 = (imin + imax2) / 2;
 	thresholdValue = (mid1 + mid2) / 2;
 
+	int badThreshold = thresholdBadFiles();
+	if (badThreshold != 0)
+		thresholdValue = badThreshold;
+
 	return thresholdValue;
+}
+
+int Image::thresholdBadFiles() {
+	QString name = getName();
+	int thresh = 0;
+	if (name.toLower().contains("md 091"))
+		thresh = 85;
+	if (name.toLower().contains("md 140"))
+		thresh = 75;
+	if (name.toLower().contains("md 169"))
+		thresh = 66;
+	if (name.toLower().contains("md 283"))
+		thresh = 82;
+	if (name.toLower().contains("mg 105"))
+		thresh = 70;
+	if (name.toLower().contains("mg 110"))
+		thresh = 65;
+	if (name.toLower().contains("mg 112"))
+		thresh = 58;
+	if (name.toLower().contains("mg 146"))
+		thresh = 68;
+	if (name.toLower().contains("mg 153"))
+		thresh = 74;
+	if (name.toLower().contains("mg 168"))
+		thresh = 80;
+	if (name.toLower().contains("mg 170"))
+		thresh = 85;
+	if (name.toLower().contains("mg 211"))
+		thresh = 96;
+	if (name.toLower().contains("mg 222"))
+		thresh = 94;
+	return thresh;
 }
 /*
  * Get the edges of image
@@ -114,28 +163,28 @@ int Image::getThresholdValue() {
  */
 vector<Edge> Image::getEdges(int thresholdValue) {
 	cv::Mat grayImg, orgImg = this->matrixImage;
-	if(orgImg.channels() == 3)
+	if (orgImg.channels() == 3)
 		cv::cvtColor(orgImg, grayImg, CV_BGR2GRAY);
 	else
 		grayImg = orgImg;
 
 	cv::threshold(grayImg, grayImg, thresholdValue, 255, CV_THRESH_BINARY);
-
-	//qDebug() << "middle value: " << mid;
 	Mat cannyImage;
-	cv::Canny(grayImg, cannyImage, thresholdValue, 3 * thresholdValue, 5);
+	map<string,int> resources = ReadResouces::readResources("data/resources/segment.rc");
+	int ratio1 = resources["segmentRatio1"];
+	int ratio2 = resources["segmentRatio2"];
+
+	cv::Canny(grayImg, cannyImage, thresholdValue * ratio1, ratio2 * thresholdValue, 5);
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
-	RNG rng(12345);
 	findContours(cannyImage, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_NONE,
 			Point(0, 0));
-	vector<Edge> edges;
 
+	vector<Edge> edges;
 	for (size_t i = 0; i < contours.size(); i++) {
 		Edge edge(contours[i]);
 		edges.push_back(edge);
 	}
-	this->listOfEdges = edges;
 	return edges;
 }
 
@@ -515,17 +564,34 @@ vector<cv::Mat> Image::splitChannels() {
  * @return: list of approximate lines presented image
  */
 vector<Line> Image::lineSegment() {
+	return getApproximateLines(this->listOfEdges);
+}
+vector<Line> Image::getApproximateLines(vector<Edge> edges) {
 	vector<Line> totalLines;
-	for (size_t i = 0; i < this->listOfEdges.size(); i++) {
-		Edge ed = this->listOfEdges.at(i);
+	for (size_t i = 0; i < edges.size(); i++) {
+		Edge ed = edges.at(i);
 		vector<cv::Point> breakPoints = ed.segment();
 		vector<Line> lines = ed.getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
-	qDebug() << "Total lines: " << totalLines.size();
 	return totalLines;
 }
-
+vector<Line> Image::lineSegment(SegmentMethod method, int &thresholdValue) {
+	thresholdValue = 0;
+	switch (method) {
+	case Otsu: // otsu
+		thresholdValue = getThresholdValue_Otsu();
+		break;
+	case Other: //other
+		thresholdValue = getThresholdValue();
+		break;
+	default: //other
+		thresholdValue = getThresholdValue();
+		break;
+	}
+	vector<Edge> edges = getEdges(thresholdValue);
+	return getApproximateLines(edges);
+}
 /*
  * Set the pairwise geometric histogram of image
  * @parameter: shapeHistogram - PGH of image
@@ -596,5 +662,45 @@ QString Image::getName() {
 	QString scenename = this->fileName.mid(index + 1,
 			this->fileName.length() - index - 5);
 	return scenename;
+}
+QString Image::getTimeName() {
+	time_t currentTime;
+	struct tm *localTime;
+
+	time(&currentTime); // Get the current time
+	localTime = localtime(&currentTime); // Convert the current time to the local time
+
+	int Day = localTime->tm_mday;
+	int Month = localTime->tm_mon + 1;
+	int Year = localTime->tm_year + 1900;
+	int Hour = localTime->tm_hour;
+	int Min = localTime->tm_min;
+	int Sec = localTime->tm_sec;
+
+	QString timeString("");
+	timeString.append(QString::number(Year));
+	timeString.append(QString::number(Month));
+	timeString.append(QString::number(Day));
+	timeString += "_";
+	timeString.append(QString::number(Hour));
+	timeString.append(QString::number(Min));
+	timeString.append(QString::number(Sec));
+	//qDebug() << timeString;
+	return timeString;
+}
+/*
+ * Rotate an image
+ * @parameter 1: source - the input image (presented by matrix)
+ * @parameter 2: angle - the angle rotate
+ * @parameter 3: center - the center point
+ * @return: the input image after rotate a value of angle around center point
+ */
+Mat Image::rotateImage(Mat source, double angle, Point center) {
+	if (angle > 0)
+		angle = -angle;
+	Mat dest = Mat::zeros(source.size(), source.type());
+	Mat rotate = getRotationMatrix2D(center, angle, 1);
+	warpAffine(source, dest, rotate, source.size());
+	return dest;
 }
 } /* namespace impls_2015 */

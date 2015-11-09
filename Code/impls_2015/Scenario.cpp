@@ -38,11 +38,12 @@ Scenario::~Scenario() {
  * @parameter 2 - output: result - the matrix presented the segmentation result
  * @return: List of approximate line of edge segmentation
  */
-vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
+vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result,
+		Image::SegmentMethod sgmethod) {
 	vector<Line> appLines;
-	EdgeSegmentation sgMethod;
-	appLines = sgMethod.lineSegment(image);
-	result = sgMethod.rePresentation(result, appLines);
+	EdgeSegmentation edgeSegment;
+	appLines = edgeSegment.lineSegment(image, sgmethod);
+	result = edgeSegment.rePresentation(result, appLines);
 	return appLines;
 }
 
@@ -54,9 +55,9 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result) {
  * 			and save in the saving folder
  */
 void Scenario::edgeSegmentationDirectory(QString inputFolder,
-		QString saveFolder) {
+		QString saveFolder, Image::SegmentMethod segmentMethod, int save) {
 	EdgeSegmentation edgeSegment;
-	edgeSegment.segmentDirectory(inputFolder, saveFolder);
+	edgeSegment.segmentDirectory(inputFolder, saveFolder, segmentMethod, save);
 }
 
 /*
@@ -68,10 +69,11 @@ void Scenario::edgeSegmentationDirectory(QString inputFolder,
  * @return: the list of local PGH
  */
 vector<LocalHistogram> Scenario::pairwiseHistogram(Image image,
-		LocalHistogram::AccuracyPGH angleAcc, int columns, cv::Mat &result) {
+		LocalHistogram::AccuracyPGH angleAcc, int columns,
+		Image::SegmentMethod sgmethod, cv::Mat &result, vector<vector<int> > &matrix) {
 	GeometricHistogram geomHistogram;
 	vector<LocalHistogram> pghHist = geomHistogram.shapeHistogram(image,
-			angleAcc, columns, result);
+			angleAcc, columns, sgmethod, result, matrix);
 	return pghHist;
 }
 
@@ -99,10 +101,11 @@ void Scenario::pairwiseHistogramDirectory(QString folderPath,
  */
 double Scenario::pghMatching(Image refImage, Image sceneImage,
 		GeometricHistogram::MatchingMethod matching,
-		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,
+		Image::SegmentMethod sgmethod) {
 	GeometricHistogram geomHistogram;
 	return geomHistogram.pghHistogramMatching(refImage, sceneImage, matching,
-			angleAcc, distanceAcc);
+			angleAcc, distanceAcc,sgmethod);
 }
 
 /*
@@ -115,11 +118,11 @@ double Scenario::pghMatching(Image refImage, Image sceneImage,
  */
 void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 		GeometricHistogram::MatchingMethod matching,
-		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,QString fileSave, Image::SegmentMethod sgmethod) {
 	qDebug() << "Matching directory";
 	GeometricHistogram geomHistogram;
 	geomHistogram.pghHistogramDirectoryMatching(refImage, directoryPath,
-			matching, angleAcc, distanceAcc);
+			matching, angleAcc, distanceAcc,fileSave,sgmethod);
 }
 
 /*
@@ -146,10 +149,12 @@ void Scenario::matchingDirectory(QString directoryPath,
  * @return: the matrix presented the estimated landmarks on the scene image
  */
 Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage,
-		QString reflmPath) {
+		QString reflmPath, Image::SegmentMethod sgmethod,
+		vector<Point> &esLandmarks) {
 	PHoughTransform pht;
-	vector<Point> esLandmarks;
-	return pht.phtPresentation(refImage, sceneImage, reflmPath.toStdString(),esLandmarks);
+
+	return pht.phtPresentation(refImage, sceneImage, reflmPath.toStdString(),
+			esLandmarks, sgmethod);
 }
 
 /*
@@ -161,9 +166,11 @@ Mat Scenario::probabilisticHoughTransform(Image refImage, Image sceneImage,
  * @parameter 5: saveDir - the path of saving directory
  */
 void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
-		QString scenelmDir, QString saveDir) {
+		QString scenelmDir, QString saveDir, Image::SegmentMethod sgmethod,
+		int save) {
 	PHoughTransform pht;
-	pht.phtDirectory(refImage, reflmPath, sceneDir, scenelmDir, saveDir);
+	pht.phtDirectory(refImage, reflmPath, sceneDir, scenelmDir, saveDir,
+			sgmethod, save);
 }
 
 /**
@@ -207,8 +214,8 @@ void Scenario::cCorelationDirectory(Image refImage, QString path,
 double Scenario::mDistanceByCrossCorrelation(Image image, QString lmpath,
 		Image sceneImage, int size, Point &ebary) {
 	LandmarkDetection lmdetection;
-	double rs = lmdetection.centroidCCorrelation(image, sceneImage, lmpath, size,
-			ebary);
+	double rs = lmdetection.centroidCCorrelation(image, sceneImage, lmpath,
+			size, ebary);
 	return rs;
 }
 
@@ -226,7 +233,7 @@ void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 	QString lmfolder = "/home/linh/Desktop/mg/landmarks";
 	LandmarkDetection lmdetection;
 //	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder);
-	lmdetection.centroidCCorrelations(refImage, lmpath, imgFolder,lmfolder);
+	lmdetection.centroidCCorrelations(refImage, lmpath, imgFolder, lmfolder);
 }
 
 /*
@@ -239,16 +246,16 @@ void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
  * @return: the matrix presented the estimated landmarks
  */
 Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
-		QString reflmPath, int templSize, int scnSize) {
+		QString reflmPath, int templSize, int scnSize,
+		Image::SegmentMethod sgmethod, vector<Point> &mcResult, double &angle, Point &ePoint) {
 	LandmarkDetection lmdetection;
-	double angle = 0;
-	vector<Point> mcResult;
 	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath,
-			templSize, scnSize, angle, mcResult);
+			templSize, scnSize, angle, sgmethod, mcResult,ePoint);
 }
 
 /*
- * Estimate the reference landmarks on each image in scene images folder based on the template matching
+ * Estimate the reference landmarks on each image in scene images folder
+ * based on the template matching
  * @parameter 1: refImage - the reference image
  * @parameter 2: folderImage - the scene images folder
  * @parameter 3: lmPath - the reference landmarks path
@@ -257,17 +264,18 @@ Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
  * @parameter 6: sceneSize - size of estimated landmark bounding box
  */
 void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
-		QString lmPath, QString savePath, int templSize, int sceneSize) {
+		QString lmPath, QString savePath, int templSize, int sceneSize,
+		Image::SegmentMethod sgmethod, int save) {
 
 	LandmarkDetection lmdetection;
 	double angle = 0;
 	lmdetection.matchingDirectory(refImage, folderImages, lmPath, savePath,
-			templSize, sceneSize, angle);
+			templSize, sceneSize, angle, sgmethod, save);
 
 }
 
 /*
-  * Compute centroid of estimated landmarks. The estimated landmarks based on the template matching
+ * Compute centroid of estimated landmarks. The estimated landmarks based on the template matching
  * @parameter 1: refImage - the reference image
  * @parameter 2: sceneImage - the reference image
  * @parameter 3: lmPath - the reference landmarks path
@@ -275,10 +283,11 @@ void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
  * @return: the centroid of estimated landmarks
  */
 double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
-		QString lmPath, int templSize, int sceneSize, Point &ebary) {
+		QString lmPath, int templSize, int sceneSize,
+		Image::SegmentMethod sgmethod, Point &ebary) {
 	LandmarkDetection lmdetection;
 	return lmdetection.centroidMatching(refImage, sceneImage, lmPath, templSize,
-			sceneSize, ebary);
+			sceneSize, sgmethod, ebary);
 }
 
 /*
@@ -290,12 +299,12 @@ double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
  * @parameter 5: sceneSize - size of estimated landmark bounding box
  */
 void Scenario::mDistanceByTemplateMatchingDirectory(Image refImage,
-		QString lmPath, QString folderImages, int templSize, int sceneSize) {
+		QString lmPath, QString folderImages, QString lmFolder, int templSize,
+		int sceneSize, QString savePath, Image::SegmentMethod sgmethod) {
 	// compute the centroid
-	//QString lmFolder = "/home/linh/Desktop/landmarks";
-	QString lmFolder = "/home/linh/Desktop/mg/landmarks";
 	LandmarkDetection lmdetection;
 	//lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,templSize,sceneSize);
-	lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,lmFolder,templSize,sceneSize);
+	lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,
+			lmFolder, templSize, sceneSize, savePath, sgmethod);
 }
 } /* namespace impls_2015 */

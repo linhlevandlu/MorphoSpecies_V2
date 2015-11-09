@@ -157,6 +157,11 @@ void ImageViewer::activeFunction() {
 	cCorrelation->setEnabled(true);
 	ccMeasureDistance->setEnabled(true);
 	tmMeasureDistance->setEnabled(true);
+	segmentationDir->setEnabled(true);
+	bhattcharyyaDir->setEnabled(true);
+	proHoughTransformDir->setEnabled(true);
+	lmExtractionDir->setEnabled(true);
+	sizeLandmarksDir->setEnabled(true);
 
 	//end
 	updateActions();
@@ -583,6 +588,31 @@ void ImageViewer::createActions() {
 	connect(tmMeasureDistance, SIGNAL(triggered()), this,
 			SLOT(tplMatchingDistance()));
 
+	segmentationDir = new QAction(tr("Edge segmentation"), this);
+	segmentationDir->setEnabled(false);
+	connect(segmentationDir, SIGNAL(triggered()), this,
+			SLOT(edgeSegmentDirectory()));
+
+	bhattcharyyaDir = new QAction(tr("Compute Bhattacharyya distance"), this);
+	bhattcharyyaDir->setEnabled(false);
+	connect(bhattcharyyaDir, SIGNAL(triggered()), this,
+			SLOT(bhattacharyyaDistanceDirectory()));
+
+	proHoughTransformDir = new QAction(tr("Probabilistic Hough Transform"),
+			this);
+	proHoughTransformDir->setEnabled(false);
+	connect(proHoughTransformDir, SIGNAL(triggered()), this,
+			SLOT(phtOnDirectory()));
+
+	lmExtractionDir = new QAction(tr("Estimated the landmarks"), this);
+	lmExtractionDir->setEnabled(false);
+	connect(lmExtractionDir, SIGNAL(triggered()), this,
+			SLOT(estlmOnDirectory()));
+
+	sizeLandmarksDir = new QAction(tr("Compute the size estimation"), this);
+	lmExtractionDir->setEnabled(false);
+	connect(sizeLandmarksDir, SIGNAL(triggered()), this,
+			SLOT(computeSizeOnDirectory()));
 	//end
 }
 
@@ -697,6 +727,12 @@ void ImageViewer::createMenus() {
 	mnuTmMatch->addAction(landmarksDetection); // landmarks detection
 	mnuTmMatch->addAction(tmMeasureDistance);
 
+	QMenu* mnuOnDirectory = other2015->addMenu(tr("Working on directory"));
+	mnuOnDirectory->addAction(segmentationDir);
+	mnuOnDirectory->addAction(bhattcharyyaDir);
+	mnuOnDirectory->addAction(proHoughTransformDir);
+	mnuOnDirectory->addAction(lmExtractionDir);
+	mnuOnDirectory->addAction(sizeLandmarksDir);
 	//end
 
 	menuBar()->addMenu(fileMenu);
@@ -2545,19 +2581,6 @@ void ImageViewer::correctMorphAction() {
 }
 
 // ====== add by LE Van Linh
-/*
- * Edge segmentation on a directory
- * @parameter: path - path of images directory
- * @return: The images contains the segmentation result
- */
-void ImageViewer::edgeSegmentDirectory(QString path) {
-	qDebug() << "Edge segmentation in directory";
-	QMessageBox msgbox;
-	msgbox.setText("Select the save folder.");
-	msgbox.exec();
-	QString folderOutput = QFileDialog::getExistingDirectory(this);
-	Scenario::edgeSegmentationDirectory(path, folderOutput);
-}
 
 /*
  * Compute the PGH measure distance by matching method and accuracy of angle and distance
@@ -2565,11 +2588,15 @@ void ImageViewer::edgeSegmentDirectory(QString path) {
  * @parameter 1: image - the reference image
  * @paramter 2: path - the images folder
  */
-void ImageViewer::matchingDirectory(Image image, QString path) {
+void ImageViewer::matchingDirectory(Image image, QString path, QString fileSave,
+		Image::SegmentMethod sgmethod) {
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/pgh.rc");
+	int angleAcc = resources["PGHAngleAcc"];
+	int distanceAcc = resources["PGHDistanceAcc"];
 	Scenario::matchingDirectory(image, path, GeometricHistogram::Bhattacharyya,
-			LocalHistogram::TwoTimeDegree, 500);
-	/*Scenario::matchingDirectory(path, GeometricHistogram::Bhattacharyya,
-	 LocalHistogram::HaftDegree, 250);*/
+			((LocalHistogram::AccuracyPGH) angleAcc), distanceAcc, fileSave,
+			sgmethod);
 }
 
 /*
@@ -2602,28 +2629,17 @@ void ImageViewer::removeYLinesAction() {
 void ImageViewer::getLandmarks() {
 
 	qDebug() << "Identification of landmarks function ...";
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/est.rc");
+	int templSize = resources["EstTemplSize"];
+	int imageSize = resources["EstImageSize"];
 	Image image(fileName);
-
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");
 	msgbox.exec();
 
 	QString lpath = QFileDialog::getOpenFileName(this);
-
-	/*
-	 * Working on directory
-	 */
-
-	/*msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-
-	 msgbox.setText("Select the saving folder.");
-	 msgbox.exec();
-	 QString saveFolder = QFileDialog::getExistingDirectory(this);
-	 Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder, 400,
-	 1400);*/
 
 	/*
 	 * Working on an image
@@ -2637,15 +2653,146 @@ void ImageViewer::getLandmarks() {
 	Image sceneImage(fileName2);
 	qDebug() << fileName2;
 
-	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath, 400,
-			1400);
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+	if (!checkPresent(image, sceneImage, sgmethod)) {
+		msgbox.setText(
+				"Sorry, we can not detect the similar between two images.");
+		msgbox.exec();
+		return;
+	}
+
+	vector<Point> esLandmarks;
+	double angle;
+	Point ePoint;
+
+	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath,
+			templSize, imageSize, sgmethod, esLandmarks, angle, ePoint);
+	int save = saveOrNot();
+	if (save == 1) {
+		msgbox.setText("Choose the folder to save the result");
+		msgbox.exec();
+		QString folderPath = QFileDialog::getExistingDirectory(this);
+		QString savePath = folderPath + "/E" + sceneImage.getName() + ".TPS";
+		LandmarkDetection lmDectection;
+		lmDectection.save_Estimated_Landmarks_To_File(esLandmarks, savePath);
+	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
+	other->fileName = fileName2;
+	other->setContextMenuPolicy(Qt::CustomContextMenu);
+	other->esLandmarks = esLandmarks;
+	other->angleDiff = angle;
+	other->ePoint = ePoint;
+	connect(other, SIGNAL(customContextMenuRequested(const QPoint&)), other,
+			SLOT(estContextMenu(const QPoint&)));
+
+	//emit estContextMenu(const p,esLandmarks,angle);
+
 	other->show();
 	qDebug() << "Done";
 }
+void ImageViewer::estContextMenu(const QPoint& pos) {
+	QPoint globalpos = this->mapToGlobal(pos);
+	QMenu menu(this);
+	QMenu *putIn = menu.addMenu("Put in");
+	QMenu *putOut = menu.addMenu("Put out");
 
+	QAction *act1 = new QAction("Original landmarks", this);
+	connect(act1, SIGNAL(triggered()), this, SLOT(putInOrgLandmarks()));
+	putIn->addAction(act1);
+
+	QAction *act2 = new QAction("Lines segment", this);
+	connect(act2, SIGNAL(triggered()), this, SLOT(putInLines()));
+	putIn->addAction(act2);
+
+	QAction *oact1 = new QAction("Original landmarks", this);
+	connect(oact1, SIGNAL(triggered()), this, SLOT(putOutOrgLandmarks()));
+	putOut->addAction(oact1);
+	if (orgLandmarks.size() > 0)
+		oact1->setEnabled(true);
+	else
+		oact1->setEnabled(false);
+
+	QAction *oact2 = new QAction("Lines segment", this);
+	connect(oact2, SIGNAL(triggered()), this, SLOT(putOutLines()));
+	putOut->addAction(oact2);
+	if (lines.size() > 0)
+		oact2->setEnabled(true);
+	else
+		oact2->setEnabled(false);
+
+	menu.exec(globalpos);
+}
+
+void ImageViewer::putInOrgLandmarks() {
+	qDebug() << "Load context menu";
+	Image sceneImage(this->fileName);
+
+	QMessageBox msgbox;
+	msgbox.setText("Select the original landmarks.");
+	msgbox.exec();
+	QString lpath = QFileDialog::getOpenFileName(this);
+	vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
+			lpath.toStdString());
+	this->orgLandmarks = orgLandmarks;
+
+	optionDisplay(sceneImage, this->esLandmarks, orgLandmarks, this->lines,
+			this->angleDiff, this->ePoint);
+}
+
+void ImageViewer::putInLines() {
+	Image sceneImage(this->fileName);
+	Mat enddest = sceneImage.getMatrixImage();
+
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+	int tValue;
+	vector<Line> lineSg = sceneImage.lineSegment(sgmethod, tValue);
+	this->lines = lineSg;
+	optionDisplay(sceneImage, this->esLandmarks, this->orgLandmarks,
+			this->lines, this->angleDiff, this->ePoint);
+}
+
+void ImageViewer::putOutLines() {
+	Image sceneImage(this->fileName);
+	this->lines.clear();
+	optionDisplay(sceneImage, this->esLandmarks, this->orgLandmarks,
+			this->lines, this->angleDiff, this->ePoint);
+}
+void ImageViewer::putOutOrgLandmarks() {
+	Image sceneImage(this->fileName);
+	this->orgLandmarks.clear();
+	optionDisplay(sceneImage, this->esLandmarks, this->orgLandmarks,
+			this->lines, this->angleDiff, this->ePoint);
+}
+void ImageViewer::optionDisplay(impls_2015::Image image, vector<Point> esLM,
+		vector<Point> orgLM, vector<impls_2015::Line> lines, double angle,
+		Point ePoint) {
+	Mat enddest = image.getMatrixImage();
+	if (orgLM.size() > 0) {
+		for (size_t t = 0; t < orgLM.size(); t++) {
+			Point temp = orgLM.at(t);
+			Point orgLM(temp.x, enddest.rows - temp.y);
+			circle(enddest, orgLM, 5, Scalar(0, 0, 255), 2, 8);
+		}
+	}
+	if (lines.size() > 0) {
+		for (size_t i = 0; i < lines.size(); i++) {
+			Line line = this->lines.at(i);
+			line.drawing(enddest);
+		}
+	}
+
+	Mat result(Image::rotateImage(enddest, angle, ePoint).clone());
+	if (esLM.size() > 0) {
+		for (size_t t = 0; t < esLM.size(); t++) {
+			Point point = esLM.at(t);
+			circle(result, point, 5, Scalar(0, 255, 255), 2, 8);
+		}
+	}
+	qImage = ImageConvert::cvMatToQImage(result);
+	imageLabel->setPixmap(QPixmap::fromImage(qImage));
+}
 /*
  * Line segmentation from an image
  */
@@ -2653,36 +2800,48 @@ void ImageViewer::edgeSegmentation() {
 	qDebug() << "Edge segmentation.";
 
 	/*
-	 * Working on directory
-	 */
-	/*QMessageBox msgbox;
-	 msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-	 edgeSegmentDirectory(folder);*/
-
-	/*
 	 * Working on an image
 	 */
 	Image image(fileName);
-	//image.drawingHistogram();
 	qDebug() << image.getName();
+
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+
 	cv::Mat enddest(image.getMatrixImage().clone());
-	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest);
+
+	vector<Line> lineSegment = Scenario::edgeSegmentation(image, enddest,
+			sgmethod);
+
+	int save = saveOrNot();
+	QMessageBox msgbox;
+	if (save == 1) {
+		msgbox.setText("Choose the folder to save the result");
+		msgbox.exec();
+		QString folderPath = QFileDialog::getExistingDirectory(this);
+		QString savePath = folderPath + "/" + image.getName() + ".PGH";
+		EdgeSegmentation edgeSeg;
+		edgeSeg.savePGHFile(lineSegment, savePath);
+	}
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Edge segmentation");
-	other->addParameterPanel(new impls_2015::EdgeSegmentationPanel(other,fileName,image.getThresholdValue()),x() + 20,y()+20);
+	other->addParameterPanel(
+			new impls_2015::EdgeSegmentationPanel(other, fileName, sgmethod,
+					image.getThresholdValue()), x() + 20, y() + 20);
+
 	qDebug() << "Done";
 }
-void ImageViewer::edgeSegmentation(int thresholdValue,QString filePath) {
+
+void ImageViewer::edgeSegmentation_Value_Changed(QString filePath,
+		int thresholdValue) {
 
 	Image image(filePath);
 	vector<Edge> edges = image.getEdges(thresholdValue);
-	vector<Line> lines = image.lineSegment();
+
+	vector<Line> lines = image.getApproximateLines(edges);
 	Mat enddest(matImage.clone());
-	for(size_t i = 0; i < lines.size();i++){
+	for (size_t i = 0; i < lines.size(); i++) {
 		Line line = lines.at(i);
 		line.drawing(enddest);
 	}
@@ -2692,17 +2851,48 @@ void ImageViewer::edgeSegmentation(int thresholdValue,QString filePath) {
 	statusBar()->showMessage(
 			tr("Threshold value: ") + QString::number(thresholdValue));
 }
+void ImageViewer::edgeSegmentation_Method_Changed(QString filePath,
+		impls_2015::Image::SegmentMethod sgmethod) {
+
+	Image image(filePath);
+	int tvalue = 0;
+	vector<Line> lines = image.lineSegment(sgmethod, tvalue);
+	Mat enddest(matImage.clone());
+	Scenario::edgeSegmentation(image, enddest, sgmethod);
+	qImage = ImageConvert::cvMatToQImage(enddest);
+	imageLabel->setPixmap(QPixmap::fromImage(qImage));
+	statusBar()->showMessage(tr("Threshold value: ") + QString::number(tvalue));
+}
 /*
  * Compute the pairwise geometric histogram of an image
  */
 void ImageViewer::pairwiseHistogram() {
 	qDebug() << "Calculate the pairwise geometric histogram of an image";
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/pgh.rc");
+	int angleAcc = resources["PGHAngleAcc"];
+	int distanceAcc = resources["PGHDistanceAcc"];
 
 	Image image(fileName);
 	cv::Mat enddest;
 
-	Scenario::pairwiseHistogram(image, LocalHistogram::TwoTimeDegree, 500,
-			enddest);
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+
+	vector<vector<int> > matrix;
+	Scenario::pairwiseHistogram(image, (LocalHistogram::AccuracyPGH) angleAcc,
+			distanceAcc, sgmethod, enddest, matrix);
+
+	int save = saveOrNot();
+	if (save == 1) {
+		QMessageBox msgbox;
+		msgbox.setText("Choose the folder to save the result");
+		msgbox.exec();
+		QString folderPath = QFileDialog::getExistingDirectory(this);
+		QString savePath = folderPath + "/Matrix_" + image.getName() + ".TPS";
+		qDebug() << savePath;
+		ShapeHistogram shapehist;
+		shapehist.writeMatrix(matrix, savePath);
+	}
 	/*
 	 * Working on directory (compute PGH on set of image in a folder and save the result into PGH file)
 	 */
@@ -2730,6 +2920,11 @@ void ImageViewer::pairwiseHistogram() {
  */
 void ImageViewer::pwBhattacharyyaMatching() {
 	qDebug() << "Pairwise histogram matching using Bhattacharyya metric...";
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/pgh.rc");
+	int angleAcc = resources["PGHAngleAcc"];
+	int distanceAcc = resources["PGHDistanceAcc"];
+
 	Image image(fileName);
 
 	/*
@@ -2750,8 +2945,10 @@ void ImageViewer::pwBhattacharyyaMatching() {
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
+	Image::SegmentMethod sgmethod = chooseSegMethod();
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Bhattacharyya, LocalHistogram::Degree, 250);
+			GeometricHistogram::Bhattacharyya,
+			(LocalHistogram::AccuracyPGH) angleAcc, distanceAcc, sgmethod);
 	qDebug() << "Matching Bhattacharyya metric: "
 			<< QString::number(matching, 'f', 20);
 	qDebug() << "Done";
@@ -2762,14 +2959,20 @@ void ImageViewer::pwBhattacharyyaMatching() {
  */
 void ImageViewer::pwChiSquaredMatching() {
 	qDebug() << "Pairwise histogram matching using Chi-squared metric...";
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/pgh.rc");
+	int angleAcc = resources["PGHAngleAcc"];
+	int distanceAcc = resources["PGHDistanceAcc"];
 	Image image(fileName);
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
+	Image::SegmentMethod sgmethod = chooseSegMethod();
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Chisquared, LocalHistogram::Degree, 250);
+			GeometricHistogram::Chisquared,
+			(LocalHistogram::AccuracyPGH) angleAcc, distanceAcc, sgmethod);
 	qDebug() << "Chi-squared metric: " << QString::number(matching, 'f', 20);
 	qDebug() << "Done";
 }
@@ -2779,14 +2982,20 @@ void ImageViewer::pwChiSquaredMatching() {
  */
 void ImageViewer::pwIntersectionMatching() {
 	qDebug() << "Pairwise histogram matching using Intersection metric...";
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/pgh.rc");
+	int angleAcc = resources["PGHAngleAcc"];
+	int distanceAcc = resources["PGHDistanceAcc"];
 	Image image(fileName);
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
 	Image image2(fileName2);
+	Image::SegmentMethod sgmethod = chooseSegMethod();
 	double matching = Scenario::pghMatching(image, image2,
-			GeometricHistogram::Intersection, LocalHistogram::Degree, 250);
+			GeometricHistogram::Intersection,
+			(LocalHistogram::AccuracyPGH) angleAcc, distanceAcc, sgmethod);
 	qDebug() << "Intersection metric: " << QString::number(matching, 'f', 20);
 
 	qDebug() << "Done";
@@ -2799,7 +3008,6 @@ void ImageViewer::pHoughTransform() {
 	qDebug() << "Probabilistic Hough Transform...";
 
 	Image image(fileName);
-	//QString reflmPath = "/home/linh/Desktop/landmarks/Md 028.TPS";
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");
@@ -2807,46 +3015,60 @@ void ImageViewer::pHoughTransform() {
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 
 	/*
-	 * Working on directory
-	 */
-	msgbox.setText("Select the scene images folder.");
-	msgbox.exec();
-	QString sceneImageDir = QFileDialog::getExistingDirectory(this);
-	//QString sceneImageDir = "/home/linh/Desktop/md/images";
-
-	msgbox.setText("Select the scene landmarks folder.");
-	msgbox.exec();
-	QString sceneLMDir = QFileDialog::getExistingDirectory(this);
-	//QString sceneLMDir = "/home/linh/Desktop/md/landmarks";
-
-	msgbox.setText("Select the save folder.");
-	msgbox.exec();
-	QString saveDir = QFileDialog::getExistingDirectory(this);
-	//QString saveDir = "/home/linh/Desktop/03Nov/md_pht";
-
-	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir,
-			saveDir);
-
-	/*
 	 * Working on an image
 	 */
-	/*msgbox.setText("Select the scene image.");
-	 msgbox.exec();
-	 QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 qDebug() << fileName2;
-	 Image image2(fileName2);
-	 Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
-	 reflmPath);
+	msgbox.setText("Select the scene image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+	Image image2(fileName2);
 
-	 ImageViewer *other = new ImageViewer;
-	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-	 "Probabilistic Hough Transform");
-	 other->show();*/
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+
+	if (!checkPresent(image, image2, sgmethod)) {
+		msgbox.setText(
+				"Sorry, we can not detect the similar between two images.");
+		msgbox.exec();
+		return;
+	}
+
+	vector<Point> esLandmarks;
+	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
+			reflmPath, sgmethod, esLandmarks);
+
+	int save = saveOrNot();
+	if (save == 1) {
+		msgbox.setText("Choose the folder to save the result");
+		msgbox.exec();
+		QString folderPath = QFileDialog::getExistingDirectory(this);
+		QString savePath = folderPath + "/E" + image2.getName() + ".TPS";
+		PHoughTransform pht;
+		pht.saveEstLandmarks(esLandmarks, savePath);
+
+	}
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Probabilistic Hough Transform");
+	other->show();
 	qDebug() << "Done";
 }
-
+bool ImageViewer::checkPresent(impls_2015::Image mImage,
+		impls_2015::Image sImage, impls_2015::Image::SegmentMethod sgmethod) {
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/pgh.rc");
+	int angleAcc = resources["PGHAngleAcc"];
+	int distanceAcc = resources["PGHDistanceAcc"];
+	double agree = (double) resources["PGHAgree"] / 100;
+	double mDistance = Scenario::pghMatching(mImage, sImage,
+			GeometricHistogram::Bhattacharyya,
+			(LocalHistogram::AccuracyPGH) angleAcc, distanceAcc, sgmethod);
+	if (mDistance < agree) {
+		return false;
+	}
+	return true;
+}
 /*
  * Identify the landmarks of an image base on cross-correlation
  */
@@ -2864,41 +3086,43 @@ void ImageViewer::crossCorrelation() {
 	/*
 	 * Working on directory
 	 */
-	qDebug() << "Landmarks detected by cross-correlation (in directory)";
+	/*qDebug() << "Landmarks detected by cross-correlation (in directory)";
 
-	msgbox.setText("Select the images folder.");
-	msgbox.exec();
-	QString folder = QFileDialog::getExistingDirectory(this);
+	 msgbox.setText("Select the images folder.");
+	 msgbox.exec();
+	 QString folder = QFileDialog::getExistingDirectory(this);
 
-	msgbox.setText("Select the saving folder.");
-	msgbox.exec();
-	QString saveFolder = QFileDialog::getExistingDirectory(this);
-	Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);
+	 msgbox.setText("Select the saving folder.");
+	 msgbox.exec();
+	 QString saveFolder = QFileDialog::getExistingDirectory(this);
+	 Scenario::cCorelationDirectory(image, folder, saveFolder, lpath);*/
 
 	/*
 	 * Working on an image
 	 */
-	/*msgbox.setText("Select the second image.");
-	 msgbox.exec();
-	 QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 Image sceneImage(fileName2);
+	msgbox.setText("Select the second image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	Image sceneImage(fileName2);
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/ccorrelation.rc");
+	int templSize = resources["templSize"];
+	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
+			sceneImage, templSize);
+	QString scenename = sceneImage.getName();
+	qDebug() << scenename;
 
-	 vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
-	 sceneImage, 400);
-	 QString scenename = sceneImage.getName();
-	 qDebug() << scenename;
-
-	 Mat enddest(sceneImage.getMatrixImage().clone());
-	 for (size_t i = 0; i < landmarks.size(); i++) {
-	 Point lm = landmarks.at(i);
-	 circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 255, 255), 2, 4);
-	 }
-	 ImageViewer *other = new ImageViewer;
-	 other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
-	 "Landmark -- " + this->fileName);
-	 other->show();*/
+	Mat enddest(sceneImage.getMatrixImage().clone());
+	for (size_t i = 0; i < landmarks.size(); i++) {
+		Point lm = landmarks.at(i);
+		circle(enddest, Point(lm.x, lm.y), 5, Scalar(0, 255, 255), 2, 4);
+	}
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Landmark -- " + this->fileName);
+	other->show();
 	qDebug() << "Done";
 }
 
@@ -2936,8 +3160,11 @@ void ImageViewer::crossCorrelationDistance() {
 		return;
 	Image sceneImage(fileName2);
 	Point ebary;
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/ccorrelation.rc");
+	double templSize = resources["templSize"];
 	double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
-			sceneImage, 400, ebary);
+			sceneImage, templSize, ebary);
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
 	qDebug() << "Measure distance estimated: " << eCentroid;
 
@@ -2960,16 +3187,6 @@ void ImageViewer::tplMatchingDistance() {
 	QString lpath = QFileDialog::getOpenFileName(this);
 
 	/*
-	 * Working on directory
-	 */
-	/*msgbox.setText("Select the images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-
-	 Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder, 400,
-	 1400);*/
-
-	/*
 	 * Working on an image
 	 */
 	msgbox.setText("Select the scene image.");
@@ -2980,9 +3197,206 @@ void ImageViewer::tplMatchingDistance() {
 		return;
 	Image sceneImage(fileName2);
 	Point ebary;
+	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/est.rc");
+	int templSize = resources["EstTemplSize"];
+	int imageSize = resources["EstImageSize"];
 	double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
-			lpath, 400, 1400, ebary);
+			lpath, templSize, imageSize, sgmethod, ebary);
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
-	qDebug() << "Measure distance estimated: " << eCentroid;
+	qDebug() << "Size estimated: " << eCentroid;
+	qDebug() << "Done";
+}
+
+// working on directory
+
+impls_2015::Image::SegmentMethod ImageViewer::chooseSegMethod() {
+	QMessageBox choicebox;
+	choicebox.setText("Choose the segmentation method ?");
+	QRadioButton *otsuRadio = new QRadioButton("Otsu method", this);
+	choicebox.addButton(otsuRadio, QMessageBox::AcceptRole);
+
+	QRadioButton *otherRadio = new QRadioButton("Other method", this);
+	otherRadio->setChecked(true);
+	choicebox.addButton(otherRadio, QMessageBox::RejectRole);
+
+	int method = choicebox.exec();
+	Image::SegmentMethod sgmethod;
+	switch (method) {
+	case QMessageBox::AcceptRole: //0
+		//qDebug() << "Using Otsu threshold value to segment.";
+		sgmethod = Image::Otsu;
+		break;
+	case QMessageBox::RejectRole: //1
+		//qDebug() << "Using another threshold value to segment.";
+		sgmethod = Image::Other;
+		break;
+	default:
+		//qDebug() << "Using another threshold value to segment.";
+		sgmethod = Image::Other;
+		break;
+	}
+	return sgmethod;
+}
+int ImageViewer::saveOrNot() {
+	QMessageBox msgbox;
+	msgbox.setText("Do you want save the results to file ?");
+	msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	msgbox.setDefaultButton(QMessageBox::No);
+	int save = msgbox.exec();
+	switch (save) {
+	case QMessageBox::Yes:
+		//qDebug() << "Save the results to file";
+		save = 1;
+		break;
+	case QMessageBox::No:
+		//qDebug() << "Do not save the results to file";
+		save = 0;
+		break;
+	default:
+		//qDebug() << "Do not save the results to file (default)";
+		save = 0;
+		break;
+	}
+	return save;
+}
+void ImageViewer::edgeSegmentDirectory() {
+	qDebug() << "Edge segmentation on directory";
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the images folder.");
+	msgbox.exec();
+	QString folderInput = QFileDialog::getExistingDirectory(this);
+
+	msgbox.setText("Select the folder to save the result.");
+	msgbox.exec();
+	QString folderOutput = QFileDialog::getExistingDirectory(this);
+
+	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
+	int save = saveOrNot();
+
+	Scenario::edgeSegmentationDirectory(folderInput, folderOutput, sgmethod,
+			save);
+	qDebug() << "Done";
+}
+void ImageViewer::bhattacharyyaDistanceDirectory() {
+	qDebug() << "Compare PGH matching using Bhattacharyya metric on directory";
+	Image image(fileName);
+
+	/*
+	 * Working on directory
+	 */
+
+	QMessageBox msgbox;
+	msgbox.setText("Select the images folder.");
+	msgbox.exec();
+	QString folderPath = QFileDialog::getExistingDirectory(this);
+	msgbox.setText("Select the save folder.");
+	msgbox.exec();
+	QString saveDir = QFileDialog::getExistingDirectory(this);
+	QString fileSave = saveDir + "/BhattacharyyaDistance" + Image::getTimeName()
+			+ ".txt";
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+	matchingDirectory(image, folderPath, fileSave, sgmethod);
+	qDebug() << "Done";
+}
+void ImageViewer::phtOnDirectory() {
+	qDebug() << "Probabilistic Hough Transform on directory";
+	Image image(fileName);
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+
+	msgbox.setText("Select the scene images folder.");
+	msgbox.exec();
+	QString sceneImageDir = QFileDialog::getExistingDirectory(this);
+
+	msgbox.setText("Select the scene landmarks folder.");
+	msgbox.exec();
+	QString sceneLMDir = QFileDialog::getExistingDirectory(this);
+
+	msgbox.setText("Select the save folder.");
+	msgbox.exec();
+	QString saveDir = QFileDialog::getExistingDirectory(this);
+
+	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
+	int save = saveOrNot();
+
+	Scenario::phtDirectory(image, reflmPath, sceneImageDir, sceneLMDir, saveDir,
+			sgmethod, save);
+	qDebug() << "Done";
+}
+void ImageViewer::estlmOnDirectory() {
+	qDebug() << "Estimated landmarks on directory";
+	Image image(fileName);
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+
+	QString lpath = QFileDialog::getOpenFileName(this);
+
+	/*
+	 * Working on directory
+	 */
+
+	msgbox.setText("Select the scene images folder.");
+	msgbox.exec();
+	QString folder = QFileDialog::getExistingDirectory(this);
+
+	/*msgbox.setText("Select the scene landarks folder.");
+	 msgbox.exec();
+	 QString orgLMPath = QFileDialog::getExistingDirectory(this);*/
+
+	msgbox.setText("Select the saving folder.");
+	msgbox.exec();
+	QString saveFolder = QFileDialog::getExistingDirectory(this);
+
+	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
+	int save = saveOrNot();
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/est.rc");
+	int templSize = resources["EstTemplSize"];
+	int imageSize = resources["EstImageSize"];
+	Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder,
+			templSize, imageSize, sgmethod, save);
+	qDebug() << "Done";
+}
+void ImageViewer::computeSizeOnDirectory() {
+	qDebug() << "Compute the original size and the estimated size on directory";
+	Image image(fileName);
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.exec();
+
+	QString lpath = QFileDialog::getOpenFileName(this);
+	/*
+	 * Working on directory
+	 */
+	msgbox.setText("Select the images folder.");
+	msgbox.exec();
+	QString folder = QFileDialog::getExistingDirectory(this);
+
+	msgbox.setText("Select the scene original landmarks folder.");
+	msgbox.exec();
+	QString lmFolder = QFileDialog::getExistingDirectory(this);
+
+	msgbox.setText("Select the saving folder.");
+	msgbox.exec();
+	QString saveFolder = QFileDialog::getExistingDirectory(this);
+
+	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
+
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/est.rc");
+	int templSize = resources["EstTemplSize"];
+	int imageSize = resources["EstImageSize"];
+	Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder,
+			lmFolder, templSize, imageSize, saveFolder, sgmethod);
+
 	qDebug() << "Done";
 }
