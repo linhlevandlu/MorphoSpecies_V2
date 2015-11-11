@@ -578,12 +578,12 @@ void ImageViewer::createActions() {
 	cCorrelation->setEnabled(false);
 	connect(cCorrelation, SIGNAL(triggered()), this, SLOT(crossCorrelation()));
 
-	ccMeasureDistance = new QAction(tr("CC measure distance"), this);
+	ccMeasureDistance = new QAction(tr("By Cross-correlation"), this);
 	ccMeasureDistance->setEnabled(false);
 	connect(ccMeasureDistance, SIGNAL(triggered()), this,
 			SLOT(crossCorrelationDistance()));
 
-	tmMeasureDistance = new QAction(tr("Template matching MS"), this);
+	tmMeasureDistance = new QAction(tr("By Edge extraction (1,1)"), this);
 	tmMeasureDistance->setEnabled(false);
 	connect(tmMeasureDistance, SIGNAL(triggered()), this,
 			SLOT(tplMatchingDistance()));
@@ -604,13 +604,13 @@ void ImageViewer::createActions() {
 	connect(proHoughTransformDir, SIGNAL(triggered()), this,
 			SLOT(phtOnDirectory()));
 
-	lmExtractionDir = new QAction(tr("Estimated the landmarks"), this);
+	lmExtractionDir = new QAction(tr("Landmarks identifying"), this);
 	lmExtractionDir->setEnabled(false);
 	connect(lmExtractionDir, SIGNAL(triggered()), this,
 			SLOT(estlmOnDirectory()));
 
-	sizeLandmarksDir = new QAction(tr("Compute the size estimation"), this);
-	lmExtractionDir->setEnabled(false);
+	sizeLandmarksDir = new QAction(tr("By Edge extraction (1,n)"), this);
+	sizeLandmarksDir->setEnabled(false);
 	connect(sizeLandmarksDir, SIGNAL(triggered()), this,
 			SLOT(computeSizeOnDirectory()));
 	//end
@@ -636,8 +636,12 @@ void ImageViewer::createMenus() {
 	helpMenu = new QMenu(tr("&Help"), this);
 	helpMenu->addAction(aboutAct);
 
-	pluginsMenu = new QMenu(tr("&Algorithms"), this);
-	opencvMenu = pluginsMenu->addMenu(tr("OpenCV"));
+	//pluginsMenu = new QMenu(tr("&Algorithms"), this);
+	//opencvMenu = pluginsMenu->addMenu(tr("OpenCV"));
+
+	segment = new QMenu(tr("&Segmentation"), this);
+	segment->addAction(edgeSegment);
+	opencvMenu = segment->addMenu(tr("OpenCV"));
 
 	QMenu* mnuSmooth = opencvMenu->addMenu(tr("Smooth"));
 	mnuSmooth->addAction(normalBlurAct);
@@ -690,54 +694,60 @@ void ImageViewer::createMenus() {
 	mnuTrans->addAction(equalizationAct);
 	mnuTrans->addAction(backprojectionAct);
 
-	myimplMenu = pluginsMenu->addMenu(tr("Others"));
-	myimplMenu->addAction(grayscaleMyImplAct);
-	myimplMenu->addAction(binaryMyImplAct);
-	myimplMenu->addSeparator();
-	myimplMenu->addAction(robertsMyImplAct);
-	myimplMenu->addAction(sobelMyImplAct);
-	myimplMenu->addSeparator();
-	myimplMenu->addAction(otsuMyImplAct);
-	myimplMenu->addAction(growingMyImplAct);
-	myimplMenu->addSeparator();
-	myimplMenu->addAction(hitmissMyImplAct);
-	myimplMenu->addAction(antMyImplAct);
+	/*myimplMenu = pluginsMenu->addMenu(tr("Others"));
+	 myimplMenu->addAction(grayscaleMyImplAct);
+	 myimplMenu->addAction(binaryMyImplAct);
+	 myimplMenu->addSeparator();
+	 myimplMenu->addAction(robertsMyImplAct);
+	 myimplMenu->addAction(sobelMyImplAct);
+	 myimplMenu->addSeparator();
+	 myimplMenu->addAction(otsuMyImplAct);
+	 myimplMenu->addAction(growingMyImplAct);
+	 myimplMenu->addSeparator();
+	 myimplMenu->addAction(hitmissMyImplAct);
+	 myimplMenu->addAction(antMyImplAct);*/
 
 	//add by Linh
+	landmarks = new QMenu(tr("Landmarks"), this);
 
-	other2015 = pluginsMenu->addMenu(tr("Classification"));
+	QMenu *estimation = landmarks->addMenu(tr("Estimation"));
 
-	QMenu* mnuccorrelation = other2015->addMenu("Cross correlations");
-	mnuccorrelation->addAction(cCorrelation);
-	mnuccorrelation->addAction(ccMeasureDistance);
+	QMenu* mnuArticle = estimation->addMenu(tr("By Edge extraction (1,1)"));
+	mnuArticle->addAction(phTransform);
+	mnuArticle->addAction(landmarksDetection);
 
-	QMenu* mnuArticle = other2015->addMenu(tr("Automatic extraction"));
-	mnuArticle->addAction(removeLinesAct);
-	mnuArticle->addAction(edgeSegment);
-	mnuArticle->addAction(pwHistogram);
+	QMenu* mnuOnDirectory = estimation->addMenu(tr("By Edge extraction (1,n)"));
+	//mnuOnDirectory->addAction(segmentationDir);
+	//mnuOnDirectory->addAction(bhattcharyyaDir);
+	mnuOnDirectory->addAction(proHoughTransformDir);
+	mnuOnDirectory->addAction(lmExtractionDir);
 
-	QMenu* mnuHistMatch = mnuArticle->addMenu(tr("PGH matching"));
+	estimation->addAction(cCorrelation);
+
+	QMenu *analysis = landmarks->addMenu(tr("Analysis"));
+	analysis->addAction(tmMeasureDistance);
+	analysis->addAction(sizeLandmarksDir);
+	analysis->addAction(ccMeasureDistance);
+
+	utilities = new QMenu(tr("Utilities"), this);
+	utilities->addAction(grayscaleMyImplAct);
+	utilities->addAction(binaryMyImplAct);
+	utilities->addSeparator();
+	utilities->addAction(removeLinesAct);
+	utilities->addAction(pwHistogram);
+	QMenu* mnuHistMatch = utilities->addMenu(tr("PGH matching"));
 	mnuHistMatch->addAction(pwhMatching);
 	mnuHistMatch->addAction(pwhChisquared);
 	mnuHistMatch->addAction(pwhIntersection);
 
-	mnuArticle->addAction(phTransform);
-
-	QMenu* mnuTmMatch = mnuArticle->addMenu("Landmarks Estimation");
-	mnuTmMatch->addAction(landmarksDetection); // landmarks detection
-	mnuTmMatch->addAction(tmMeasureDistance);
-
-	QMenu* mnuOnDirectory = other2015->addMenu(tr("Working on directory"));
-	mnuOnDirectory->addAction(segmentationDir);
-	mnuOnDirectory->addAction(bhattcharyyaDir);
-	mnuOnDirectory->addAction(proHoughTransformDir);
-	mnuOnDirectory->addAction(lmExtractionDir);
-	mnuOnDirectory->addAction(sizeLandmarksDir);
 	//end
 
 	menuBar()->addMenu(fileMenu);
 	menuBar()->addMenu(viewMenu);
-	menuBar()->addMenu(pluginsMenu);
+	menuBar()->addMenu(segment);
+	menuBar()->addMenu(landmarks);
+	menuBar()->addMenu(utilities);
+	//menuBar()->addMenu(pluginsMenu);
 	menuBar()->addMenu(helpMenu);
 }
 
@@ -2636,7 +2646,7 @@ void ImageViewer::getLandmarks() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 
 	QString lpath = QFileDialog::getOpenFileName(this);
@@ -2644,7 +2654,7 @@ void ImageViewer::getLandmarks() {
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the scene image.");
+	msgbox.setText("Select the model image.");
 	msgbox.exec();
 
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -2665,7 +2675,7 @@ void ImageViewer::getLandmarks() {
 	double angle;
 	Point ePoint;
 
-	Mat enddest = Scenario::landmarksMatching(image, sceneImage, lpath,
+	Mat enddest = Scenario::landmarksMatching(sceneImage, image, lpath,
 			templSize, imageSize, sgmethod, esLandmarks, angle, ePoint);
 	int save = saveOrNot();
 	if (save == 1) {
@@ -2679,7 +2689,7 @@ void ImageViewer::getLandmarks() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Landmark -- " + this->fileName);
-	other->fileName = fileName2;
+	other->fileName = fileName;
 	other->setContextMenuPolicy(Qt::CustomContextMenu);
 	other->esLandmarks = esLandmarks;
 	other->angleDiff = angle;
@@ -3010,14 +3020,14 @@ void ImageViewer::pHoughTransform() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the scene image.");
+	msgbox.setText("Select the model image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
@@ -3035,7 +3045,7 @@ void ImageViewer::pHoughTransform() {
 	}
 
 	vector<Point> esLandmarks;
-	Mat enddest = Scenario::probabilisticHoughTransform(image, image2,
+	Mat enddest = Scenario::probabilisticHoughTransform(image2, image,
 			reflmPath, sgmethod, esLandmarks);
 
 	int save = saveOrNot();
@@ -3079,7 +3089,7 @@ void ImageViewer::crossCorrelation() {
 
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
 
@@ -3100,7 +3110,7 @@ void ImageViewer::crossCorrelation() {
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the second image.");
+	msgbox.setText("Select the model image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
@@ -3109,8 +3119,8 @@ void ImageViewer::crossCorrelation() {
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/ccorrelation.rc");
 	int templSize = resources["templSize"];
-	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(image, lpath,
-			sceneImage, templSize);
+	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(sceneImage, lpath,
+			image, templSize);
 	QString scenename = sceneImage.getName();
 	qDebug() << scenename;
 
@@ -3137,7 +3147,7 @@ void ImageViewer::crossCorrelationDistance() {
 
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
 
@@ -3153,7 +3163,7 @@ void ImageViewer::crossCorrelationDistance() {
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the scene image.");
+	msgbox.setText("Select the model image.");
 	msgbox.exec();
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
@@ -3163,8 +3173,8 @@ void ImageViewer::crossCorrelationDistance() {
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/ccorrelation.rc");
 	double templSize = resources["templSize"];
-	double eCentroid = Scenario::mDistanceByCrossCorrelation(image, lpath,
-			sceneImage, templSize, ebary);
+	double eCentroid = Scenario::mDistanceByCrossCorrelation(sceneImage, lpath,
+			image, templSize, ebary);
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
 	qDebug() << "Measure distance estimated: " << eCentroid;
 
@@ -3181,7 +3191,7 @@ void ImageViewer::tplMatchingDistance() {
 	Image image(fileName);
 
 	QMessageBox msgbox;
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 
 	QString lpath = QFileDialog::getOpenFileName(this);
@@ -3189,7 +3199,7 @@ void ImageViewer::tplMatchingDistance() {
 	/*
 	 * Working on an image
 	 */
-	msgbox.setText("Select the scene image.");
+	msgbox.setText("Select the model image.");
 	msgbox.exec();
 
 	QString fileName2 = QFileDialog::getOpenFileName(this);
@@ -3202,7 +3212,7 @@ void ImageViewer::tplMatchingDistance() {
 			"data/resources/est.rc");
 	int templSize = resources["EstTemplSize"];
 	int imageSize = resources["EstImageSize"];
-	double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
+	double eCentroid = Scenario::mDistanceByTemplateMatching(sceneImage, image,
 			lpath, templSize, imageSize, sgmethod, ebary);
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
 	qDebug() << "Size estimated: " << eCentroid;
@@ -3306,7 +3316,7 @@ void ImageViewer::phtOnDirectory() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 
@@ -3334,7 +3344,7 @@ void ImageViewer::estlmOnDirectory() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 
 	QString lpath = QFileDialog::getOpenFileName(this);
@@ -3370,7 +3380,7 @@ void ImageViewer::computeSizeOnDirectory() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of reference image.");
+	msgbox.setText("Select the landmark file of model image.");
 	msgbox.exec();
 
 	QString lpath = QFileDialog::getOpenFileName(this);

@@ -317,8 +317,10 @@ private:
 	QMenu *myimplMenu;
 	QMenu *pluginsMenu;
 	QMenu *helpMenu;
-
 //add by LE Van Linh
+	QMenu *segment;
+	QMenu *landmarks;
+	QMenu *utilities;
 	QMenu *other2015;
 
 //end
