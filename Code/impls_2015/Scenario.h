@@ -106,6 +106,7 @@ public:
 			QString lmPath, QString folderImages, QString lmFolder,
 			int templSize, int sceneSize, QString savePath,
 			Image::SegmentMethod sgmethod);
+	static Mat loadOriginalLandmarks(Image image, QString lmPath,vector<Point> &orgLandmarks);
 };
 
 } /* namespace impls_2015 */

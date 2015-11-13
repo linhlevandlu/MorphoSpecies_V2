@@ -162,7 +162,7 @@ void ImageViewer::activeFunction() {
 	proHoughTransformDir->setEnabled(true);
 	lmExtractionDir->setEnabled(true);
 	sizeLandmarksDir->setEnabled(true);
-
+	loadOrgLandmarks->setEnabled(true);
 	//end
 	updateActions();
 
@@ -528,7 +528,7 @@ void ImageViewer::createActions() {
 	connect(antMyImplAct, SIGNAL(triggered()), this, SLOT(antMyImplAction()));
 
 	//add by LE Van Linh
-	removeLinesAct = new QAction(tr("Remove Yellow lines"), this);
+	removeLinesAct = new QAction(tr("Remove Yellow grid"), this);
 	removeLinesAct->setEnabled(false);
 	removeLinesAct->setShortcut(tr("Ctrl+R"));
 	connect(removeLinesAct, SIGNAL(triggered()), this,
@@ -613,6 +613,10 @@ void ImageViewer::createActions() {
 	sizeLandmarksDir->setEnabled(false);
 	connect(sizeLandmarksDir, SIGNAL(triggered()), this,
 			SLOT(computeSizeOnDirectory()));
+	loadOrgLandmarks = new QAction(tr("Load original landmarks"), this);
+	loadOrgLandmarks->setEnabled(false);
+	connect(loadOrgLandmarks, SIGNAL(triggered()), this,
+			SLOT(loadOriginalLandmarks()));
 	//end
 }
 
@@ -735,6 +739,8 @@ void ImageViewer::createMenus() {
 	utilities->addSeparator();
 	utilities->addAction(removeLinesAct);
 	utilities->addAction(pwHistogram);
+	utilities->addAction(loadOrgLandmarks);
+
 	QMenu* mnuHistMatch = utilities->addMenu(tr("PGH matching"));
 	mnuHistMatch->addAction(pwhMatching);
 	mnuHistMatch->addAction(pwhChisquared);
@@ -1374,7 +1380,7 @@ void ImageViewer::houghLineAction() {
 	cv::Canny(matImage, dst, 50, 200, 3);
 	cv::cvtColor(dst, cdst, CV_GRAY2BGR);
 
-	vector<cv::Vec2f> lines;
+	vector < cv::Vec2f > lines;
 	cv::HoughLines(dst, lines, 1, CV_PI / 180, 100, 0, 0);
 
 	for (size_t i = 0; i < lines.size(); i++) {
@@ -1406,7 +1412,7 @@ void ImageViewer::houghCircleAction() {
 	/// Reduce the noise so we avoid false circle detection
 	cv::GaussianBlur(src_gray, src_gray, cv::Size(9, 9), 2, 2);
 
-	vector<cv::Vec3f> circles;
+	vector < cv::Vec3f > circles;
 
 	/// Apply the Hough Transform to find the circles
 	cv::HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8,
@@ -1416,7 +1422,7 @@ void ImageViewer::houghCircleAction() {
 
 	/// Draw the circles detected
 	for (size_t i = 0; i < circles.size(); i++) {
-		cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+		cv::Point center(cvRound (circles[i][0]), cvRound (circles[i][1]));
 		int radius = cvRound(circles[i][2]);
 		// circle center
 		cv::circle(matImage, center, 3, cv::Scalar(0, 255, 0), -1, 8, 0);
@@ -1442,8 +1448,8 @@ void ImageViewer::findContourAction() {
 	cv::blur(src_gray, src_gray, cv::Size(3, 3));
 
 	cv::Mat canny_output;
-	vector<vector<cv::Point> > contours;
-	vector<cv::Vec4i> hierarchy;
+	vector < vector<cv::Point> > contours;
+	vector < cv::Vec4i > hierarchy;
 
 	/// Detect edges using canny
 	cv::Canny(src_gray, canny_output, thresh, thresh * 2, 3);
@@ -1480,8 +1486,8 @@ void ImageViewer::convexHullAction() {
 
 	cv::Mat src_copy = matImage.clone();
 	cv::Mat threshold_output;
-	vector<vector<cv::Point> > contours;
-	vector<cv::Vec4i> hierarchy;
+	vector < vector<cv::Point> > contours;
+	vector < cv::Vec4i > hierarchy;
 
 	/// Detect edges using Threshold
 	cv::threshold(src_gray, threshold_output, thresh, 255, cv::THRESH_BINARY);
@@ -1491,7 +1497,7 @@ void ImageViewer::convexHullAction() {
 			CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
 	/// Find the convex hull object for each contour
-	vector<vector<cv::Point> > hull(contours.size());
+	vector < vector<cv::Point> > hull(contours.size());
 	for (size_t i = 0; i < contours.size(); i++) {
 		cv::convexHull(cv::Mat(contours[i]), hull[i], false);
 	}
@@ -1526,8 +1532,8 @@ void ImageViewer::bdBoxCircleAction() {
 	cv::blur(src_gray, src_gray, cv::Size(3, 3));
 
 	cv::Mat threshold_output;
-	vector<vector<cv::Point> > contours;
-	vector<cv::Vec4i> hierarchy;
+	vector < vector<cv::Point> > contours;
+	vector < cv::Vec4i > hierarchy;
 
 	/// Detect edges using Threshold
 	cv::threshold(src_gray, threshold_output, thresh, 255, cv::THRESH_BINARY);
@@ -1536,9 +1542,9 @@ void ImageViewer::bdBoxCircleAction() {
 			CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
 	/// Approximate contours to polygons + get bounding rects and circles
-	vector<vector<cv::Point> > contours_poly(contours.size());
-	vector<cv::Rect> boundRect(contours.size());
-	vector<cv::Point2f> center(contours.size());
+	vector < vector<cv::Point> > contours_poly(contours.size());
+	vector < cv::Rect > boundRect(contours.size());
+	vector < cv::Point2f > center(contours.size());
 	vector<float> radius(contours.size());
 
 	for (size_t i = 0; i < contours.size(); i++) {
@@ -1579,8 +1585,8 @@ void ImageViewer::bdRotEclipseAction() {
 	cv::blur(src_gray, src_gray, cv::Size(3, 3));
 
 	cv::Mat threshold_output;
-	vector<vector<cv::Point> > contours;
-	vector<cv::Vec4i> hierarchy;
+	vector < vector<cv::Point> > contours;
+	vector < cv::Vec4i > hierarchy;
 
 	/// Detect edges using Threshold
 	cv::threshold(src_gray, threshold_output, thresh, 255, cv::THRESH_BINARY);
@@ -1589,8 +1595,8 @@ void ImageViewer::bdRotEclipseAction() {
 			CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
 	/// Find the rotated rectangles and ellipses for each contour
-	vector<cv::RotatedRect> minRect(contours.size());
-	vector<cv::RotatedRect> minEllipse(contours.size());
+	vector < cv::RotatedRect > minRect(contours.size());
+	vector < cv::RotatedRect > minEllipse(contours.size());
 
 	for (size_t i = 0; i < contours.size(); i++) {
 		minRect[i] = cv::minAreaRect(cv::Mat(contours[i]));
@@ -1636,8 +1642,8 @@ void ImageViewer::imgMomentsAction() {
 	cv::blur(src_gray, src_gray, cv::Size(3, 3));
 
 	cv::Mat canny_output;
-	vector<vector<cv::Point> > contours;
-	vector<cv::Vec4i> hierarchy;
+	vector < vector<cv::Point> > contours;
+	vector < cv::Vec4i > hierarchy;
 
 	/// Detect edges using canny
 	cv::Canny(src_gray, canny_output, thresh, thresh * 2, 3);
@@ -1646,13 +1652,13 @@ void ImageViewer::imgMomentsAction() {
 			CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
 	/// Get the moments
-	vector<cv::Moments> mu(contours.size());
+	vector < cv::Moments > mu(contours.size());
 	for (size_t i = 0; i < contours.size(); i++) {
 		mu[i] = cv::moments(contours[i], false);
 	}
 
 	///  Get the mass centers:
-	vector<cv::Point2f> mc(contours.size());
+	vector < cv::Point2f > mc(contours.size());
 	for (size_t i = 0; i < contours.size(); i++) {
 		mc[i] = cv::Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
 	}
@@ -1730,7 +1736,7 @@ void ImageViewer::shiTomasiAction() {
 	}
 
 	/// Parameters for Shi-Tomasi algorithm
-	vector<cv::Point2f> corners;
+	vector < cv::Point2f > corners;
 	double qualityLevel = 0.01;
 	double minDistance = 10;
 	int blockSize = 3;
@@ -1795,8 +1801,8 @@ void ImageViewer::cornerDetectAction() {
 	/* calculate Mc */
 	for (int j = 0; j < src_gray.rows; j++) {
 		for (int i = 0; i < src_gray.cols; i++) {
-			float lambda_1 = myHarris_dst.at<cv::Vec6f>(j, i)[0];
-			float lambda_2 = myHarris_dst.at<cv::Vec6f>(j, i)[1];
+			float lambda_1 = myHarris_dst.at < cv::Vec6f > (j, i)[0];
+			float lambda_2 = myHarris_dst.at < cv::Vec6f > (j, i)[1];
 			Mc.at<float>(j, i) = lambda_1 * lambda_2
 					- 0.04f * pow((lambda_1 + lambda_2), 2);
 		}
@@ -1894,7 +1900,7 @@ void ImageViewer::featureSurfAction() {
 
 void ImageViewer::featureSurfAction(int minHessian, bool refresh) {
 	cv::SurfFeatureDetector detector(minHessian);
-	std::vector<cv::KeyPoint> keypoints;
+	std::vector < cv::KeyPoint > keypoints;
 	detector.detect(matImage, keypoints);
 	//-- Draw keypoints
 	cv::Mat img_keypoints;
@@ -1927,7 +1933,7 @@ void ImageViewer::featureSiftAction() {
 
 	cv::SiftFeatureDetector detector;
 
-	std::vector<cv::KeyPoint> keypoints;
+	std::vector < cv::KeyPoint > keypoints;
 
 	detector.detect(src_gray, keypoints);
 
@@ -1978,7 +1984,7 @@ void ImageViewer::matchingBFAction() {
 
 	//-- Step 3: Matching descriptor vectors with a brute force matcher
 	cv::BFMatcher matcher(cv::NORM_L2);
-	std::vector<cv::DMatch> matches;
+	std::vector < cv::DMatch > matches;
 	matcher.match(descriptors_1, descriptors_2, matches);
 
 	//-- Draw matches
@@ -2024,7 +2030,7 @@ void ImageViewer::matchingFLANNAction() {
 
 	//-- Step 3: Matching descriptor vectors using FLANN matcher
 	cv::FlannBasedMatcher matcher;
-	std::vector<cv::DMatch> matches;
+	std::vector < cv::DMatch > matches;
 	matcher.match(descriptors_1, descriptors_2, matches);
 
 	double max_dist = 0;
@@ -2046,7 +2052,7 @@ void ImageViewer::matchingFLANNAction() {
 	//-- or a small arbitary value ( 0.02 ) in the event that min_dist is very
 	//-- small)
 	//-- PS.- radiusMatch can also be used here.
-	std::vector<cv::DMatch> good_matches;
+	std::vector < cv::DMatch > good_matches;
 
 	for (int i = 0; i < descriptors_1.rows; i++) {
 		if (matches[i].distance <= max(2 * min_dist, 0.02)) {
@@ -2100,7 +2106,7 @@ void ImageViewer::matchingHomographyAction() {
 
 	//-- Step 3: Matching descriptor vectors using FLANN matcher
 	cv::FlannBasedMatcher matcher;
-	std::vector<cv::DMatch> matches;
+	std::vector < cv::DMatch > matches;
 	matcher.match(descriptors_object, descriptors_scene, matches);
 
 	double max_dist = 0;
@@ -2119,7 +2125,7 @@ void ImageViewer::matchingHomographyAction() {
 	qDebug("-- Min dist : %f \n", min_dist);
 
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
-	std::vector<cv::DMatch> good_matches;
+	std::vector < cv::DMatch > good_matches;
 
 	for (int i = 0; i < descriptors_object.rows; i++) {
 		if (matches[i].distance < 3 * min_dist) {
@@ -2133,8 +2139,8 @@ void ImageViewer::matchingHomographyAction() {
 			vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
 	//-- Localize the object
-	std::vector<cv::Point2f> obj;
-	std::vector<cv::Point2f> scene;
+	std::vector < cv::Point2f > obj;
+	std::vector < cv::Point2f > scene;
 
 	for (size_t i = 0; i < good_matches.size(); i++) {
 		//-- Get the keypoints from the good matches
@@ -2357,7 +2363,7 @@ void ImageViewer::affineAction() {
 void ImageViewer::histogramAction() {
 	qDebug() << "MainWindow::histogramAction ";
 
-	vector<cv::Mat> bgr_planes;
+	vector < cv::Mat > bgr_planes;
 	cv::split(ImageConvert::QImageToCvMat(qImage), bgr_planes);
 
 	/// Establish the number of bins
@@ -2444,7 +2450,7 @@ void ImageViewer::backprojectionAction() {
 	cv::mixChannels(&hsv, 1, &hue, 1, ch, 1);
 
 	cv::MatND hist;
-	int histSize = MAX( bins, 2 );
+	int histSize = MAX(bins, 2);
 	float hue_range[] = { 0, 180 };
 	const float* ranges = { hue_range };
 
@@ -2575,7 +2581,7 @@ void ImageViewer::correctMorphAction() {
 
 	//-- Step 3: Matching descriptor vectors with a brute force matcher
 	cv::BFMatcher matcher(cv::NORM_L2);
-	std::vector<cv::DMatch> matches;
+	std::vector < cv::DMatch > matches;
 	matcher.match(descriptors_1, descriptors_2, matches);
 
 	//-- Draw matches
@@ -2646,11 +2652,6 @@ void ImageViewer::getLandmarks() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of model image.");
-	msgbox.exec();
-
-	QString lpath = QFileDialog::getOpenFileName(this);
-
 	/*
 	 * Working on an image
 	 */
@@ -2663,6 +2664,11 @@ void ImageViewer::getLandmarks() {
 	Image sceneImage(fileName2);
 	qDebug() << fileName2;
 
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+
+	QString lpath = QFileDialog::getOpenFileName(this);
+
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 	if (!checkPresent(image, sceneImage, sgmethod)) {
 		msgbox.setText(
@@ -2671,7 +2677,7 @@ void ImageViewer::getLandmarks() {
 		return;
 	}
 
-	vector<Point> esLandmarks;
+	vector < Point > esLandmarks;
 	double angle;
 	Point ePoint;
 
@@ -2743,7 +2749,7 @@ void ImageViewer::putInOrgLandmarks() {
 	msgbox.setText("Select the original landmarks.");
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
-	vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
+	vector < Point > orgLandmarks = sceneImage.readLandmarksFile(
 			lpath.toStdString());
 	this->orgLandmarks = orgLandmarks;
 
@@ -2849,7 +2855,7 @@ void ImageViewer::edgeSegmentation_Value_Changed(QString filePath,
 	Image image(filePath);
 	vector<Edge> edges = image.getEdges(thresholdValue);
 
-	vector<Line> lines = image.getApproximateLines(edges);
+	vector < Line > lines = image.getApproximateLines(edges);
 	Mat enddest(matImage.clone());
 	for (size_t i = 0; i < lines.size(); i++) {
 		Line line = lines.at(i);
@@ -2866,7 +2872,7 @@ void ImageViewer::edgeSegmentation_Method_Changed(QString filePath,
 
 	Image image(filePath);
 	int tvalue = 0;
-	vector<Line> lines = image.lineSegment(sgmethod, tvalue);
+	vector < Line > lines = image.lineSegment(sgmethod, tvalue);
 	Mat enddest(matImage.clone());
 	Scenario::edgeSegmentation(image, enddest, sgmethod);
 	qImage = ImageConvert::cvMatToQImage(enddest);
@@ -2888,7 +2894,7 @@ void ImageViewer::pairwiseHistogram() {
 
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 
-	vector<vector<int> > matrix;
+	vector < vector<int> > matrix;
 	Scenario::pairwiseHistogram(image, (LocalHistogram::AccuracyPGH) angleAcc,
 			distanceAcc, sgmethod, enddest, matrix);
 
@@ -3020,10 +3026,6 @@ void ImageViewer::pHoughTransform() {
 	Image image(fileName);
 	QMessageBox msgbox;
 
-	msgbox.setText("Select the landmark file of model image.");
-	msgbox.exec();
-	QString reflmPath = QFileDialog::getOpenFileName(this);
-
 	/*
 	 * Working on an image
 	 */
@@ -3035,6 +3037,10 @@ void ImageViewer::pHoughTransform() {
 	qDebug() << fileName2;
 	Image image2(fileName2);
 
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 
 	if (!checkPresent(image, image2, sgmethod)) {
@@ -3044,7 +3050,7 @@ void ImageViewer::pHoughTransform() {
 		return;
 	}
 
-	vector<Point> esLandmarks;
+	vector < Point > esLandmarks;
 	Mat enddest = Scenario::probabilisticHoughTransform(image2, image,
 			reflmPath, sgmethod, esLandmarks);
 
@@ -3119,8 +3125,8 @@ void ImageViewer::crossCorrelation() {
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/ccorrelation.rc");
 	int templSize = resources["templSize"];
-	vector<Point> landmarks = Scenario::landmarksByCrossCorelation(sceneImage, lpath,
-			image, templSize);
+	vector < Point > landmarks = Scenario::landmarksByCrossCorelation(
+			sceneImage, lpath, image, templSize);
 	QString scenename = sceneImage.getName();
 	qDebug() << scenename;
 
@@ -3270,6 +3276,23 @@ int ImageViewer::saveOrNot() {
 		break;
 	}
 	return save;
+}
+
+void ImageViewer::loadOriginalLandmarks() {
+	Image image(fileName);
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+
+	vector < Point > orgLM;
+	Mat enddest = Scenario::loadOriginalLandmarks(image, reflmPath, orgLM);
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Landmark -- " + this->fileName);
+	other->show();
+	qDebug() << "Done";
 }
 void ImageViewer::edgeSegmentDirectory() {
 	qDebug() << "Edge segmentation on directory";

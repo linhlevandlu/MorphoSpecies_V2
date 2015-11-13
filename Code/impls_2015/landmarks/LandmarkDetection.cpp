@@ -94,9 +94,9 @@ Point LandmarkDetection::matCrossCorrelation(Mat templ, Mat scene) {
  */
 vector<Point> LandmarkDetection::crossCorrelation(Image refImage,
 		Image sceneImage, QString lmPath, int templSize) {
-	vector<Point> refLandmarks = refImage.readLandmarksFile(
+	vector < Point > refLandmarks = refImage.readLandmarksFile(
 			lmPath.toStdString().c_str());
-	vector<Point> sceneLandmarks;
+	vector < Point > sceneLandmarks;
 	Point tLocation, tDistance, iLocation, iDistance;
 	for (size_t i = 0; i < refLandmarks.size(); i++) {
 		Point temp = refLandmarks.at(i);
@@ -129,8 +129,8 @@ void LandmarkDetection::cCorrelationByDirectory(Image refImage,
 		Image sceneImage(_name);
 
 		cv::Mat result(sceneImage.getMatrixImage().clone());
-		vector<Point> landmarks = crossCorrelation(refImage, sceneImage, lmPath,
-				400);
+		vector < Point > landmarks = crossCorrelation(refImage, sceneImage,
+				lmPath, 400);
 		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
 
@@ -163,7 +163,7 @@ double LandmarkDetection::centroidCCorrelation(Image refImage, Image sceneImage,
 	 vector<Point> orgLandmarks = refImage.readLandmarksFile(
 	 slmPath.toStdString().c_str());*/
 
-	vector<Point> eLandmarks = crossCorrelation(refImage, sceneImage, lmPath,
+	vector < Point > eLandmarks = crossCorrelation(refImage, sceneImage, lmPath,
 			size);
 	double eCentroid;
 	eCentroid = measureDistance(eLandmarks, ebary);
@@ -190,9 +190,9 @@ void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 
 		QString scenename = sceneImage.getName();
 		QString spath = folderlandmarks + "/" + scenename + ".TPS";
-		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
+		vector < Point > orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
-		vector<Point> eLandmarks = crossCorrelation(refImage, sceneImage,
+		vector < Point > eLandmarks = crossCorrelation(refImage, sceneImage,
 				lmPath, 400);
 		of << scenename.toStdString().c_str() << ".JPG" << "\t";
 		qDebug() << scenename;
@@ -225,7 +225,7 @@ void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 		Image sceneImage(_name);
 
 		QString scenename = sceneImage.getName();
-		vector<Point> eLandmarks = crossCorrelation(refImage, sceneImage,
+		vector < Point > eLandmarks = crossCorrelation(refImage, sceneImage,
 				lmPath, 400);
 		of << scenename.toStdString().c_str() << ".JPG" << "\t";
 		qDebug() << scenename;
@@ -303,13 +303,13 @@ double LandmarkDetection::measureDistance(vector<Point> orgLandmarks,
 Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize, double &angleDiff,
 		Image::SegmentMethod sgmethod, vector<Point> &mcResult, Point &ePoint) {
-	vector<Point> refLandmarks = refImage.readLandmarksFile(
+	vector < Point > refLandmarks = refImage.readLandmarksFile(
 			lmPath.toStdString());
 	Mat sMatrix = sceneImage.getMatrixImage();
 	Mat mMatrix = refImage.getMatrixImage();
 
 	PHoughTransform pht;
-	vector<Point> esLandmarks = pht.estimateLandmarks(refImage, sceneImage,
+	vector < Point > esLandmarks = pht.estimateLandmarks(refImage, sceneImage,
 			lmPath.toStdString(), angleDiff, ePoint, sgmethod);
 
 	/*save to file*/
@@ -347,6 +347,15 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 	 cv::putText(sDisplay, s, orgPoint, FONT_HERSHEY_COMPLEX, 1,
 	 Scalar(255, 0, 0), 1, 8);
 	 }*/
+	// draw the original landmarks
+	QString orgLMPath = "/home/linh/Desktop/md/landmarks/" + sceneImage.getName() + ".TPS";
+	vector < Point > orgLM;
+	sDisplay = sceneImage.loadOriginalLandmarks(sDisplay, orgLMPath, orgLM);
+
+	// draw the segmentation
+	int tValue;
+	vector<Line> lines = sceneImage.lineSegment(sgmethod, tValue);
+	sceneImage.drawSegment(sDisplay, lines);
 
 	Mat result(Image::rotateImage(sDisplay, angleDiff, ePoint).clone());
 	// drawing the estimated landmarks
@@ -417,7 +426,7 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
 
-		vector<Point> mcresult;
+		vector < Point > mcresult;
 		Point ePoint;
 		Mat result = matchingTemplate(refImage, sceneImage, lmPath, templSize,
 				sceneSize, angleDiff, sgmethod, mcresult, ePoint);
@@ -428,33 +437,6 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 			QString estTPS(savePath + "/E_" + scenename + ".TPS");
 			save_Estimated_Landmarks_To_File(mcresult, estTPS);
 		}
-		/*QString spath = sceneLMPath + "/" + scenename + ".TPS";
-		 vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
-		 spath.toStdString().c_str());
-
-		 QString estTPS(savePath + "/E_" + scenename + ".TPS");
-		 ofstream of(estTPS.toStdString().c_str());
-		 of << "LM = " << mcresult.size() << "\n";
-
-		 QString diffEMTPS(savePath + "/DiffEM " + scenename + ".TPS");
-		 ofstream diffFile(diffEMTPS.toStdString().c_str());
-		 diffFile << "IMAGE = " << scenename.toStdString().c_str() << ".JPG"
-		 << "\n";
-
-		 qDebug() << orgLandmarks.size() << ", " << mcresult.size();
-		 for (size_t k = 0; k < mcresult.size(); k++) {
-		 Point esPoint = mcresult.at(k);
-		 of << esPoint.x << " " << esPoint.y << "\n";
-
-		 Point orgPoint = orgLandmarks.at(k);
-		 diffFile << orgPoint.x << " " << orgPoint.y << "\t" << esPoint.x
-		 << " " << esPoint.y << "\t";
-		 Line ldistance(esPoint, orgPoint);
-		 diffFile << ldistance.length() << "\n";
-		 }
-		 diffFile.close();
-		 of << "IMAGE = " << scenename.toStdString().c_str() << ".JPG";
-		 of.close();*/
 	}
 }
 
@@ -472,7 +454,7 @@ double LandmarkDetection::centroidMatching(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize,
 		Image::SegmentMethod sgmethod, Point &ebary) {
 	double angleDiff = 0, eCentroid = 0;
-	vector<Point> mcResult;
+	vector < Point > mcResult;
 	Point ePoint;
 	matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
 			angleDiff, sgmethod, mcResult, ePoint);
@@ -506,9 +488,9 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		QString scenename = sceneImage.getName();
 		QString spath = folderlandmarks + "/" + scenename + ".TPS";
 		qDebug() << spath;
-		vector<Point> orgLandmarks = sceneImage.readLandmarksFile(
+		vector < Point > orgLandmarks = sceneImage.readLandmarksFile(
 				spath.toStdString().c_str());
-		vector<Point> mcResult;
+		vector < Point > mcResult;
 		double angle = 0;
 		Point ePoint;
 		matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
@@ -553,7 +535,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 		Image sceneImage(_name);
 
 		QString scenename = sceneImage.getName();
-		vector<Point> mcResult;
+		vector < Point > mcResult;
 		double angle = 0;
 		Point ePoint;
 		matchingTemplate(refImage, sceneImage, lmPath, templSize, sceneSize,
@@ -572,5 +554,9 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 	}
 	of.close();
 }
-
+Mat LandmarkDetection::loadOriginalLandmarks(Image image, QString lmPath,
+		vector<Point> &orgLandmarks) {
+	return image.loadOriginalLandmarks(image.getMatrixImage(), lmPath,
+			orgLandmarks);
+}
 } /* namespace impls_2015 */

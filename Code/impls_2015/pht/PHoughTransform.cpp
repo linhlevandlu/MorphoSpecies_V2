@@ -471,6 +471,17 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		vector<Point> esLandmarks;
 		Mat mat = phtPresentation(refImage, sceneImage, reflmPath.toStdString(),
 				esLandmarks, sgmethod);
+
+		// draw the original landmarks
+		QString orgLMPath = scenelmDir + "/"+scenename+".TPS";
+		vector<Point> orgLM;
+		mat = sceneImage.loadOriginalLandmarks(mat,orgLMPath,orgLM);
+
+		// draw the segmentation
+		int tValue;
+		vector<Line> lines = sceneImage.lineSegment(sgmethod,tValue);
+		sceneImage.drawSegment(mat,lines);
+
 		QString savePath = saveDir + "/" + scenename + ".JPG";
 		imwrite(savePath.toStdString().c_str(), mat);
 		if (save == 1) {

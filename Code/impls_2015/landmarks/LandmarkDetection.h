@@ -91,6 +91,7 @@ public:
 	void save_Original_And_Estimated_Landmarks_To_File(
 			vector<Point> orgLandmarks, vector<Point> esLandmarks,
 			QString path);
+	Mat loadOriginalLandmarks(Image image, QString lmPath,vector<Point> &orgLandmarks);
 };
 
 } /* namespace impls_2015 */

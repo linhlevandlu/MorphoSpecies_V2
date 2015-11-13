@@ -106,6 +106,8 @@ public:
 	QString getName();
 	static QString getTimeName();
 	static Mat rotateImage(Mat source, double angle, Point center);
+	Mat loadOriginalLandmarks(Mat matImage, QString lmPath,vector<Point> &orgLandmarks);
+	void drawSegment(Mat &output, vector<Line> lines);
 };
 
 } /* namespace impls_2015 */

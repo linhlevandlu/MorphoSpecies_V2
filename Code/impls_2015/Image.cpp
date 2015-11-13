@@ -170,13 +170,15 @@ vector<Edge> Image::getEdges(int thresholdValue) {
 
 	cv::threshold(grayImg, grayImg, thresholdValue, 255, CV_THRESH_BINARY);
 	Mat cannyImage;
-	map<string,int> resources = ReadResouces::readResources("data/resources/segment.rc");
+	map<string, int> resources = ReadResouces::readResources(
+			"data/resources/segment.rc");
 	int ratio1 = resources["segmentRatio1"];
 	int ratio2 = resources["segmentRatio2"];
 
-	cv::Canny(grayImg, cannyImage, thresholdValue * ratio1, ratio2 * thresholdValue, 5);
-	vector<vector<Point> > contours;
-	vector<Vec4i> hierarchy;
+	cv::Canny(grayImg, cannyImage, thresholdValue * ratio1,
+			ratio2 * thresholdValue, 5);
+	vector < vector<Point> > contours;
+	vector < Vec4i > hierarchy;
 	findContours(cannyImage, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_NONE,
 			Point(0, 0));
 
@@ -349,21 +351,21 @@ void Image::drawing(cv::Mat &outputImage) {
  * @return: the limit point of grid
  */
 cv::Point Image::findLimitPoint() {
-	vector<cv::Mat> hsv_planes = splitChannels();
+	vector < cv::Mat > hsv_planes = splitChannels();
 
 	cv::Point limit_point = cv::Point(0, 0);
 	int yellow_count = 0;
 	for (int j = 10; j < hsv_planes[0].cols; j++) {
-		if (hsv_planes[0].at<uchar>(5, j) > 100
-				|| (hsv_planes[0].at<uchar>(5, j) > 70
-						&& hsv_planes[0].at<uchar>(5, j) < 100
-						&& hsv_planes[1].at<uchar>(5, j) < 10
-						&& hsv_planes[2].at<uchar>(5, j) > 175)) {
+		if (hsv_planes[0].at < uchar > (5, j) > 100
+				|| (hsv_planes[0].at < uchar > (5, j) > 70
+						&& hsv_planes[0].at < uchar > (5, j) < 100
+						&& hsv_planes[1].at < uchar > (5, j) < 10
+						&& hsv_planes[2].at < uchar > (5, j) > 175)) {
 			limit_point.x = j;
 			limit_point.y = 0;
 			yellow_count = 0;
 			for (int i = 1; i < hsv_planes[0].rows * 2 / 3; i++) {
-				if (hsv_planes[0].at<uchar>(i, j) <= 38) {
+				if (hsv_planes[0].at < uchar > (i, j) <= 38) {
 					yellow_count++;
 					if (yellow_count >= 8) {
 						limit_point.x = 0;
@@ -398,16 +400,16 @@ cv::Point Image::findReplacePoint() {
 	hist_img = this->histogram();
 	float avg = meanHistogram();
 
-	vector<cv::Mat> hsv_planes = splitChannels();
+	vector < cv::Mat > hsv_planes = splitChannels();
 	// find the replate point
 	cv::Point repPoint = cv::Point(0, 0);
 	for (int i = 0; i < gray_img.rows; i++) {
 		for (int j = 0; j < gray_img.cols; j++) {
 			if (gray_img.at<float>(i, j) >= avg
-					&& hsv_planes[0].at<uchar>(i, j) > 90
-					&& hsv_planes[0].at<uchar>(i, j) < 130
-					&& hsv_planes[1].at<uchar>(i, j) > 51
-					&& hsv_planes[2].at<uchar>(i, j) > 215) { // background
+					&& hsv_planes[0].at < uchar > (i, j) > 90
+					&& hsv_planes[0].at < uchar > (i, j) < 130
+					&& hsv_planes[1].at < uchar > (i, j) > 51
+					&& hsv_planes[2].at < uchar > (i, j) > 215) { // background
 				repPoint.x = i;
 				repPoint.y = j;
 				break;
@@ -458,83 +460,83 @@ cv::Mat Image::removingGrid(int minBrightness) {
 	cv::Point bg = findReplacePoint();
 
 	cv::Mat inputImage = this->matrixImage;
-	vector<cv::Mat> hsv_planes;
+	vector < cv::Mat > hsv_planes;
 	hsv_planes = splitChannels();
 	// replace the points
 	for (int i = 0; i < hsv_planes[0].rows; i++) {
 		for (int j = 0; j < limit_point.x; j++) {
 			if (insectPart == ELYTRE) {
 				if (j > hsv_planes[0].cols / 4
-						&& ((hsv_planes[0].at<uchar>(i, j + 50) >= 90
-								&& hsv_planes[0].at<uchar>(i, j + 50) <= 130
-								&& hsv_planes[2].at<uchar>(i, j + 50) >= 10
-								&& hsv_planes[2].at<uchar>(i, j + 50) <= 120)
-								|| (hsv_planes[0].at<uchar>(i, j + 50) >= 90
-										&& hsv_planes[0].at<uchar>(i, j + 50)
-												<= 130
-										&& hsv_planes[1].at<uchar>(i, j + 50)
-												>= 60
-										&& hsv_planes[2].at<uchar>(i, j + 50)
-												>= 10
-										&& hsv_planes[2].at<uchar>(i, j + 50)
-												<= 120)))
+						&& ((hsv_planes[0].at < uchar > (i, j + 50) >= 90
+								&& hsv_planes[0].at < uchar > (i, j + 50) <= 130
+								&& hsv_planes[2].at < uchar > (i, j + 50) >= 10
+								&& hsv_planes[2].at < uchar > (i, j + 50) <= 120)
+								|| (hsv_planes[0].at < uchar > (i, j + 50) >= 90
+										&& hsv_planes[0].at < uchar
+												> (i, j + 50) <= 130
+										&& hsv_planes[1].at < uchar
+												> (i, j + 50) >= 60
+										&& hsv_planes[2].at < uchar
+												> (i, j + 50) >= 10
+										&& hsv_planes[2].at < uchar
+												> (i, j + 50) <= 120)))
 					break;
 			}
 
 			if (insectPart == MDROITE || insectPart == MGAUCHE) {
-				if ((hsv_planes[0].at<uchar>(i, j + 50) >= 39
-						&& hsv_planes[0].at<uchar>(i, j + 50) <= 130
-						&& hsv_planes[1].at<uchar>(i, j + 50) >= 39))
+				if ((hsv_planes[0].at < uchar > (i, j + 50) >= 39
+						&& hsv_planes[0].at < uchar > (i, j + 50) <= 130
+						&& hsv_planes[1].at < uchar > (i, j + 50) >= 39))
 					break;
 			}
 			if (insectPart == PRONOTUM) {
 				if (j > hsv_planes[0].cols / 5
-						&& ((hsv_planes[0].at<uchar>(i, j + 50) >= 40
-								&& hsv_planes[0].at<uchar>(i, j + 50) <= 170
-								&& hsv_planes[1].at<uchar>(i, j + 50) >= 30
-								&& hsv_planes[1].at<uchar>(i, j + 50) <= 95
-								&& hsv_planes[2].at<uchar>(i, j + 50) >= 35)))
+						&& ((hsv_planes[0].at < uchar > (i, j + 50) >= 40
+								&& hsv_planes[0].at < uchar > (i, j + 50) <= 170
+								&& hsv_planes[1].at < uchar > (i, j + 50) >= 30
+								&& hsv_planes[1].at < uchar > (i, j + 50) <= 95
+								&& hsv_planes[2].at < uchar > (i, j + 50) >= 35)))
 					break;
 			}
 			if (insectPart == TETE) {
 				if (j > hsv_planes[0].cols / 4
-						&& ((hsv_planes[0].at<uchar>(i, j + 50) >= 39
-								&& hsv_planes[0].at<uchar>(i, j + 50) <= 140
-								&& hsv_planes[2].at<uchar>(i, j + 50) >= 10
-								&& hsv_planes[2].at<uchar>(i, j + 50) <= 145)
-								|| (hsv_planes[0].at<uchar>(i, j + 50) > 130
-										&& hsv_planes[1].at<uchar>(i, j + 50)
-												< 70
-										&& hsv_planes[2].at<uchar>(i, j + 50)
-												> 120)
-								|| (hsv_planes[0].at<uchar>(i, j + 50) >= 3
-										&& hsv_planes[0].at<uchar>(i, j + 50)
-												<= 15
-										&& hsv_planes[2].at<uchar>(i, j + 50)
-												>= 120
-										&& hsv_planes[2].at<uchar>(i, j + 50)
-												<= 153)))
+						&& ((hsv_planes[0].at < uchar > (i, j + 50) >= 39
+								&& hsv_planes[0].at < uchar > (i, j + 50) <= 140
+								&& hsv_planes[2].at < uchar > (i, j + 50) >= 10
+								&& hsv_planes[2].at < uchar > (i, j + 50) <= 145)
+								|| (hsv_planes[0].at < uchar > (i, j + 50) > 130
+										&& hsv_planes[1].at < uchar
+												> (i, j + 50) < 70
+										&& hsv_planes[2].at < uchar
+												> (i, j + 50) > 120)
+								|| (hsv_planes[0].at < uchar > (i, j + 50) >= 3
+										&& hsv_planes[0].at < uchar
+												> (i, j + 50) <= 15
+										&& hsv_planes[2].at < uchar
+												> (i, j + 50) >= 120
+										&& hsv_planes[2].at < uchar
+												> (i, j + 50) <= 153)))
 					break;
 			}
 			// replace the points
-			if (hsv_planes[0].at<uchar>(i, j) <= 38
-					&& (hsv_planes[2].at<uchar>(i, j) >= 10
-							&& hsv_planes[2].at<uchar>(i, j) <= 100)) {
-				hsv_planes[0].at<uchar>(i, j) = hsv_planes[0].at<uchar>(bg.x,
-						bg.y);
-				hsv_planes[1].at<uchar>(i, j) = hsv_planes[1].at<uchar>(bg.x,
-						bg.y);
-				hsv_planes[2].at<uchar>(i, j) = hsv_planes[2].at<uchar>(bg.x,
-						bg.y);
+			if (hsv_planes[0].at < uchar > (i, j) <= 38
+					&& (hsv_planes[2].at < uchar > (i, j) >= 10
+							&& hsv_planes[2].at < uchar > (i, j) <= 100)) {
+				hsv_planes[0].at < uchar > (i, j) = hsv_planes[0].at < uchar
+						> (bg.x, bg.y);
+				hsv_planes[1].at < uchar > (i, j) = hsv_planes[1].at < uchar
+						> (bg.x, bg.y);
+				hsv_planes[2].at < uchar > (i, j) = hsv_planes[2].at < uchar
+						> (bg.x, bg.y);
 			} else { // there are not yellow points
 					 // replace the point what do not enough the bright (not in yellow range)
-				if (hsv_planes[2].at<uchar>(i, j) > minBrightness) {
-					hsv_planes[0].at<uchar>(i, j) = hsv_planes[0].at<uchar>(
-							bg.x, bg.y);
-					hsv_planes[1].at<uchar>(i, j) = hsv_planes[1].at<uchar>(
-							bg.x, bg.y);
-					hsv_planes[2].at<uchar>(i, j) = hsv_planes[2].at<uchar>(
-							bg.x, bg.y);
+				if (hsv_planes[2].at < uchar > (i, j) > minBrightness) {
+					hsv_planes[0].at < uchar > (i, j) = hsv_planes[0].at < uchar
+							> (bg.x, bg.y);
+					hsv_planes[1].at < uchar > (i, j) = hsv_planes[1].at < uchar
+							> (bg.x, bg.y);
+					hsv_planes[2].at < uchar > (i, j) = hsv_planes[2].at < uchar
+							> (bg.x, bg.y);
 				}
 			}
 		}
@@ -553,7 +555,7 @@ cv::Mat Image::removingGrid(int minBrightness) {
  */
 vector<cv::Mat> Image::splitChannels() {
 	cv::Mat hsvImage;
-	vector<cv::Mat> hsv_planes;
+	vector < cv::Mat > hsv_planes;
 	cv::cvtColor(this->matrixImage, hsvImage, cv::COLOR_BGR2HSV);
 	cv::split(hsvImage, hsv_planes);
 	return hsv_planes;
@@ -570,7 +572,7 @@ vector<Line> Image::getApproximateLines(vector<Edge> edges) {
 	vector<Line> totalLines;
 	for (size_t i = 0; i < edges.size(); i++) {
 		Edge ed = edges.at(i);
-		vector<cv::Point> breakPoints = ed.segment();
+		vector < cv::Point > breakPoints = ed.segment();
 		vector<Line> lines = ed.getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
@@ -616,7 +618,7 @@ ShapeHistogram Image::getShapeHistogram() {
 vector<Point> Image::readLandmarksFile(string filePath) {
 	ifstream openFile(filePath.c_str());
 	string lineText;
-	vector<Point> landmarks;
+	vector < Point > landmarks;
 	if (openFile.is_open()) {
 		getline(openFile, lineText);
 		QString firsLine = (lineText.c_str());
@@ -702,5 +704,24 @@ Mat Image::rotateImage(Mat source, double angle, Point center) {
 	Mat rotate = getRotationMatrix2D(center, angle, 1);
 	warpAffine(source, dest, rotate, source.size());
 	return dest;
+}
+
+Mat Image::loadOriginalLandmarks(Mat matImage, QString lmPath,
+		vector<Point> &orgLandmarks) {
+	Mat result(matImage.clone());
+	vector < Point > orgLMtemp = readLandmarksFile(lmPath.toStdString());
+	for (size_t i = 0; i < orgLMtemp.size(); i++) {
+		Point orgLM(orgLMtemp.at(i).x,
+				matImage.rows - orgLMtemp.at(i).y);
+		circle(result, orgLM, 5, Scalar(0, 255, 0), 2, 8);
+		orgLandmarks.push_back(orgLM);
+	}
+	return result;
+}
+void Image::drawSegment(Mat &output, vector<Line> lines) {
+	for (size_t i = 0; i < lines.size(); i++) {
+		Line line = lines.at(i);
+		line.drawing(output);
+	}
 }
 } /* namespace impls_2015 */

@@ -194,6 +194,7 @@ private slots:
 	void phtOnDirectory();
 	void estlmOnDirectory();
 	void computeSizeOnDirectory();
+	void loadOriginalLandmarks();
 
 	// context menu
 	void estContextMenu(const QPoint& pos);
@@ -302,6 +303,7 @@ private:
 	QAction *cCorrelation; // cross correlation
 	QAction *ccMeasureDistance;
 	QAction *tmMeasureDistance;
+	QAction *loadOrgLandmarks;
 
 	// working with directory
 	QAction *segmentationDir;
