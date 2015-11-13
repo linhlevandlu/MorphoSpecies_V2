@@ -162,7 +162,7 @@ void ImageViewer::activeFunction() {
 	proHoughTransformDir->setEnabled(true);
 	lmExtractionDir->setEnabled(true);
 	sizeLandmarksDir->setEnabled(true);
-
+	loadOrgLandmarks->setEnabled(true);
 	//end
 	updateActions();
 
@@ -528,7 +528,7 @@ void ImageViewer::createActions() {
 	connect(antMyImplAct, SIGNAL(triggered()), this, SLOT(antMyImplAction()));
 
 	//add by LE Van Linh
-	removeLinesAct = new QAction(tr("Remove Yellow lines"), this);
+	removeLinesAct = new QAction(tr("Remove Yellow grid"), this);
 	removeLinesAct->setEnabled(false);
 	removeLinesAct->setShortcut(tr("Ctrl+R"));
 	connect(removeLinesAct, SIGNAL(triggered()), this,
@@ -613,6 +613,10 @@ void ImageViewer::createActions() {
 	lmExtractionDir->setEnabled(false);
 	connect(sizeLandmarksDir, SIGNAL(triggered()), this,
 			SLOT(computeSizeOnDirectory()));
+	loadOrgLandmarks = new QAction(tr("Load original landmarks"), this);
+	loadOrgLandmarks->setEnabled(false);
+	connect(loadOrgLandmarks, SIGNAL(triggered()), this,
+			SLOT(loadOriginalLandmarks()));
 	//end
 }
 
@@ -712,6 +716,7 @@ void ImageViewer::createMenus() {
 	mnuccorrelation->addAction(ccMeasureDistance);
 
 	QMenu* mnuArticle = other2015->addMenu(tr("Automatic extraction"));
+	mnuArticle->addAction(loadOrgLandmarks);
 	mnuArticle->addAction(removeLinesAct);
 	mnuArticle->addAction(edgeSegment);
 	mnuArticle->addAction(pwHistogram);
@@ -2631,8 +2636,8 @@ void ImageViewer::getLandmarks() {
 	qDebug() << "Identification of landmarks function ...";
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/est.rc");
-	int templSize = resources["EstTemplSize"];
-	int imageSize = resources["EstImageSize"];
+	int templSize = resources["templateSize"];
+	int imageSize = resources["imageSize"];
 	Image image(fileName);
 	QMessageBox msgbox;
 
@@ -3051,8 +3056,58 @@ void ImageViewer::pHoughTransform() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
+	other->matImage = enddest;
+	other->fileName = fileName2;
+	other->setContextMenuPolicy(Qt::CustomContextMenu);
+	other->esLandmarks = esLandmarks;
+	connect(other, SIGNAL(customContextMenuRequested(const QPoint&)), other,
+			SLOT(phtContextMenu(const QPoint&)));
 	other->show();
 	qDebug() << "Done";
+}
+void ImageViewer::phtContextMenu(const QPoint& pos) {
+	QPoint globalpos = this->mapToGlobal(pos);
+	QMenu menu(this);
+	//QMenu *putIn = menu.addMenu("Put in");
+	//QMenu *putOut = menu.addMenu("Put out");
+
+	QAction *act1 = new QAction("Load original landmarks", this);
+	connect(act1, SIGNAL(triggered()), this, SLOT(putOrgLandmarks()));
+	menu.addAction(act1);
+
+	QAction *act2 = new QAction("Save estimated landmarks to file", this);
+	connect(act2, SIGNAL(triggered()), this, SLOT(savePHTToFile()));
+	menu.addAction(act2);
+
+	menu.exec(globalpos);
+}
+
+void ImageViewer::putOrgLandmarks() {
+	qDebug() << "Load context menu";
+	Image sceneImage(this->fileName);
+
+	QMessageBox msgbox;
+	msgbox.setText("Select the original landmarks.");
+	msgbox.exec();
+	QString lpath = QFileDialog::getOpenFileName(this);
+	vector<Point> orgLMs;
+	Mat result = sceneImage.loadOriginalLandmarks(this->matImage, lpath,
+			orgLMs);
+	this->orgLandmarks = orgLMs;
+
+	qImage = ImageConvert::cvMatToQImage(result);
+	imageLabel->setPixmap(QPixmap::fromImage(qImage));
+}
+void ImageViewer::savePHTToFile() {
+	QMessageBox msgbox;
+	msgbox.setText("Choose the folder to save the result");
+	msgbox.exec();
+	QString folderPath = QFileDialog::getExistingDirectory(this);
+	Image sceneImage(this->fileName);
+	QString savePath = folderPath + "/E" + sceneImage.getName() + ".TPS";
+	PHoughTransform pht;
+	pht.saveEstLandmarks(this->esLandmarks, savePath);
+
 }
 bool ImageViewer::checkPresent(impls_2015::Image mImage,
 		impls_2015::Image sImage, impls_2015::Image::SegmentMethod sgmethod) {
@@ -3200,8 +3255,8 @@ void ImageViewer::tplMatchingDistance() {
 	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/est.rc");
-	int templSize = resources["EstTemplSize"];
-	int imageSize = resources["EstImageSize"];
+	int templSize = resources["templateSize"];
+	int imageSize = resources["imageSize"];
 	double eCentroid = Scenario::mDistanceByTemplateMatching(image, sceneImage,
 			lpath, templSize, imageSize, sgmethod, ebary);
 	qDebug() << "Ebary point: (" << ebary.x << ", " << ebary.y << ")";
@@ -3261,6 +3316,24 @@ int ImageViewer::saveOrNot() {
 	}
 	return save;
 }
+
+void ImageViewer::loadOriginalLandmarks() {
+	Image image(fileName);
+	QMessageBox msgbox;
+
+	msgbox.setText("Select the landmark file.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+
+	vector < Point > orgLM;
+	Mat enddest = Scenario::loadOriginalLandmarks(image, reflmPath, orgLM);
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Landmark -- " + this->fileName);
+	other->show();
+	qDebug() << "Done";
+}
+
 void ImageViewer::edgeSegmentDirectory() {
 	qDebug() << "Edge segmentation on directory";
 	QMessageBox msgbox;
@@ -3359,8 +3432,8 @@ void ImageViewer::estlmOnDirectory() {
 	int save = saveOrNot();
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/est.rc");
-	int templSize = resources["EstTemplSize"];
-	int imageSize = resources["EstImageSize"];
+	int templSize = resources["templateSize"];
+	int imageSize = resources["imageSize"];
 	Scenario::landmarksMatchingDirectory(image, folder, lpath, saveFolder,
 			templSize, imageSize, sgmethod, save);
 	qDebug() << "Done";
@@ -3393,8 +3466,8 @@ void ImageViewer::computeSizeOnDirectory() {
 
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/est.rc");
-	int templSize = resources["EstTemplSize"];
-	int imageSize = resources["EstImageSize"];
+	int templSize = resources["templateSize"];
+	int imageSize = resources["imageSize"];
 	Scenario::mDistanceByTemplateMatchingDirectory(image, lpath, folder,
 			lmFolder, templSize, imageSize, saveFolder, sgmethod);
 

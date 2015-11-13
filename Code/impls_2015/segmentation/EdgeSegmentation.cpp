@@ -36,9 +36,17 @@ EdgeSegmentation::EdgeSegmentation() {
  * @parameter: image - the input image
  * @return: list of approximate lines
  */
-vector<Line> EdgeSegmentation::lineSegment(Image image, Image::SegmentMethod sgmethod) {
+vector<Line> EdgeSegmentation::lineSegment(Image image,
+		Image::SegmentMethod sgmethod) {
 	int thresh = 0;
-	return image.lineSegment(sgmethod,thresh);
+
+	clock_t t1, t2;
+	t1 = clock();
+	vector<Line> lines = image.lineSegment(sgmethod, thresh);
+	t2 = clock();
+	qDebug() << "time to segmentation: "
+			<< ((float) t2 - (float) t1) / CLOCKS_PER_SEC << " seconds";
+	return lines;
 }
 
 /*
@@ -66,20 +74,23 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
 	QFileInfoList files = Image::readImagesFolder(inputPath);
 	QString spath = savePath + "/thresholdValues.txt";
 	ofstream of(spath.toStdString().c_str());
+
+	clock_t t1, t2;
+	t1 = clock();
+
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
 		Image image(_name);
-
+		qDebug() << _name;
 		int tvalue = 0;
-		vector<Line> lines = image.lineSegment(method,tvalue);
-		of << image.getName().toStdString().c_str() << "\t"
-						<< tvalue << "\n";
+		vector<Line> lines = image.lineSegment(method, tvalue);
+		of << image.getName().toStdString().c_str() << "\t" << tvalue << "\n";
 
 		// save PGH files
 		QString pghName = savePath + "/" + image.getName() + ".PGH";
-		if(save == 1)
-			savePGHFile(lines,pghName);
+		if (save == 1)
+			savePGHFile(lines, pghName);
 
 		//save the images
 		cv::Mat segImg(image.getMatrixImage().clone());
@@ -87,6 +98,9 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
 		QString path = savePath + "/" + image.getName() + ".JPG";
 		imwrite(path.toStdString().c_str(), segImg);
 	}
+	t2 = clock();
+	of << "time to segmentation: " << ((float) t2 - (float) t1) / CLOCKS_PER_SEC
+			<< " seconds";
 	of.close();
 }
 void EdgeSegmentation::savePGHFile(vector<Line> lines, QString savePath) {

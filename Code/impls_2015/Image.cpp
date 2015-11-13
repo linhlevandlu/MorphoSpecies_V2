@@ -171,8 +171,8 @@ vector<Edge> Image::getEdges(int thresholdValue) {
 	cv::threshold(grayImg, grayImg, thresholdValue, 255, CV_THRESH_BINARY);
 	Mat cannyImage;
 	map<string,int> resources = ReadResouces::readResources("data/resources/segment.rc");
-	int ratio1 = resources["segmentRatio1"];
-	int ratio2 = resources["segmentRatio2"];
+	int ratio1 = resources["lowerRatio"];
+	int ratio2 = resources["upperRatio"];
 
 	cv::Canny(grayImg, cannyImage, thresholdValue * ratio1, ratio2 * thresholdValue, 5);
 	vector<vector<Point> > contours;
@@ -703,4 +703,25 @@ Mat Image::rotateImage(Mat source, double angle, Point center) {
 	warpAffine(source, dest, rotate, source.size());
 	return dest;
 }
+
+
+Mat Image::loadOriginalLandmarks(Mat matImage, QString lmPath,
+		vector<Point> &orgLandmarks) {
+	Mat result(matImage.clone());
+	vector < Point > orgLMtemp = readLandmarksFile(lmPath.toStdString());
+	for (size_t i = 0; i < orgLMtemp.size(); i++) {
+		Point orgLM(orgLMtemp.at(i).x,
+				matImage.rows - orgLMtemp.at(i).y);
+		circle(result, orgLM, 5, Scalar(0, 255, 0), 2, 8);
+		orgLandmarks.push_back(orgLM);
+	}
+	return result;
+}
+void Image::drawSegment(Mat &output, vector<Line> lines) {
+	for (size_t i = 0; i < lines.size(); i++) {
+		Line line = lines.at(i);
+		line.drawing(output);
+	}
+}
+
 } /* namespace impls_2015 */

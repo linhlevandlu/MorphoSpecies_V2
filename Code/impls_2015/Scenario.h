@@ -74,7 +74,8 @@ public:
 			QString imgFolder);
 	static Mat landmarksMatching(Image refImage, Image sceneImage,
 			QString reflmPath, int templSize, int scnSize,
-			Image::SegmentMethod sgmethod, vector<Point> &mcResult, double &angle, Point &ePoint);
+			Image::SegmentMethod sgmethod, vector<Point> &mcResult,
+			double &angle, Point &ePoint);
 	static void landmarksMatchingDirectory(Image refImage, QString folderImages,
 			QString lmPath, QString savePath, int templSize, int sceneSize,
 			Image::SegmentMethod sgmethod, int save);
@@ -86,7 +87,8 @@ public:
 			Image::SegmentMethod sgmethod);
 	static void matchingDirectory(Image refImage, QString directoryPath,
 			GeometricHistogram::MatchingMethod matching,
-			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,QString fileSave, Image::SegmentMethod sgmethod);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,
+			QString fileSave, Image::SegmentMethod sgmethod);
 	static void matchingDirectory(QString directoryPath,
 			GeometricHistogram::MatchingMethod matching,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
@@ -106,6 +108,8 @@ public:
 			QString lmPath, QString folderImages, QString lmFolder,
 			int templSize, int sceneSize, QString savePath,
 			Image::SegmentMethod sgmethod);
+	static Mat loadOriginalLandmarks(Image image, QString lmPath,
+			vector<Point> &orgLandmarks);
 };
 
 } /* namespace impls_2015 */

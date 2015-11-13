@@ -307,7 +307,8 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 			lmPath.toStdString());
 	Mat sMatrix = sceneImage.getMatrixImage();
 	Mat mMatrix = refImage.getMatrixImage();
-
+	clock_t t1, t2;
+	t1 = clock();
 	PHoughTransform pht;
 	vector<Point> esLandmarks = pht.estimateLandmarks(refImage, sceneImage,
 			lmPath.toStdString(), angleDiff, ePoint, sgmethod);
@@ -333,6 +334,9 @@ Mat LandmarkDetection::matchingTemplate(Image refImage, Image sceneImage,
 		mcResult.push_back(iLocation + maxLoc + tDistance);
 	}
 
+	t2 = clock();
+	qDebug() << "Time matching: " << ((float) t2 - (float) t1) / CLOCKS_PER_SEC
+			<< " seconds";
 	Mat sDisplay(sMatrix.clone());
 	//drawing the original landmarks
 	/*for (size_t k = 0; k < orgLandmarks.size(); k++) {
@@ -409,6 +413,11 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		double angleDiff, Image::SegmentMethod sgmethod, int save) {
 	QFileInfoList files = Image::readImagesFolder(folderImages);
 
+	QString spath = savePath + "/TimeToRun.txt";
+	ofstream of(spath.toStdString().c_str());
+	clock_t t1, t2;
+	t1 = clock();
+
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
@@ -456,6 +465,10 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 		 of << "IMAGE = " << scenename.toStdString().c_str() << ".JPG";
 		 of.close();*/
 	}
+	t2 = clock();
+	of << "Total estimation time: "
+			<< ((float) t2 - (float) t1) / CLOCKS_PER_SEC << " seconds";
+	of.close();
 }
 
 /*
@@ -572,5 +585,9 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 	}
 	of.close();
 }
-
+Mat LandmarkDetection::loadOriginalLandmarks(Image image, QString lmPath,
+		vector<Point> &orgLandmarks) {
+	return image.loadOriginalLandmarks(image.getMatrixImage(), lmPath,
+			orgLandmarks);
+}
 } /* namespace impls_2015 */

@@ -1,2 +1,2 @@
-segmentRatio1 = 1
-segmentRatio2 = 3
+lowerRatio = 1
+upperRatio = 3
