@@ -57,7 +57,7 @@ class QToolBar;
 class QDialog;
 
 class ImageViewer: public QMainWindow {
-Q_OBJECT
+	Q_OBJECT
 
 public:
 	ImageViewer();
@@ -94,7 +94,8 @@ public:
 	//add by LE Van Linh
 	//void removeYLinesAction(int minBrightness, QString pathImage);
 
-	void matchingDirectory(impls_2015::Image image, QString path, QString fileSave, impls_2015::Image::SegmentMethod sgmethod);
+	void matchingDirectory(impls_2015::Image image, QString path,
+			QString fileSave, impls_2015::Image::SegmentMethod sgmethod);
 	void edgeSegmentation_Value_Changed(QString filePath, int thresholdValue);
 	void edgeSegmentation_Method_Changed(QString filePath,
 			impls_2015::Image::SegmentMethod sgmethod);
@@ -202,6 +203,10 @@ private slots:
 	void putInLines();
 	void putOutOrgLandmarks();
 	void putOutLines();
+
+	void phtContextMenu(const QPoint& pos);
+	void putOrgLandmarks();
+	void savePHTToFile();
 private:
 	void createActions();
 	void createMenus();
@@ -219,8 +224,10 @@ private:
 
 	// Linh
 	void optionDisplay(impls_2015::Image image, vector<Point> esLM,
-			vector<Point> orgLM, vector<impls_2015::Line> lines, double angle, Point ePoint);
-	bool checkPresent(impls_2015::Image mImage, impls_2015::Image sImage,impls_2015::Image::SegmentMethod sgmethod);
+			vector<Point> orgLM, vector<impls_2015::Line> lines, double angle,
+			Point ePoint);
+	bool checkPresent(impls_2015::Image mImage, impls_2015::Image sImage,
+			impls_2015::Image::SegmentMethod sgmethod);
 
 #ifndef QT_NO_PRINTER
 	QPrinter printer;

@@ -3067,9 +3067,61 @@ void ImageViewer::pHoughTransform() {
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
 			"Probabilistic Hough Transform");
+	other->matImage = enddest;
+	other->fileName = fileName2;
+	other->setContextMenuPolicy(Qt::CustomContextMenu);
+	other->esLandmarks = esLandmarks;
+	connect(other, SIGNAL(customContextMenuRequested(const QPoint&)), other,
+			SLOT(phtContextMenu(const QPoint&)));
 	other->show();
 	qDebug() << "Done";
 }
+
+void ImageViewer::phtContextMenu(const QPoint& pos) {
+	QPoint globalpos = this->mapToGlobal(pos);
+	QMenu menu(this);
+	//QMenu *putIn = menu.addMenu("Put in");
+	//QMenu *putOut = menu.addMenu("Put out");
+
+	QAction *act1 = new QAction("Load original landmarks", this);
+	connect(act1, SIGNAL(triggered()), this, SLOT(putOrgLandmarks()));
+	menu.addAction(act1);
+
+	QAction *act2 = new QAction("Save estimated landmarks to file", this);
+	connect(act2, SIGNAL(triggered()), this, SLOT(savePHTToFile()));
+	menu.addAction(act2);
+
+	menu.exec(globalpos);
+}
+
+void ImageViewer::putOrgLandmarks() {
+	qDebug() << "Load context menu";
+	Image sceneImage(this->fileName);
+
+	QMessageBox msgbox;
+	msgbox.setText("Select the original landmarks.");
+	msgbox.exec();
+	QString lpath = QFileDialog::getOpenFileName(this);
+	vector<Point> orgLMs;
+	Mat result = sceneImage.loadOriginalLandmarks(this->matImage, lpath,
+			orgLMs);
+	this->orgLandmarks = orgLMs;
+
+	qImage = ImageConvert::cvMatToQImage(result);
+	imageLabel->setPixmap(QPixmap::fromImage(qImage));
+}
+void ImageViewer::savePHTToFile() {
+	QMessageBox msgbox;
+	msgbox.setText("Choose the folder to save the result");
+	msgbox.exec();
+	QString folderPath = QFileDialog::getExistingDirectory(this);
+	Image sceneImage(this->fileName);
+	QString savePath = folderPath + "/E" + sceneImage.getName() + ".TPS";
+	PHoughTransform pht;
+	pht.saveEstLandmarks(this->esLandmarks, savePath);
+
+}
+
 bool ImageViewer::checkPresent(impls_2015::Image mImage,
 		impls_2015::Image sImage, impls_2015::Image::SegmentMethod sgmethod) {
 	map<string, int> resources = ReadResouces::readResources(
