@@ -63,7 +63,6 @@ public:
 	enum InsectPart {
 		ELYTRE, MDROITE, MGAUCHE, PRONOTUM, TETE
 	};
-
 	Image();
 	Image(QString filePath);
 	virtual ~Image();

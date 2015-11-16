@@ -85,6 +85,7 @@ public:
 	static vector<Line> readFile(QString filePath);
 	void sortByX();
 	void sortByY();
+	bool operator<(const Edge &edge) const;
 };
 
 } /* namespace impls_2015 */

@@ -262,4 +262,7 @@ void Edge::sortByY() {
 	std::sort(this->listOfPoints.begin(), this->listOfPoints.end(),
 			yComparation);
 }
+bool Edge::operator<(const Edge &edge) const{
+	return listOfPoints.size() > edge.listOfPoints.size();
+}
 } /* namespace impls_2015 */
