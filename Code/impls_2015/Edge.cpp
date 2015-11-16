@@ -109,7 +109,7 @@ void Edge::breakEdge() {
 			double distance = 0;
 			double maxDistance = 0; // ??????????????????
 			double imax = 0;
-			for (size_t i = 1; i < listOfPoints.size()-1; i++) {
+			for (size_t i = 1; i < listOfPoints.size() - 1; i++) {
 				cv::Point pointi = listOfPoints.at(i);
 				distance = abs(line.perpendicularDistance(pointi));
 				if (distance > maxDistance) {
@@ -145,9 +145,9 @@ void Edge::breakEdge() {
  * @paramter: contours - list of point on edge
  * @return: list of break points on edge
  */
-vector<Point> Edge::breakEdge(vector<Point> contours){
+vector<Point> Edge::breakEdge(vector<Point> contours) {
 	vector<Point> appContour;
-	approxPolyDP(contours,appContour,3,false);
+	approxPolyDP(contours, appContour, 3, false);
 	return appContour;
 }
 /**
@@ -252,5 +252,14 @@ vector<Line> Edge::readFile(QString filePath) {
 		openFile.close();
 	}
 	return lines;
+}
+
+void Edge::sortByX() {
+	std::sort(this->listOfPoints.begin(), this->listOfPoints.end(),
+			xComparation);
+}
+void Edge::sortByY() {
+	std::sort(this->listOfPoints.begin(), this->listOfPoints.end(),
+			yComparation);
 }
 } /* namespace impls_2015 */

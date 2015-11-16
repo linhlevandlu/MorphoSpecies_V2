@@ -58,6 +58,16 @@ private:
 	vector<Point> breakEdge(vector<Point> contour);
 
 public:
+	struct comparex {
+		bool operator()(Point p1, Point p2) {
+			return p1.x < p2.x;
+		}
+	} xComparation;
+	struct comparey {
+		bool operator()(Point p1, Point p2) {
+			return p1.y < p2.y;
+		}
+	} yComparation;
 	Edge();
 	Edge(vector<Line> lines);
 	Edge(vector<cv::Point> points);
@@ -73,7 +83,8 @@ public:
 	void drawing(cv::Mat &outputImage);
 
 	static vector<Line> readFile(QString filePath);
-
+	void sortByX();
+	void sortByY();
 };
 
 } /* namespace impls_2015 */
