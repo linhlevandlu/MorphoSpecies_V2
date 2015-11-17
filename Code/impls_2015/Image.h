@@ -96,7 +96,9 @@ public:
 
 	vector<Line> lineSegment();
 	vector<Line> lineSegment(SegmentMethod method,int &thresholdValue);
+	vector<Line> lineSegmentPost(SegmentMethod method,int &thresholdValue);
 	vector<Line> getApproximateLines(vector<Edge> edges);
+	vector<Line> getApproximateLinesPostSegment(vector<Edge> edges);
 	void setShapeHistogram(ShapeHistogram shapeHistogram);
 	ShapeHistogram getShapeHistogram();
 	vector<Point> readLandmarksFile(string filePath);

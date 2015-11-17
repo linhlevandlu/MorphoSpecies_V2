@@ -47,6 +47,15 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result,
 	return appLines;
 }
 
+vector<Line> Scenario::postSegmentation(Image image, cv::Mat &result,
+		Image::SegmentMethod sgmethod) {
+	vector<Line> appLines;
+	EdgeSegmentation edgeSegment;
+	appLines = edgeSegment.postLineSegment(image, sgmethod);
+	result = edgeSegment.rePresentation(result, appLines);
+	return appLines;
+}
+
 /*
  * Edge segmentation on a directory
  * @parameter 1: inputFolder - the images folder path

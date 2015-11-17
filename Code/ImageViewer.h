@@ -196,6 +196,7 @@ private slots:
 	void estlmOnDirectory();
 	void computeSizeOnDirectory();
 	void loadOriginalLandmarks();
+	void postEdgeProcessing();
 
 	// context menu
 	void estContextMenu(const QPoint& pos);
@@ -311,6 +312,8 @@ private:
 	QAction *ccMeasureDistance;
 	QAction *tmMeasureDistance;
 	QAction *loadOrgLandmarks;
+	QAction *postProcessing;
+
 
 	// working with directory
 	QAction *segmentationDir;

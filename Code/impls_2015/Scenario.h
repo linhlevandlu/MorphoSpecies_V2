@@ -60,6 +60,8 @@ public:
 	virtual ~Scenario();
 	static vector<Line> edgeSegmentation(Image image, cv::Mat &result,
 			Image::SegmentMethod sgmethod);
+	static vector<Line> postSegmentation(Image image, cv::Mat &result,
+			Image::SegmentMethod sgmethod);
 	static void edgeSegmentationDirectory(QString inputFolder,
 			QString saveFolder, Image::SegmentMethod segmentMethod, int save);
 	static vector<LocalHistogram> pairwiseHistogram(Image image,

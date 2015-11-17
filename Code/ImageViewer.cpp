@@ -163,6 +163,7 @@ void ImageViewer::activeFunction() {
 	lmExtractionDir->setEnabled(true);
 	sizeLandmarksDir->setEnabled(true);
 	loadOrgLandmarks->setEnabled(true);
+	postProcessing->setEnabled(true);
 	//end
 	updateActions();
 
@@ -617,6 +618,11 @@ void ImageViewer::createActions() {
 	loadOrgLandmarks->setEnabled(false);
 	connect(loadOrgLandmarks, SIGNAL(triggered()), this,
 			SLOT(loadOriginalLandmarks()));
+
+	postProcessing = new QAction(tr("Post-processing"), this);
+	postProcessing->setEnabled(false);
+	connect(postProcessing, SIGNAL(triggered()), this,
+			SLOT(postEdgeProcessing()));
 	//end
 }
 
@@ -645,6 +651,7 @@ void ImageViewer::createMenus() {
 
 	segment = new QMenu(tr("&Segmentation"), this);
 	segment->addAction(edgeSegment);
+	segment->addAction(postProcessing);
 	opencvMenu = segment->addMenu(tr("OpenCV"));
 
 	QMenu* mnuSmooth = opencvMenu->addMenu(tr("Smooth"));
@@ -2879,6 +2886,44 @@ void ImageViewer::edgeSegmentation_Method_Changed(QString filePath,
 	imageLabel->setPixmap(QPixmap::fromImage(qImage));
 	statusBar()->showMessage(tr("Threshold value: ") + QString::number(tvalue));
 }
+
+void ImageViewer::postEdgeProcessing() {
+	qDebug() << "Edge segmentation.";
+
+	/*
+	 * Working on an image
+	 */
+	Image image(fileName);
+	qDebug() << image.getName();
+
+	Image::SegmentMethod sgmethod = chooseSegMethod();
+
+	cv::Mat enddest(image.getMatrixImage().clone());
+
+	vector<Line> lineSegment = Scenario::postSegmentation(image, enddest,
+			sgmethod);
+
+	int save = saveOrNot();
+	QMessageBox msgbox;
+	if (save == 1) {
+		msgbox.setText("Choose the folder to save the result");
+		msgbox.exec();
+		QString folderPath = QFileDialog::getExistingDirectory(this);
+		QString savePath = folderPath + "/" + image.getName() + ".PGH";
+		EdgeSegmentation edgeSeg;
+		edgeSeg.savePGHFile(lineSegment, savePath);
+	}
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
+			"Edge segmentation");
+	/*other->addParameterPanel(
+			new impls_2015::EdgeSegmentationPanel(other, fileName, sgmethod,
+					image.getThresholdValue()), x() + 20, y() + 20);*/
+	other->show();
+	qDebug() << "Done";
+}
+
 /*
  * Compute the pairwise geometric histogram of an image
  */
@@ -3102,7 +3147,7 @@ void ImageViewer::putOrgLandmarks() {
 	msgbox.setText("Select the original landmarks.");
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
-	vector<Point> orgLMs;
+	vector < Point > orgLMs;
 	Mat result = sceneImage.loadOriginalLandmarks(this->matImage, lpath,
 			orgLMs);
 	this->orgLandmarks = orgLMs;

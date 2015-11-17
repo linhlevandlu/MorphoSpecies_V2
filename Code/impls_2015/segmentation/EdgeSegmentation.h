@@ -60,6 +60,7 @@ public:
 	EdgeSegmentation();
 	//vector<Edge> getEdges(Image inputImage);
 	vector<Line> lineSegment(Image image, Image::SegmentMethod sgmethod);
+	vector<Line> postLineSegment(Image image, Image::SegmentMethod sgmethod);
 	cv::Mat rePresentation(cv::Mat resultImage, vector<Line> lines);
 	void segmentDirectory(QString inputFolder,QString saveFolder,Image::SegmentMethod method, int save);
 	void savePGHFile(vector<Line> lines, QString savePath);

@@ -40,7 +40,10 @@ vector<Line> EdgeSegmentation::lineSegment(Image image, Image::SegmentMethod sgm
 	int thresh = 0;
 	return image.lineSegment(sgmethod,thresh);
 }
-
+vector<Line> EdgeSegmentation::postLineSegment(Image image, Image::SegmentMethod sgmethod) {
+	int thresh = 0;
+	return image.lineSegmentPost(sgmethod,thresh);
+}
 /*
  * Presentation the result of segmentation
  * @parameter 1: resultImage - the result image (on Matrix)
