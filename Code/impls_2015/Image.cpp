@@ -568,55 +568,55 @@ vector<cv::Mat> Image::splitChannels() {
 vector<Line> Image::lineSegment() {
 	return getApproximateLines(this->listOfEdges);
 }
-/*vector<Line> Image::getApproximateLines(vector<Edge> edges) {
- vector<Line> totalLines;
- vector<Edge> drawEdge;
- std::sort(edges.begin(), edges.end());
- Edge ed0 = edges.at(0);
- drawEdge.push_back(ed0);
-
- ed0.sortByX();
- int minX = ed0.getPoints().at(0).x;
- int maxX = ed0.getPoints().at(ed0.getPoints().size() - 1).x;
-
- ed0.sortByY();
- int minY = ed0.getPoints().at(0).y;
- int maxY = ed0.getPoints().at(ed0.getPoints().size() - 1).y;
- for (size_t i = 1; i < edges.size(); i++) {
- Edge temp = edges.at(i);
- Edge ed = temp;
- ed.sortByX();
- int edminX = ed.getPoints().at(0).x;
- int edmaxX = ed.getPoints().at(ed.getPoints().size() - 1).x;
-
- ed.sortByY();
- int edminY = ed.getPoints().at(0).y;
- int edmaxY = ed.getPoints().at(ed.getPoints().size() - 1).y;
-
- if (!(edminX >= minX && edminX <= maxX && edmaxX >= minX
- && edmaxX <= maxX && edminY >= minY && edminY <= maxY
- && edmaxY >= minY && edmaxY <= maxY)) {
- drawEdge.push_back(temp);
- }
- }
- for (size_t j = 0; j < drawEdge.size(); j++) {
- Edge dedge = drawEdge.at(j);
- vector<cv::Point> breakPoints = dedge.segment();
- vector<Line> lines = dedge.getLines(breakPoints);
- totalLines.insert(totalLines.end(), lines.begin(), lines.end());
- }
- return totalLines;
- }*/
 vector<Line> Image::getApproximateLines(vector<Edge> edges) {
 	vector<Line> totalLines;
-	for (size_t i = 0; i < edges.size(); i++) {
-		Edge ed = edges.at(i);
-		vector<cv::Point> breakPoints = ed.segment();
-		vector<Line> lines = ed.getLines(breakPoints);
+	vector<Edge> drawEdge;
+	std::sort(edges.begin(), edges.end());
+	Edge ed0 = edges.at(0);
+	drawEdge.push_back(ed0);
+
+	ed0.sortByX();
+	int minX = ed0.getPoints().at(0).x;
+	int maxX = ed0.getPoints().at(ed0.getPoints().size() - 1).x;
+
+	ed0.sortByY();
+	int minY = ed0.getPoints().at(0).y;
+	int maxY = ed0.getPoints().at(ed0.getPoints().size() - 1).y;
+	for (size_t i = 1; i < edges.size(); i++) {
+		Edge temp = edges.at(i);
+		Edge ed = temp;
+		ed.sortByX();
+		int edminX = ed.getPoints().at(0).x;
+		int edmaxX = ed.getPoints().at(ed.getPoints().size() - 1).x;
+
+		ed.sortByY();
+		int edminY = ed.getPoints().at(0).y;
+		int edmaxY = ed.getPoints().at(ed.getPoints().size() - 1).y;
+
+		if (!(edminX >= minX && edminX <= maxX && edmaxX >= minX
+				&& edmaxX <= maxX && edminY >= minY && edminY <= maxY
+				&& edmaxY >= minY && edmaxY <= maxY)) {
+			drawEdge.push_back(temp);
+		}
+	}
+	for (size_t j = 0; j < drawEdge.size(); j++) {
+		Edge dedge = drawEdge.at(j);
+		vector<cv::Point> breakPoints = dedge.segment();
+		vector<Line> lines = dedge.getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
 	return totalLines;
 }
+/*vector<Line> Image::getApproximateLines(vector<Edge> edges) {
+ vector<Line> totalLines;
+ for (size_t i = 0; i < edges.size(); i++) {
+ Edge ed = edges.at(i);
+ vector<cv::Point> breakPoints = ed.segment();
+ vector<Line> lines = ed.getLines(breakPoints);
+ totalLines.insert(totalLines.end(), lines.begin(), lines.end());
+ }
+ return totalLines;
+ }*/
 vector<Line> Image::lineSegment(SegmentMethod method, int &thresholdValue) {
 	thresholdValue = 0;
 	switch (method) {
