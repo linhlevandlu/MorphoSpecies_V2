@@ -2,7 +2,7 @@
  * PWHistogram.h
  *
  *  Created on: Aug 27, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,7 @@
 #ifndef PWHISTOGRAM_H_
 #define PWHISTOGRAM_H_
 
-#include <QtGui/QDialog>
-#include <QtGui/QWidget>
-#include <QtGui/QSlider>
-#include <QtCore/qqueue.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

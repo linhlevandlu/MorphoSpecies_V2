@@ -2,7 +2,7 @@
  * GeometricHistogram.h
  *
  *  Created on: Sep 17, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,6 @@
 
 #ifndef GEOMETRICHISTOGRAM_H_
 #define GEOMETRICHISTOGRAM_H_
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
 #include <QtCore/qlist.h>
 #include <QtGui/QFileDialog>
 #include <QtCore/qdir.h>
@@ -62,7 +60,7 @@ public:
 	void phgHistogramDirMatching(QString folderPath, MatchingMethod method,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 	void pairwiseHistogramDirectory(QString folderPath,
-			LocalHistogram::AccuracyPGH angleAcc, int columns);
+			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 
 };
 

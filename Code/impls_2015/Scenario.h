@@ -2,7 +2,7 @@
  * Scenario.h
  *
  *  Created on: Aug 21, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -21,11 +21,6 @@
 
 #ifndef SCENARIO_H_
 #define SCENARIO_H_
-
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
-#include <QtCore/qlist.h>
-#include <QtGui/QFileDialog>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"

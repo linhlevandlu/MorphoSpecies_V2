@@ -2,7 +2,7 @@
  * Image.h
  *
  *  Created on: Aug 21, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,11 @@
 #ifndef IMAGE_H_
 #define IMAGE_H_
 
+/*
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
 #include <QtCore/qlist.h>
+*/
 #include <QtCore/qstring.h>
 #include <QtCore/qdir.h>
 #include "opencv2/core/core.hpp"
@@ -48,7 +50,7 @@ namespace impls_2015 {
 
 class Image: public IDrawOperation {
 private:
-	QString fileName;
+	string fileName;
 	vector<Edge> listOfEdges;
 	vector<Point> listOfLandmarks;
 	int histogramSize;
@@ -64,11 +66,11 @@ public:
 		ELYTRE, MDROITE, MGAUCHE, PRONOTUM, TETE
 	};
 	Image();
-	Image(QString filePath);
+	Image(string filePath);
 	virtual ~Image();
 
-	QString getFileName();
-	void setFileName(QString filePath);
+	string getFileName();
+	void setFileName(string filePath);
 	vector<Edge> getEdges(int thresholdValue);
 	void setEdges(vector<Edge> edges);
 	int getThresholdValue_Otsu();

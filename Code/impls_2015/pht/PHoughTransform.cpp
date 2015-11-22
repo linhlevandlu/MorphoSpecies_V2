@@ -2,7 +2,7 @@
  * PHoughTransform.cpp
  *
  *  Created on: Sep 23, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -463,7 +463,7 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		QString scenename = sceneImage.getName();
 		qDebug() << scenename;

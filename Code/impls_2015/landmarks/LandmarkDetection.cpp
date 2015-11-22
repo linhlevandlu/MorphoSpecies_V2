@@ -2,7 +2,7 @@
  * LandmarkDetection.cpp
  *
  *  Created on: Aug 21, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -126,7 +126,7 @@ void LandmarkDetection::cCorrelationByDirectory(Image refImage,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		cv::Mat result(sceneImage.getMatrixImage().clone());
 		vector<Point> landmarks = crossCorrelation(refImage, sceneImage, lmPath,
@@ -186,7 +186,7 @@ void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		QString scenename = sceneImage.getName();
 		QString spath = folderlandmarks + "/" + scenename + ".TPS";
@@ -222,7 +222,7 @@ void LandmarkDetection::centroidCCorrelations(Image refImage, QString lmPath,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		QString scenename = sceneImage.getName();
 		vector<Point> eLandmarks = crossCorrelation(refImage, sceneImage,
@@ -421,7 +421,7 @@ void LandmarkDetection::matchingDirectory(Image refImage, QString folderImages,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		QString scenename = sceneImage.getName();
 		qDebug() << scenename;
@@ -514,7 +514,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		QString scenename = sceneImage.getName();
 		QString spath = folderlandmarks + "/" + scenename + ".TPS";
@@ -563,7 +563,7 @@ void LandmarkDetection::centroidMatchingDirectory(Image refImage,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 
 		QString scenename = sceneImage.getName();
 		vector<Point> mcResult;

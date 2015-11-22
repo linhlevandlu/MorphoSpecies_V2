@@ -2,7 +2,7 @@
  * Image.cpp
  *
  *  Created on: Aug 21, 2015
- *  Image processing for morphometrics (IPM) Version 0.2
+ *  Image processing for morphometrics (IPM) Version 2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ Image::Image() {
 /**
  * Constructor of image with a path
  */
-Image::Image(string filePath) {
+Image::Image(QString filePath) {
 	this->fileName = filePath;
 	this->histogramSize = 256;
 	this->matrixImage = getMatImage();
@@ -50,7 +50,7 @@ Image::~Image() {
  * Get the full name of image
  * @return: the file path of image
  */
-string Image::getFileName() {
+QString Image::getFileName() {
 	return this->fileName;
 }
 
@@ -58,7 +58,7 @@ string Image::getFileName() {
  * Set the file path of image
  * @filePath: the image path
  */
-void Image::setFileName(string filePath) {
+void Image::setFileName(QString filePath) {
 	this->fileName = filePath;
 }
 
@@ -226,7 +226,7 @@ cv::Mat Image::getMatrixImage() {
  * @return: the matrix represented the image
  */
 cv::Mat Image::getMatImage() {
-	return cv::imread(fileName);
+	return cv::imread(fileName.toStdString());
 }
 
 /**
@@ -427,8 +427,7 @@ cv::Point Image::findReplacePoint() {
  */
 Image::InsectPart Image::getPart() {
 	Image::InsectPart sType = ELYTRE;
-	QString fName(this->fileName.c_str());
-	QString temp = fName.toLower();
+	QString temp = this->fileName.toLower();
 	if (temp.contains("ely"))
 		sType = ELYTRE;
 	else {
@@ -700,10 +699,9 @@ QFileInfoList Image::readImagesFolder(QString folderPath) {
  * @return: the name of image
  */
 QString Image::getName() {
-	QString fName(this->fileName.c_str());
-	int index = fName.lastIndexOf("/");
-	QString scenename = fName.mid(index + 1,
-			fName.length() - index - 5);
+	int index = this->fileName.lastIndexOf("/");
+	QString scenename = this->fileName.mid(index + 1,
+			this->fileName.length() - index - 5);
 	return scenename;
 }
 QString Image::getTimeName() {

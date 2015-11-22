@@ -2620,7 +2620,7 @@ void ImageViewer::removeYLinesAction() {
 	//readDirectory("/home/Images/Morphometrics/tete/Original_images");
 
 	// run on a image
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	cv::Mat enddest = image.removingGrid(90);
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
@@ -2638,7 +2638,7 @@ void ImageViewer::getLandmarks() {
 			"data/resources/est.rc");
 	int templSize = resources["templateSize"];
 	int imageSize = resources["imageSize"];
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");
@@ -2655,7 +2655,7 @@ void ImageViewer::getLandmarks() {
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
-	Image sceneImage(fileName2);
+	Image sceneImage(fileName2.toStdString());
 	qDebug() << fileName2;
 
 	Image::SegmentMethod sgmethod = chooseSegMethod();
@@ -2732,7 +2732,7 @@ void ImageViewer::estContextMenu(const QPoint& pos) {
 
 void ImageViewer::putInOrgLandmarks() {
 	qDebug() << "Load context menu";
-	Image sceneImage(this->fileName);
+	Image sceneImage(this->fileName.toStdString());
 
 	QMessageBox msgbox;
 	msgbox.setText("Select the original landmarks.");
@@ -2747,7 +2747,7 @@ void ImageViewer::putInOrgLandmarks() {
 }
 
 void ImageViewer::putInLines() {
-	Image sceneImage(this->fileName);
+	Image sceneImage(this->fileName.toStdString());
 	Mat enddest = sceneImage.getMatrixImage();
 
 	Image::SegmentMethod sgmethod = chooseSegMethod();
@@ -2759,13 +2759,13 @@ void ImageViewer::putInLines() {
 }
 
 void ImageViewer::putOutLines() {
-	Image sceneImage(this->fileName);
+	Image sceneImage(this->fileName.toStdString());
 	this->lines.clear();
 	optionDisplay(sceneImage, this->esLandmarks, this->orgLandmarks,
 			this->lines, this->angleDiff, this->ePoint);
 }
 void ImageViewer::putOutOrgLandmarks() {
-	Image sceneImage(this->fileName);
+	Image sceneImage(this->fileName.toStdString());
 	this->orgLandmarks.clear();
 	optionDisplay(sceneImage, this->esLandmarks, this->orgLandmarks,
 			this->lines, this->angleDiff, this->ePoint);
@@ -2803,11 +2803,10 @@ void ImageViewer::optionDisplay(impls_2015::Image image, vector<Point> esLM,
  */
 void ImageViewer::edgeSegmentation() {
 	qDebug() << "Edge segmentation.";
-
 	/*
 	 * Working on an image
 	 */
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	qDebug() << image.getName();
 
 	Image::SegmentMethod sgmethod = chooseSegMethod();
@@ -2841,7 +2840,7 @@ void ImageViewer::edgeSegmentation() {
 void ImageViewer::edgeSegmentation_Value_Changed(QString filePath,
 		int thresholdValue) {
 
-	Image image(filePath);
+	Image image(filePath.toStdString());
 	vector<Edge> edges = image.getEdges(thresholdValue);
 
 	vector<Line> lines = image.getApproximateLines(edges);
@@ -2859,7 +2858,7 @@ void ImageViewer::edgeSegmentation_Value_Changed(QString filePath,
 void ImageViewer::edgeSegmentation_Method_Changed(QString filePath,
 		impls_2015::Image::SegmentMethod sgmethod) {
 
-	Image image(filePath);
+	Image image(filePath.toStdString());
 	int tvalue = 0;
 	vector<Line> lines = image.lineSegment(sgmethod, tvalue);
 	Mat enddest(matImage.clone());
@@ -2878,7 +2877,7 @@ void ImageViewer::pairwiseHistogram() {
 	int angleAcc = resources["PGHAngleAcc"];
 	int distanceAcc = resources["PGHDistanceAcc"];
 
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	cv::Mat enddest;
 
 	Image::SegmentMethod sgmethod = chooseSegMethod();
@@ -2930,7 +2929,7 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	int angleAcc = resources["PGHAngleAcc"];
 	int distanceAcc = resources["PGHDistanceAcc"];
 
-	Image image(fileName);
+	Image image(fileName.toStdString());
 
 	/*
 	 * Working on directory
@@ -2949,7 +2948,7 @@ void ImageViewer::pwBhattacharyyaMatching() {
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
-	Image image2(fileName2);
+	Image image2(fileName2.toStdString());
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 	double matching = Scenario::pghMatching(image, image2,
 			GeometricHistogram::Bhattacharyya,
@@ -2968,12 +2967,12 @@ void ImageViewer::pwChiSquaredMatching() {
 			"data/resources/pgh.rc");
 	int angleAcc = resources["PGHAngleAcc"];
 	int distanceAcc = resources["PGHDistanceAcc"];
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
-	Image image2(fileName2);
+	Image image2(fileName2.toStdString());
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 	double matching = Scenario::pghMatching(image, image2,
 			GeometricHistogram::Chisquared,
@@ -2991,12 +2990,12 @@ void ImageViewer::pwIntersectionMatching() {
 			"data/resources/pgh.rc");
 	int angleAcc = resources["PGHAngleAcc"];
 	int distanceAcc = resources["PGHDistanceAcc"];
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
-	Image image2(fileName2);
+	Image image2(fileName2.toStdString());
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 	double matching = Scenario::pghMatching(image, image2,
 			GeometricHistogram::Intersection,
@@ -3012,7 +3011,7 @@ void ImageViewer::pwIntersectionMatching() {
 void ImageViewer::pHoughTransform() {
 	qDebug() << "Probabilistic Hough Transform...";
 
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");
@@ -3028,7 +3027,7 @@ void ImageViewer::pHoughTransform() {
 	if (fileName2.isEmpty())
 		return;
 	qDebug() << fileName2;
-	Image image2(fileName2);
+	Image image2(fileName2.toStdString());
 
 	Image::SegmentMethod sgmethod = chooseSegMethod();
 
@@ -3084,7 +3083,7 @@ void ImageViewer::phtContextMenu(const QPoint& pos) {
 
 void ImageViewer::putOrgLandmarks() {
 	qDebug() << "Load context menu";
-	Image sceneImage(this->fileName);
+	Image sceneImage(this->fileName.toStdString());
 
 	QMessageBox msgbox;
 	msgbox.setText("Select the original landmarks.");
@@ -3103,7 +3102,7 @@ void ImageViewer::savePHTToFile() {
 	msgbox.setText("Choose the folder to save the result");
 	msgbox.exec();
 	QString folderPath = QFileDialog::getExistingDirectory(this);
-	Image sceneImage(this->fileName);
+	Image sceneImage(this->fileName.toStdString());
 	QString savePath = folderPath + "/E" + sceneImage.getName() + ".TPS";
 	PHoughTransform pht;
 	pht.saveEstLandmarks(this->esLandmarks, savePath);
@@ -3130,7 +3129,7 @@ bool ImageViewer::checkPresent(impls_2015::Image mImage,
 void ImageViewer::crossCorrelation() {
 
 	qDebug() << "Cross correlation";
-	Image image(fileName);
+	Image image(fileName.toStdString());
 
 	QMessageBox msgbox;
 
@@ -3160,7 +3159,7 @@ void ImageViewer::crossCorrelation() {
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
-	Image sceneImage(fileName2);
+	Image sceneImage(fileName2.toStdString());
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/ccorrelation.rc");
 	int templSize = resources["templSize"];
@@ -3188,7 +3187,7 @@ void ImageViewer::crossCorrelation() {
 void ImageViewer::crossCorrelationDistance() {
 
 	qDebug() << "Compute the measure distance by cross correlation";
-	Image image(fileName);
+	Image image(fileName.toStdString());
 
 	QMessageBox msgbox;
 
@@ -3213,7 +3212,7 @@ void ImageViewer::crossCorrelationDistance() {
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
-	Image sceneImage(fileName2);
+	Image sceneImage(fileName2.toStdString());
 	Point ebary;
 	map<string, int> resources = ReadResouces::readResources(
 			"data/resources/ccorrelation.rc");
@@ -3233,7 +3232,7 @@ void ImageViewer::crossCorrelationDistance() {
 void ImageViewer::tplMatchingDistance() {
 	qDebug() << "Measure distance by article";
 
-	Image image(fileName);
+	Image image(fileName.toStdString());
 
 	QMessageBox msgbox;
 	msgbox.setText("Select the landmark file of reference image.");
@@ -3250,7 +3249,7 @@ void ImageViewer::tplMatchingDistance() {
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
-	Image sceneImage(fileName2);
+	Image sceneImage(fileName2.toStdString());
 	Point ebary;
 	impls_2015::Image::SegmentMethod sgmethod = chooseSegMethod();
 	map<string, int> resources = ReadResouces::readResources(
@@ -3318,7 +3317,7 @@ int ImageViewer::saveOrNot() {
 }
 
 void ImageViewer::loadOriginalLandmarks() {
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file.");
@@ -3355,7 +3354,7 @@ void ImageViewer::edgeSegmentDirectory() {
 }
 void ImageViewer::bhattacharyyaDistanceDirectory() {
 	qDebug() << "Compare PGH matching using Bhattacharyya metric on directory";
-	Image image(fileName);
+	Image image(fileName.toStdString());
 
 	/*
 	 * Working on directory
@@ -3376,7 +3375,7 @@ void ImageViewer::bhattacharyyaDistanceDirectory() {
 }
 void ImageViewer::phtOnDirectory() {
 	qDebug() << "Probabilistic Hough Transform on directory";
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");
@@ -3404,7 +3403,7 @@ void ImageViewer::phtOnDirectory() {
 }
 void ImageViewer::estlmOnDirectory() {
 	qDebug() << "Estimated landmarks on directory";
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");
@@ -3440,7 +3439,7 @@ void ImageViewer::estlmOnDirectory() {
 }
 void ImageViewer::computeSizeOnDirectory() {
 	qDebug() << "Compute the original size and the estimated size on directory";
-	Image image(fileName);
+	Image image(fileName.toStdString());
 	QMessageBox msgbox;
 
 	msgbox.setText("Select the landmark file of reference image.");

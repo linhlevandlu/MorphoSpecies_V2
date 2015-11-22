@@ -2,7 +2,7 @@
  * Edge.cpp
  *
  *  Created on: Aug 20, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -204,18 +204,16 @@ vector<cv::Point> Edge::segment() {
  * @result: an image in Matrix
  */
 void Edge::drawing(cv::Mat &outputImage) {
-	//Mat output = Mat::zeros(inputImage.size(), CV_8UC3);
-	QString title;
+
 	if (listOfLines.size() > 0) {
-		qDebug() << "Drawing the edges from a list of lines.";
+		cout << "Drawing the edges from a list of lines.";
 		for (size_t i = 0; i < listOfLines.size(); i++) {
 			Line linei = listOfLines.at(i);
 			linei.drawing(outputImage);
 		}
-		title = "Edge By Lines";
 	} else {
 		if (listOfPoints.size() > 0) {
-			qDebug() << "Drawing the edges from list of points.";
+			cout << "Drawing the edges from list of points.";
 			cv::Point p;
 			p = listOfPoints.at(0);
 			for (size_t i = 1; i < listOfPoints.size(); i++) {
@@ -223,7 +221,6 @@ void Edge::drawing(cv::Mat &outputImage) {
 				cv::line(outputImage, p, q, cv::Scalar(0, 255, 0), 1, 8);
 				p = q;
 			}
-			title = "Edge by Points";
 		}
 	}
 }
@@ -233,19 +230,35 @@ void Edge::drawing(cv::Mat &outputImage) {
  * @parameter: filePath - path of file contains the lines
  * @return: list of lines
  */
-vector<Line> Edge::readFile(QString filePath) {
-	ifstream openFile(filePath.toStdString().c_str());
+vector<Line> Edge::readFile(string filePath) {
+	ifstream openFile(filePath.c_str());
 	string lineText;
 	vector<Line> lines;
 	if (openFile.is_open()) {
 		while (getline(openFile, lineText)) {
-			QString sline = lineText.c_str();
-			sline = sline.replace("(", "").replace(")", "").replace(" ", ",");
-			QStringList listString = sline.split(",");
-			cv::Point point1(listString.at(0).toInt(),
-					listString.at(1).toInt());
-			cv::Point point2(listString.at(2).toInt(),
-					listString.at(3).toInt());
+			char * sline = new char[lineText.length() + 1];
+			strcpy(sline,lineText.c_str());
+			int x1 = 0,y1=0,x2=0,y2=0;
+			char * coords = strtok(sline,",");
+			while(coords != NULL){
+				if(x1 ==0){
+					x1 = atoi(coords);
+				}else{
+					if(y1 == 0){
+						y1 = atoi(coords);
+					}else{
+						if(x2 == 0){
+							x2 = atoi(coords);
+						}else{
+							y2 = atoi(coords);
+						}
+					}
+				}
+				coords = strtok(NULL,",");
+			}
+			//printf("%d %d %d %d\n",x1,y1,x2,y2);
+			cv::Point point1(x1,y1);
+			cv::Point point2(x2,y2);
 			Line line(point1, point2);
 			lines.push_back(line);
 		}

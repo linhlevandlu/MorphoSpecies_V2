@@ -3,7 +3,7 @@
  *
  *  Created on: Sep 17, 2015
  *      Author: linh
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ GeometricHistogram::~GeometricHistogram() {
  * @return: list of local histogram
  */
 vector<LocalHistogram> GeometricHistogram::shapeHistogram(Image image,
-		LocalHistogram::AccuracyPGH angleAcc, int columns,
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc,
 		Image::SegmentMethod sgmethod, cv::Mat &result,
 		vector<vector<int> > &matrix) {
 	ShapeHistogram pghHistogram = image.getShapeHistogram();
@@ -52,9 +52,8 @@ vector<LocalHistogram> GeometricHistogram::shapeHistogram(Image image,
 	vector<LocalHistogram> listLocalPGH;
 
 	listLocalPGH = pghHistogram.constructPGH(lines);
-	matrix = pghHistogram.constructMatPGH(angleAcc, columns);
-
-	result = pghHistogram.presentation(listLocalPGH, angleAcc, columns);
+	matrix = pghHistogram.constructMatPGH(listLocalPGH,angleAcc, distanceAcc);
+	result = pghHistogram.presentation(listLocalPGH, angleAcc, distanceAcc);
 
 	return listLocalPGH;
 }
@@ -75,12 +74,12 @@ double GeometricHistogram::pghHistogramMatching(Image refImage,
 
 	int t1 = 0, t2 = 0;
 	ShapeHistogram refHist = refImage.getShapeHistogram();
-	refHist.constructPGH(refImage.lineSegment(sgmethod, t1));
-	refHist.constructMatPGH(angleAcc, distanceAcc);
+	vector<LocalHistogram> refLocalHists = refHist.constructPGH(refImage.lineSegment(sgmethod, t1));
+	refHist.constructMatPGH(refLocalHists,angleAcc, distanceAcc);
 
 	ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
-	sceneHist.constructPGH(sceneImage.lineSegment(sgmethod, t2));
-	sceneHist.constructMatPGH(angleAcc, distanceAcc);
+	vector<LocalHistogram> sceneLocalHists =sceneHist.constructPGH(sceneImage.lineSegment(sgmethod, t2));
+	sceneHist.constructMatPGH(sceneLocalHists, angleAcc, distanceAcc);
 
 	/*vector<Line> set2 = readFile("test/segmentation_translate200/Md028.PGH");
 	 sceneHist.constructPGH(set2);
@@ -133,17 +132,6 @@ void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 	QString refName;
 	QString sceneName;
 	ofstream of("matching_result.txt");
-	/*of<<"\t";
-	 for (int k = 0; k < files.size(); k++) {
-	 QFileInfo file = files.at(k);
-	 QString _name = file.absoluteFilePath();
-	 int index2 = _name.lastIndexOf("/");
-	 refName = _name.mid(index2 + 1, _name.length() - index2).replace(" ",
-	 "");
-
-	 of << "\t" << refName.toStdString();
-	 }
-	 of << "\n";*/
 
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo reffile = files.at(i);
@@ -151,10 +139,10 @@ void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 		int index2 = _name.lastIndexOf("/");
 		refName = _name.mid(index2 + 1, _name.length() - index2).replace(" ",
 				"");
-		Image refImage(_name);
+		Image refImage(_name.toStdString());
 		ShapeHistogram refHist = refImage.getShapeHistogram();
-		refHist.constructPGH(refImage.lineSegment());
-		refHist.constructMatPGH(angleAcc, distanceAcc);
+		vector<LocalHistogram>refLocalHist = refHist.constructPGH(refImage.lineSegment());
+		refHist.constructMatPGH(refLocalHist, angleAcc, distanceAcc);
 		of << refName.toStdString() << "\t";
 		for (int j = 0; j < files.size(); j++) {
 			if (j >= i) {
@@ -164,10 +152,10 @@ void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 				sceneName =
 						_name2.mid(index2 + 1, _name2.length() - index2).replace(
 								" ", "");
-				Image sceneImage(_name2);
+				Image sceneImage(_name2.toStdString());
 				ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
-				sceneHist.constructPGH(sceneImage.lineSegment());
-				sceneHist.constructMatPGH(angleAcc, distanceAcc);
+				vector<LocalHistogram> sceneLocalHists = sceneHist.constructPGH(sceneImage.lineSegment());
+				sceneHist.constructMatPGH(sceneLocalHists, angleAcc, distanceAcc);
 				double distance = getDistanceMetric(refHist, sceneHist, method);
 
 				of << distance << "\t";
@@ -207,19 +195,19 @@ void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
 
 	QString refname = refImage.getName();
 	ShapeHistogram refHist = refImage.getShapeHistogram();
-	refHist.constructPGH(refImage.lineSegment(sgmethod, rtValue));
-	refHist.constructMatPGH(angleAcc, distanceAcc);
+	vector<LocalHistogram>refLocalHists = refHist.constructPGH(refImage.lineSegment(sgmethod, rtValue));
+	refHist.constructMatPGH(refLocalHists, angleAcc, distanceAcc);
 
 	of<<"Reference image "<< refname.toStdString() <<".JPG" <<"\n";
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 		qDebug() << sceneImage.getName();
 
 		ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
-		sceneHist.constructPGH(sceneImage.lineSegment(sgmethod, stValue));
-		sceneHist.constructMatPGH(angleAcc, distanceAcc);
+		vector<LocalHistogram>sceneLocalHists = sceneHist.constructPGH(sceneImage.lineSegment(sgmethod, stValue));
+		sceneHist.constructMatPGH(sceneLocalHists, angleAcc, distanceAcc);
 
 		of<< sceneImage.getName().toStdString()<<".JPG" << "\t";
 
@@ -238,7 +226,7 @@ void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
  * @parameter 3: columns - the distance accuracy
  */
 void GeometricHistogram::pairwiseHistogramDirectory(QString folderPath,
-		LocalHistogram::AccuracyPGH angleAcc, int columns) {
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	QDir qdir;
 	qdir.setPath(folderPath);
 	qdir.setFilter(QDir::Files);
@@ -254,15 +242,15 @@ void GeometricHistogram::pairwiseHistogramDirectory(QString folderPath,
 				+ _name.mid(index2 + 1, _name.length() - index2 - 5).replace(
 						" ", "") + "_L"
 				+ QString::number(LocalHistogram::heightOfAngleAxis(angleAcc))
-				+ "_C" + QString::number(columns) + ".PGH";
+				+ "_C" + QString::number(distanceAcc) + ".PGH";
 		qDebug() << savePath;
-		Image sceneImage(_name);
+		Image sceneImage(_name.toStdString());
 		vector<Line> lines = sceneImage.lineSegment();
 		vector<LocalHistogram> listLocalPGH;
 		ShapeHistogram sceneHist = sceneImage.getShapeHistogram();
 		listLocalPGH = sceneHist.constructPGH(lines);
-		vector<vector<int> > matrix = sceneHist.constructMatPGH(angleAcc,
-				columns);
+		vector<vector<int> > matrix = sceneHist.constructMatPGH(listLocalPGH,angleAcc,
+				distanceAcc);
 		sceneHist.writeMatrix(matrix, savePath);
 	}
 }

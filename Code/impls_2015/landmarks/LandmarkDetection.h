@@ -2,7 +2,7 @@
  * LandmarkDetection.h
  *
  *  Created on: Aug 21, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,6 @@
 #ifndef LANDMARKDETECTION_H_
 #define LANDMARKDETECTION_H_
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
-#include <QtCore/qqueue.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -37,7 +34,6 @@
 #include <QtCore/QDebug>
 #include <QtCore/qlist.h>
 #include <fstream>
-#include <QtGui/QFileDialog>
 #include <QtCore/qdir.h>
 #include <ostream>
 

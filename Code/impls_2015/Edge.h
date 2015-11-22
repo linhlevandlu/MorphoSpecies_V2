@@ -2,7 +2,7 @@
  * Edge.h
  *
  *  Created on: Aug 20, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,6 @@
 #ifndef EDGE_H_
 #define EDGE_H_
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
-#include <QtCore/qlist.h>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
@@ -34,10 +31,11 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
-#include <QtCore/QDebug>
 #include <iostream>
 #include <istream>
 #include <fstream>
+#include <string.h>
+#include <stdio.h>
 
 #include "Line.h"
 #include "IDrawOperation.h"
@@ -82,7 +80,7 @@ public:
 	vector<cv::Point> segment();
 	void drawing(cv::Mat &outputImage);
 
-	static vector<Line> readFile(QString filePath);
+	static vector<Line> readFile(string filePath);
 	void sortByX();
 	void sortByY();
 	bool operator<(const Edge &edge) const;

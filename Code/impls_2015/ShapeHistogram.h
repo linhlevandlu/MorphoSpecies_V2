@@ -2,7 +2,7 @@
  * ShapeHistogram.h
  *
  *  Created on: Sep 1, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -22,12 +22,6 @@
 #ifndef SHAPEHISTOGRAM_H_
 #define SHAPEHISTOGRAM_H_
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QPrinter>
-#include <QtGui/QDialog>
-#include <QtGui/QWidget>
-#include <QtGui/QSlider>
-#include <QtCore/qqueue.h>
 #include <QtCore/QDebug>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -68,14 +62,16 @@ public:
 	vector<vector<int> > getMatrix();
 	vector<LocalHistogram> getListLocalHistogram();
 
-	cv::Mat presentation(vector<LocalHistogram> pghHistograms, LocalHistogram::AccuracyPGH angleAcc, int cols);
+	cv::Mat presentation(vector<LocalHistogram> pghHistograms,
+			LocalHistogram::AccuracyPGH angleAcc, int cols);
 	double bhattacharyaMetric(ShapeHistogram scenHist);
 	double chiSquaredMetric(ShapeHistogram sceneHist);
 	double intersectionMetric(ShapeHistogram sceneHist);
 
 	vector<LocalHistogram> constructPGH(vector<Line> prLines);
 	int distanceOffset(double distance, int cols);
-	vector<vector<int> > constructMatPGH(LocalHistogram::AccuracyPGH angleAcc, int cols);
+	vector<vector<int> > constructMatPGH(vector<LocalHistogram> localHistograms,
+			LocalHistogram::AccuracyPGH angleAcc, int cols);
 	void writeMatrix(vector<vector<int> > matrixPGH, QString fileName);
 
 };

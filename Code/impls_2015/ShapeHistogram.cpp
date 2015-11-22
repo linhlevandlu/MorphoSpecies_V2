@@ -2,7 +2,7 @@
  * ShapeHistogram.cpp
  *
  *  Created on: Sep 1, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -113,10 +113,9 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> prLines) {
  * @parameter 1: angleAcc - angle accuracy
  * @parameter 2: cols - distance accuracy
  */
-vector<vector<int> > ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH angleAcc,
+vector<vector<int> > ShapeHistogram::constructMatPGH(vector<LocalHistogram> localHistograms,LocalHistogram::AccuracyPGH angleAcc,
 		int cols) {
 	int rows = heightAngleAxis(angleAcc);
-	//qDebug() << "Matrix r-c: " << rows << ", " << cols;
 	double entries = 0;
 
 	//Initialization the matrix
@@ -126,7 +125,7 @@ vector<vector<int> > ShapeHistogram::constructMatPGH(LocalHistogram::AccuracyPGH
 		matrixResult[i].resize(cols, 0);
 	}
 
-	vector<LocalHistogram> shapeHistogram = this->listLocalHistogram;
+	vector<LocalHistogram> shapeHistogram = localHistograms;//this->listLocalHistogram;
 	for (size_t i = 0; i < shapeHistogram.size(); i++) {
 		LocalHistogram lcHist = shapeHistogram.at(i);
 		vector<GFeatures> lsFeatures = lcHist.getPWHistgoram();

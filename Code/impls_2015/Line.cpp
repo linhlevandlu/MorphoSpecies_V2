@@ -2,7 +2,7 @@
  * Lines.cpp
  *
  *  Created on: Jun 24, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,6 @@
  */
 
 #include "Line.h"
-#include <QtCore/qdebug.h>
-#include <QtCore/QDebug>
-#include <QtGui/QFormLayout>
-#include <QtGui/QLabel>
-#include <QtGui/qslider.h>
-#include <QtCore/qset.h>
-#include <QtCore/qlist.h>
 #include <math.h>
 
 namespace impls_2015 {
@@ -319,10 +312,7 @@ vector<vector<double> > Line::parallelLine(double distance) {
 			if (delta > 0) {
 				c = m - k;
 				c1 = -m - k;
-				//qDebug() << "Nghiem cua phuong trinh: " << c << ", " << c1;
 			}
-			//double c2 = (distance * (sqrt(a * a + b * b))) - (a * x0 + b * y0);
-			//qDebug() << c2;
 		}
 	}
 	vector<vector<double> > equations;
@@ -372,7 +362,6 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b - e;
 		if (y0 >= 0 && y0 < height) {
-			//qDebug() << "1 nghiem " << x0 << "," << y0;
 			result.push_back(Point(x0, y0));
 		}
 	}
@@ -380,7 +369,6 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b - e;
 		if (y0 >= 0 && y0 < height) {
-			//qDebug() << "2 nghiem " << x0 << "," << y0;
 			result.push_back(Point(x0, y0));
 		}
 	}
@@ -388,7 +376,6 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b + e;
 		if (y0 >= 0 && y0 < height) {
-			//qDebug() << "3 nghiem " << x0 << "," << y0;
 			result.push_back(Point(x0, y0));
 		}
 	}
@@ -396,7 +383,6 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
 	if (x0 >= 0 && x0 < width) {
 		y0 = a * x0 + b + e;
 		if (y0 >= 0 && y0 < height) {
-			//qDebug() << "4 nghiem " << x0 << "," << y0;
 			result.push_back(Point(x0, y0));
 		}
 	}
@@ -407,7 +393,7 @@ vector<Point> Line::interParallel(Line line1, Line line2, double distance1,
  * Write the value of two endpoints of line
  */
 void Line::toString() {
-	qDebug() << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y
+	cout << "((" << p1.x << ", " << p1.y << "),(" << p2.x << ", " << p2.y
 			<< "))";
 }
 

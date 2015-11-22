@@ -2,7 +2,7 @@
  * EdgeSegmentation.cpp
  *
  *  Created on: Aug 13, 2015
- *  Image processing for morphometrics (IPM) Version 2
+ *  Image processing for morphometrics (IPM) Version 0.2
  *	Copyright (C) 2015 LE Van Linh (linhlevandlu@gmail.com)
  *
  *	This program is free software: you can redistribute it and/or modify
@@ -40,12 +40,12 @@ vector<Line> EdgeSegmentation::lineSegment(Image image,
 		Image::SegmentMethod sgmethod) {
 	int thresh = 0;
 
-	clock_t t1, t2;
-	t1 = clock();
+	//clock_t t1, t2;
+//	t1 = clock();
 	vector<Line> lines = image.lineSegment(sgmethod, thresh);
-	t2 = clock();
-	qDebug() << "time to segmentation: "
-			<< ((float) t2 - (float) t1) / CLOCKS_PER_SEC << " seconds";
+	//t2 = clock();
+	//qDebug() << "time to segmentation: "
+	//		<< ((float) t2 - (float) t1) / CLOCKS_PER_SEC << " seconds";
 	return lines;
 }
 
@@ -81,7 +81,7 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
-		Image image(_name);
+		Image image(_name.toStdString());
 		qDebug() << _name;
 		int tvalue = 0;
 		vector<Line> lines = image.lineSegment(method, tvalue);
@@ -112,9 +112,14 @@ void EdgeSegmentation::savePGHFile(vector<Line> lines, QString savePath) {
 		y1 = line.getP1().y;
 		x2 = line.getP2().x;
 		y2 = line.getP2().y;
-		of << "(" << x1 << "," << y1 << ")" << " (" << x2 << "," << y2 << ")"
-				<< "\n";
+		of << x1 << "," << y1 << "," << x2 << "," << y2 << "\n";
 	}
 	of.close();
+}
+
+void EdgeSegmentation::saveSegmentation(Image image,
+		Image::SegmentMethod sgmethod, QString savePath) {
+	vector<Line> lines = lineSegment(image,sgmethod);
+	savePGHFile(lines,savePath);
 }
 } /* namespace impls_2015 */
