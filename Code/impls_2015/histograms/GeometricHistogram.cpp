@@ -127,7 +127,7 @@ double GeometricHistogram::getDistanceMetric(ShapeHistogram refHist,
 void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
 		MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
 		int distanceAcc) {
-	QFileInfoList files = Image::readImagesFolder(folderPath);
+	QFileInfoList files = Image::readImagesFolder(folderPath.toStdString());
 
 	QString refName;
 	QString sceneName;
@@ -184,7 +184,7 @@ void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
 		QString folderPath, MatchingMethod matchingMethod,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc, QString fileSave,
 		Image::SegmentMethod sgmethod) {
-	QFileInfoList files = Image::readImagesFolder(folderPath);
+	QFileInfoList files = Image::readImagesFolder(folderPath.toStdString());
 
 	ofstream of(fileSave.toStdString().c_str());
 

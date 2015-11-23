@@ -459,7 +459,7 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		QString sceneDir, QString scenelmDir, QString saveDir,
 		Image::SegmentMethod sgmethod, int save) {
 
-	QFileInfoList files = Image::readImagesFolder(sceneDir);
+	QFileInfoList files = Image::readImagesFolder(sceneDir.toStdString());
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();

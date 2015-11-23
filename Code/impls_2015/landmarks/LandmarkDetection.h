@@ -64,7 +64,7 @@ public:
 	void centroidCCorrelations(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks);
 	//Mat rotateImage(Mat source, double angle, Point center);
-	Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
+	Mat matchingTemplate(Image refImage, Image sceneImage, string lmPath,
 			int templSize, int sceneSize, double &angleDiff,
 			Image::SegmentMethod sgmethod, vector<Point> &mcResult, Point &ePoint);
 	void matchingDirectory(Image refImage, QString folderImages, QString lmPath,
@@ -77,7 +77,7 @@ public:
 	void centroidMatchingDirectory(Image refImage, QString lmPath,
 			QString folderImages, QString folderlandmarks, int templSize,
 			int sceneSize, QString savePath, Image::SegmentMethod sgmethod);
-	double centroidMatching(Image refImage, Image sceneImage, QString lmPath,
+	double centroidMatching(Image refImage, Image sceneImage, string lmPath,
 			int templSize, int sceneSize,Image::SegmentMethod sgmethod, Point &ebary);
 	void centroidMatchingDirectory(Image refImage, QString lmPath,
 			QString folderImages, int templSize, int sceneSize,

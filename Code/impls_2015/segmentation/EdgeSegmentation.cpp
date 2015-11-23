@@ -69,10 +69,10 @@ cv::Mat EdgeSegmentation::rePresentation(cv::Mat resultImage,
  * @parameter 1: inputPath - the images folder
  * @parameter 2: savePath - the ouput folder
  */
-void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
+void EdgeSegmentation::segmentDirectory(string inputPath, string savePath,
 		Image::SegmentMethod method, int save) {
 	QFileInfoList files = Image::readImagesFolder(inputPath);
-	QString spath = savePath + "/thresholdValues.txt";
+	QString spath(savePath.append("/thresholdValues.txt").c_str());
 	ofstream of(spath.toStdString().c_str());
 
 	clock_t t1, t2;
@@ -88,14 +88,18 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
 		of << image.getName().toStdString().c_str() << "\t" << tvalue << "\n";
 
 		// save PGH files
-		QString pghName = savePath + "/" + image.getName() + ".PGH";
+		QString pghName(
+				savePath.append("/").append(image.getName().toStdString()).append(
+						".PGH").c_str()); // = savePath.c_str() + "/" + image.getName() + ".PGH";
 		if (save == 1)
-			savePGHFile(lines, pghName);
+			savePGHFile(lines, pghName.toStdString());
 
 		//save the images
 		cv::Mat segImg(image.getMatrixImage().clone());
 		segImg = rePresentation(segImg, lines);
-		QString path = savePath + "/" + image.getName() + ".JPG";
+		QString path(
+				savePath.append("/").append(image.getName().toStdString()).append(
+						".JPG").c_str()); // = savePath.c_str() + "/" + image.getName() + ".JPG";
 		imwrite(path.toStdString().c_str(), segImg);
 	}
 	t2 = clock();
@@ -103,9 +107,9 @@ void EdgeSegmentation::segmentDirectory(QString inputPath, QString savePath,
 			<< " seconds";
 	of.close();
 }
-void EdgeSegmentation::savePGHFile(vector<Line> lines, QString savePath) {
+void EdgeSegmentation::savePGHFile(vector<Line> lines, string savePath) {
 	int x1, y1, x2, y2;
-	ofstream of(savePath.toStdString().c_str());
+	ofstream of(savePath.c_str());
 	for (size_t i = 0; i < lines.size(); i++) {
 		Line line = lines.at(i);
 		x1 = line.getP1().x;
@@ -118,8 +122,8 @@ void EdgeSegmentation::savePGHFile(vector<Line> lines, QString savePath) {
 }
 
 void EdgeSegmentation::saveSegmentation(Image image,
-		Image::SegmentMethod sgmethod, QString savePath) {
-	vector<Line> lines = lineSegment(image,sgmethod);
-	savePGHFile(lines,savePath);
+		Image::SegmentMethod sgmethod, string savePath) {
+	vector<Line> lines = lineSegment(image, sgmethod);
+	savePGHFile(lines, savePath);
 }
 } /* namespace impls_2015 */

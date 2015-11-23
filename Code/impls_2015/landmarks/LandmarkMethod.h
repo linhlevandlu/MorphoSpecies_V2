@@ -32,7 +32,7 @@ class LandmarkMethod {
 public:
 	LandmarkMethod();
 	virtual ~LandmarkMethod();
-	virtual Mat matchingTemplate(Image refImage, Image sceneImage, QString lmPath,
+	virtual Mat matchingTemplate(Image refImage, Image sceneImage, string lmPath,
 			int templSize, int sceneSize, double &angleDiff, Image::SegmentMethod sgmethod,
 			vector<Point> &mcResult, Point &ePoint) = 0;
 };

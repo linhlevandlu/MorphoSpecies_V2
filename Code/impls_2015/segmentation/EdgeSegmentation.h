@@ -56,9 +56,9 @@ public:
 	EdgeSegmentation();
 	vector<Line> lineSegment(Image image, Image::SegmentMethod sgmethod);
 	cv::Mat rePresentation(cv::Mat resultImage, vector<Line> lines);
-	void segmentDirectory(QString inputFolder,QString saveFolder,Image::SegmentMethod method, int save);
-	void savePGHFile(vector<Line> lines, QString savePath);
-	void saveSegmentation(Image image, Image::SegmentMethod sgmethod, QString savePath);
+	void segmentDirectory(string inputFolder,string saveFolder,Image::SegmentMethod method, int save);
+	void savePGHFile(vector<Line> lines, string savePath);
+	void saveSegmentation(Image image, Image::SegmentMethod sgmethod, string savePath);
 };
 
 } /* namespace impls_2015 */

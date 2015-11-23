@@ -57,7 +57,7 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result,
 void Scenario::edgeSegmentationDirectory(QString inputFolder,
 		QString saveFolder, Image::SegmentMethod segmentMethod, int save) {
 	EdgeSegmentation edgeSegment;
-	edgeSegment.segmentDirectory(inputFolder, saveFolder, segmentMethod, save);
+	edgeSegment.segmentDirectory(inputFolder.toStdString(), saveFolder.toStdString(), segmentMethod, save);
 }
 
 /*
@@ -252,7 +252,7 @@ Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		Image::SegmentMethod sgmethod, vector<Point> &mcResult, double &angle,
 		Point &ePoint) {
 	LandmarkDetection lmdetection;
-	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath,
+	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath.toStdString(),
 			templSize, scnSize, angle, sgmethod, mcResult, ePoint);
 }
 
@@ -289,7 +289,7 @@ double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize,
 		Image::SegmentMethod sgmethod, Point &ebary) {
 	LandmarkDetection lmdetection;
-	return lmdetection.centroidMatching(refImage, sceneImage, lmPath, templSize,
+	return lmdetection.centroidMatching(refImage, sceneImage, lmPath.toStdString(), templSize,
 			sceneSize, sgmethod, ebary);
 }
 

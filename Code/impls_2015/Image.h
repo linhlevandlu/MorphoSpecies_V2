@@ -38,6 +38,8 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
+#include <iostream>
+#include <string>
 
 #include "Edge.h"
 #include "ShapeHistogram.h"
@@ -103,11 +105,11 @@ public:
 	vector<Point> readLandmarksFile(string filePath);
 
 
-	static QFileInfoList readImagesFolder(QString folderPath);
+	static QFileInfoList readImagesFolder(string folderPath);
 	QString getName();
 	static QString getTimeName();
 	static Mat rotateImage(Mat source, double angle, Point center);
-	Mat loadOriginalLandmarks(Mat matImage, QString lmPath,vector<Point> &orgLandmarks);
+	Mat loadOriginalLandmarks(Mat matImage, string lmPath,vector<Point> &orgLandmarks);
 	void drawSegment(Mat &output, vector<Line> lines);
 };
 

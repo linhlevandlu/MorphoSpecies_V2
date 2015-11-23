@@ -2824,7 +2824,7 @@ void ImageViewer::edgeSegmentation() {
 		QString folderPath = QFileDialog::getExistingDirectory(this);
 		QString savePath = folderPath + "/" + image.getName() + ".PGH";
 		EdgeSegmentation edgeSeg;
-		edgeSeg.savePGHFile(lineSegment, savePath);
+		edgeSeg.savePGHFile(lineSegment, savePath.toStdString());
 	}
 
 	ImageViewer *other = new ImageViewer;
@@ -3090,7 +3090,7 @@ void ImageViewer::putOrgLandmarks() {
 	msgbox.exec();
 	QString lpath = QFileDialog::getOpenFileName(this);
 	vector<Point> orgLMs;
-	Mat result = sceneImage.loadOriginalLandmarks(this->matImage, lpath,
+	Mat result = sceneImage.loadOriginalLandmarks(this->matImage, lpath.toStdString(),
 			orgLMs);
 	this->orgLandmarks = orgLMs;
 

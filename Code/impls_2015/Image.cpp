@@ -684,9 +684,10 @@ vector<Point> Image::readLandmarksFile(string filePath) {
  * @parameter: folderPath - the images folder
  * @return: list of images in folder
  */
-QFileInfoList Image::readImagesFolder(QString folderPath) {
+QFileInfoList Image::readImagesFolder(string folderPath) {
 	QDir qdir;
-	qdir.setPath(folderPath);
+	QString fPath(folderPath.c_str());
+	qdir.setPath(fPath);
 	qdir.setFilter(QDir::Files);
 	QStringList filterNames;
 	filterNames << "*.JPG";
@@ -747,10 +748,10 @@ Mat Image::rotateImage(Mat source, double angle, Point center) {
 	return dest;
 }
 
-Mat Image::loadOriginalLandmarks(Mat matImage, QString lmPath,
+Mat Image::loadOriginalLandmarks(Mat matImage, string lmPath,
 		vector<Point> &orgLandmarks) {
 	Mat result(matImage.clone());
-	vector<Point> orgLMtemp = readLandmarksFile(lmPath.toStdString());
+	vector<Point> orgLMtemp = readLandmarksFile(lmPath);
 	for (size_t i = 0; i < orgLMtemp.size(); i++) {
 		Point orgLM(orgLMtemp.at(i).x, matImage.rows - orgLMtemp.at(i).y);
 		circle(result, orgLM, 5, Scalar(0, 255, 0), 2, 8);
