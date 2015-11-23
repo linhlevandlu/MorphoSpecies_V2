@@ -124,10 +124,10 @@ double GeometricHistogram::getDistanceMetric(ShapeHistogram refHist,
  * @parameter 3: angleAcc - the angle accuracy
  * @parameter 4: distanceAcc - the distance accuracy
  */
-void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
+void GeometricHistogram::phgHistogramDirMatching(string folderPath,
 		MatchingMethod method, LocalHistogram::AccuracyPGH angleAcc,
 		int distanceAcc) {
-	QFileInfoList files = Image::readImagesFolder(folderPath.toStdString());
+	QFileInfoList files = Image::readImagesFolder(folderPath);
 
 	QString refName;
 	QString sceneName;
@@ -181,12 +181,12 @@ void GeometricHistogram::phgHistogramDirMatching(QString folderPath,
  * @parameter 5: distanceAcc - the distance accuracy
  */
 void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
-		QString folderPath, MatchingMethod matchingMethod,
-		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc, QString fileSave,
+		string folderPath, MatchingMethod matchingMethod,
+		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc, string fileSave,
 		Image::SegmentMethod sgmethod) {
-	QFileInfoList files = Image::readImagesFolder(folderPath.toStdString());
+	QFileInfoList files = Image::readImagesFolder(folderPath);
 
-	ofstream of(fileSave.toStdString().c_str());
+	ofstream of(fileSave.c_str());
 
 	qDebug() << "Matching method: " << matchingMethod << ", angle accuracy: "
 			<< angleAcc << " * 180.";
@@ -225,10 +225,11 @@ void GeometricHistogram::pghHistogramDirectoryMatching(Image refImage,
  * @parameter 2: angleAcc -the angle accuracy
  * @parameter 3: columns - the distance accuracy
  */
-void GeometricHistogram::pairwiseHistogramDirectory(QString folderPath,
+void GeometricHistogram::pairwiseHistogramDirectory(string folderPath,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	QDir qdir;
-	qdir.setPath(folderPath);
+	QString fPath(folderPath.c_str());
+	qdir.setPath(fPath);
 	qdir.setFilter(QDir::Files);
 	QStringList filterNames;
 	filterNames << "*.JPG";
@@ -251,7 +252,7 @@ void GeometricHistogram::pairwiseHistogramDirectory(QString folderPath,
 		listLocalPGH = sceneHist.constructPGH(lines);
 		vector<vector<int> > matrix = sceneHist.constructMatPGH(listLocalPGH,angleAcc,
 				distanceAcc);
-		sceneHist.writeMatrix(matrix, savePath);
+		sceneHist.writeMatrix(matrix, savePath.toStdString());
 	}
 }
 

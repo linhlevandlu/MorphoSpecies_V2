@@ -57,7 +57,8 @@ vector<Line> Scenario::edgeSegmentation(Image image, cv::Mat &result,
 void Scenario::edgeSegmentationDirectory(QString inputFolder,
 		QString saveFolder, Image::SegmentMethod segmentMethod, int save) {
 	EdgeSegmentation edgeSegment;
-	edgeSegment.segmentDirectory(inputFolder.toStdString(), saveFolder.toStdString(), segmentMethod, save);
+	edgeSegment.segmentDirectory(inputFolder.toStdString(),
+			saveFolder.toStdString(), segmentMethod, save);
 }
 
 /*
@@ -88,7 +89,8 @@ void Scenario::pairwiseHistogramDirectory(QString folderPath,
 		LocalHistogram::AccuracyPGH angleAcc, int columns) {
 	qDebug() << "Pairwise for directory: ";
 	GeometricHistogram geomHistogram;
-	geomHistogram.pairwiseHistogramDirectory(folderPath, angleAcc, columns);
+	geomHistogram.pairwiseHistogramDirectory(folderPath.toStdString(), angleAcc,
+			columns);
 }
 
 /*
@@ -123,8 +125,9 @@ void Scenario::matchingDirectory(Image refImage, QString directoryPath,
 		Image::SegmentMethod sgmethod) {
 	qDebug() << "Matching directory";
 	GeometricHistogram geomHistogram;
-	geomHistogram.pghHistogramDirectoryMatching(refImage, directoryPath,
-			matching, angleAcc, distanceAcc, fileSave, sgmethod);
+	geomHistogram.pghHistogramDirectoryMatching(refImage,
+			directoryPath.toStdString(), matching, angleAcc, distanceAcc,
+			fileSave.toStdString(), sgmethod);
 }
 
 /*
@@ -139,8 +142,8 @@ void Scenario::matchingDirectory(QString directoryPath,
 		LocalHistogram::AccuracyPGH angleAcc, int distanceAcc) {
 	qDebug() << "Matching directory";
 	GeometricHistogram geomHistogram;
-	geomHistogram.phgHistogramDirMatching(directoryPath, matching, angleAcc,
-			distanceAcc);
+	geomHistogram.phgHistogramDirMatching(directoryPath.toStdString(), matching,
+			angleAcc, distanceAcc);
 }
 
 /*
@@ -171,8 +174,8 @@ void Scenario::phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
 		QString scenelmDir, QString saveDir, Image::SegmentMethod sgmethod,
 		int save) {
 	PHoughTransform pht;
-	pht.phtDirectory(refImage, reflmPath, sceneDir, scenelmDir, saveDir,
-			sgmethod, save);
+	pht.phtDirectory(refImage, reflmPath.toStdString(), sceneDir.toStdString(),
+			scenelmDir.toStdString(), saveDir.toStdString(), sgmethod, save);
 }
 
 /**
@@ -187,7 +190,8 @@ vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 
 	vector<Point> landmarks;
 	LandmarkDetection lmdetection;
-	landmarks = lmdetection.crossCorrelation(image, sceneImage, lpath, tsize);
+	landmarks = lmdetection.crossCorrelation(image, sceneImage,
+			lpath.toStdString(), tsize);
 	return landmarks;
 }
 
@@ -201,7 +205,8 @@ vector<Point> Scenario::landmarksByCrossCorelation(Image image, QString lpath,
 void Scenario::cCorelationDirectory(Image refImage, QString path,
 		QString savePath, QString lmPath) {
 	LandmarkDetection lmdetection;
-	lmdetection.cCorrelationByDirectory(refImage, path, savePath, lmPath);
+	lmdetection.cCorrelationByDirectory(refImage, path.toStdString(),
+			savePath.toStdString(), lmPath.toStdString());
 }
 
 /*
@@ -216,8 +221,8 @@ void Scenario::cCorelationDirectory(Image refImage, QString path,
 double Scenario::mDistanceByCrossCorrelation(Image image, QString lmpath,
 		Image sceneImage, int size, Point &ebary) {
 	LandmarkDetection lmdetection;
-	double rs = lmdetection.centroidCCorrelation(image, sceneImage, lmpath,
-			size, ebary);
+	double rs = lmdetection.centroidCCorrelation(image, sceneImage,
+			lmpath.toStdString(), size, ebary);
 	return rs;
 }
 
@@ -235,7 +240,8 @@ void Scenario::mDistanceByCrossCorrelationDir(Image refImage, QString lmpath,
 	QString lmfolder = "/home/linh/Desktop/mg/landmarks";
 	LandmarkDetection lmdetection;
 //	lmdetection.centroidCCorelations(refImage, lmpath, imgFolder);
-	lmdetection.centroidCCorrelations(refImage, lmpath, imgFolder, lmfolder);
+	lmdetection.centroidCCorrelations(refImage, lmpath.toStdString(),
+			imgFolder.toStdString(), lmfolder.toStdString());
 }
 
 /*
@@ -252,8 +258,9 @@ Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		Image::SegmentMethod sgmethod, vector<Point> &mcResult, double &angle,
 		Point &ePoint) {
 	LandmarkDetection lmdetection;
-	return lmdetection.matchingTemplate(refImage, sceneImage, reflmPath.toStdString(),
-			templSize, scnSize, angle, sgmethod, mcResult, ePoint);
+	return lmdetection.matchingTemplate(refImage, sceneImage,
+			reflmPath.toStdString(), templSize, scnSize, angle, sgmethod,
+			mcResult, ePoint);
 }
 
 /*
@@ -272,8 +279,9 @@ void Scenario::landmarksMatchingDirectory(Image refImage, QString folderImages,
 
 	LandmarkDetection lmdetection;
 	double angle = 0;
-	lmdetection.matchingDirectory(refImage, folderImages, lmPath, savePath,
-			templSize, sceneSize, angle, sgmethod, save);
+	lmdetection.matchingDirectory(refImage, folderImages.toStdString(),
+			lmPath.toStdString(), savePath.toStdString(), templSize, sceneSize,
+			angle, sgmethod, save);
 
 }
 
@@ -289,8 +297,8 @@ double Scenario::mDistanceByTemplateMatching(Image refImage, Image sceneImage,
 		QString lmPath, int templSize, int sceneSize,
 		Image::SegmentMethod sgmethod, Point &ebary) {
 	LandmarkDetection lmdetection;
-	return lmdetection.centroidMatching(refImage, sceneImage, lmPath.toStdString(), templSize,
-			sceneSize, sgmethod, ebary);
+	return lmdetection.centroidMatching(refImage, sceneImage,
+			lmPath.toStdString(), templSize, sceneSize, sgmethod, ebary);
 }
 
 /*
@@ -307,14 +315,14 @@ void Scenario::mDistanceByTemplateMatchingDirectory(Image refImage,
 	// compute the centroid
 	LandmarkDetection lmdetection;
 	//lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,templSize,sceneSize);
-	lmdetection.centroidMatchingDirectory(refImage, lmPath, folderImages,
-			lmFolder, templSize, sceneSize, savePath, sgmethod);
+	lmdetection.centroidMatchingDirectory(refImage, lmPath.toStdString(), folderImages.toStdString(),
+			lmFolder.toStdString(), templSize, sceneSize, savePath.toStdString(), sgmethod);
 }
 
 Mat Scenario::loadOriginalLandmarks(Image image, QString lmPath,
 		vector<Point> &orgLandmarks) {
 	LandmarkDetection lmdetection;
-	return lmdetection.loadOriginalLandmarks(image, lmPath, orgLandmarks);
+	return lmdetection.loadOriginalLandmarks(image, lmPath.toStdString(), orgLandmarks);
 }
 
 } /* namespace impls_2015 */

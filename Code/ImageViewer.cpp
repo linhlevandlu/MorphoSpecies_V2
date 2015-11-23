@@ -2679,7 +2679,7 @@ void ImageViewer::getLandmarks() {
 		QString folderPath = QFileDialog::getExistingDirectory(this);
 		QString savePath = folderPath + "/E" + sceneImage.getName() + ".TPS";
 		LandmarkDetection lmDectection;
-		lmDectection.save_Estimated_Landmarks_To_File(esLandmarks, savePath);
+		lmDectection.save_Estimated_Landmarks_To_File(esLandmarks, savePath.toStdString());
 	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ImageConvert::cvMatToQImage(enddest),
@@ -2895,7 +2895,7 @@ void ImageViewer::pairwiseHistogram() {
 		QString savePath = folderPath + "/Matrix_" + image.getName() + ".TPS";
 		qDebug() << savePath;
 		ShapeHistogram shapehist;
-		shapehist.writeMatrix(matrix, savePath);
+		shapehist.writeMatrix(matrix, savePath.toStdString());
 	}
 	/*
 	 * Working on directory (compute PGH on set of image in a folder and save the result into PGH file)
@@ -3049,7 +3049,7 @@ void ImageViewer::pHoughTransform() {
 		QString folderPath = QFileDialog::getExistingDirectory(this);
 		QString savePath = folderPath + "/E" + image2.getName() + ".TPS";
 		PHoughTransform pht;
-		pht.saveEstLandmarks(esLandmarks, savePath);
+		pht.saveEstLandmarks(esLandmarks, savePath.toStdString());
 
 	}
 	ImageViewer *other = new ImageViewer;
@@ -3105,7 +3105,7 @@ void ImageViewer::savePHTToFile() {
 	Image sceneImage(this->fileName.toStdString());
 	QString savePath = folderPath + "/E" + sceneImage.getName() + ".TPS";
 	PHoughTransform pht;
-	pht.saveEstLandmarks(this->esLandmarks, savePath);
+	pht.saveEstLandmarks(this->esLandmarks, savePath.toStdString());
 
 }
 bool ImageViewer::checkPresent(impls_2015::Image mImage,

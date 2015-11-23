@@ -455,11 +455,11 @@ Point PHoughTransform::newLocation(Point point, double angleDiff,
  * @parameter 4: scenelmDir - the folder contains the original landmarks file of scene images
  * @parameter 5: saveDir - the save folder
  */
-void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
-		QString sceneDir, QString scenelmDir, QString saveDir,
+void PHoughTransform::phtDirectory(Image refImage, string reflmPath,
+		string sceneDir, string scenelmDir, string saveDir,
 		Image::SegmentMethod sgmethod, int save) {
 
-	QFileInfoList files = Image::readImagesFolder(sceneDir.toStdString());
+	QFileInfoList files = Image::readImagesFolder(sceneDir);
 	for (int i = 0; i < files.size(); i++) {
 		QFileInfo file = files.at(i);
 		QString _name = file.absoluteFilePath();
@@ -469,25 +469,25 @@ void PHoughTransform::phtDirectory(Image refImage, QString reflmPath,
 		qDebug() << scenename;
 
 		vector<Point> esLandmarks;
-		Mat mat = phtPresentation(refImage, sceneImage, reflmPath.toStdString(),
+		Mat mat = phtPresentation(refImage, sceneImage, reflmPath,
 				esLandmarks, sgmethod);
-		QString savePath = saveDir + "/" + scenename + ".JPG";
-		imwrite(savePath.toStdString().c_str(), mat);
+		string savePath = saveDir.append("/").append(scenename.toStdString()).append(".JPG");
+		imwrite(savePath.c_str(), mat);
 		if (save == 1) {
-			QString fileTPS(saveDir + "/" + scenename + ".TPS");
+			string fileTPS = saveDir.append("/").append(scenename.toStdString()).append(".TPS");
 			saveEstLandmarks(esLandmarks, fileTPS);
 		}
 	}
 }
 void PHoughTransform::saveEstLandmarks(vector<Point> esLandmarks,
-		QString savePath) {
+		string savePath) {
 
-	ofstream of(savePath.toStdString().c_str());
+	ofstream of(savePath.c_str());
 	of << "LM = " << esLandmarks.size() << "\n";
 	for (size_t t = 0; t < esLandmarks.size(); t++) {
 		of << esLandmarks.at(t).x << " " << esLandmarks.at(t).y << "\n";
 	}
-	of << "FILE = " << savePath.toStdString().c_str();
+	of << "FILE = " << savePath.c_str();
 	of.close();
 }
 

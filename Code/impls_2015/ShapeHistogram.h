@@ -72,7 +72,7 @@ public:
 	int distanceOffset(double distance, int cols);
 	vector<vector<int> > constructMatPGH(vector<LocalHistogram> localHistograms,
 			LocalHistogram::AccuracyPGH angleAcc, int cols);
-	void writeMatrix(vector<vector<int> > matrixPGH, QString fileName);
+	void writeMatrix(vector<vector<int> > matrixPGH, string fileName);
 
 };
 

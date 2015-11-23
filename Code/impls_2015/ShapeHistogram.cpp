@@ -153,8 +153,8 @@ vector<vector<int> > ShapeHistogram::constructMatPGH(vector<LocalHistogram> loca
  * Save the presented matrix into file
  * @parameter: fileName - save file path
  */
-void ShapeHistogram::writeMatrix(vector<vector<int> > matrixPGH,QString fileName) {
-	ofstream of(fileName.toStdString().c_str());
+void ShapeHistogram::writeMatrix(vector<vector<int> > matrixPGH,string fileName) {
+	ofstream of(fileName.c_str());
 	int rows = matrixPGH.size();
 	int cols = matrixPGH[0].size();
 	for (int i = 0; i < rows; i++) {

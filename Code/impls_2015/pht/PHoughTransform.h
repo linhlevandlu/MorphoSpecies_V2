@@ -68,12 +68,12 @@ public:
 			double &angleDiff, Point &ePoint, Image::SegmentMethod sgmethod);
 	Mat phtPresentation(Image refImage, Image sceneImage, string reflmPath,
 			vector<Point> &esLandmarks, Image::SegmentMethod sgmethod);
-	void phtDirectory(Image refImage, QString reflmPath, QString sceneDir,
-			QString scenelmDir, QString saveDir, Image::SegmentMethod sgmethod,
+	void phtDirectory(Image refImage, string reflmPath, string sceneDir,
+			string scenelmDir, string saveDir, Image::SegmentMethod sgmethod,
 			int save);
 	double angleDifference(Line refLine, Line sceneLine);
 	Point newLocation(Point point, double angleDiff, Point refPoint);
-	void saveEstLandmarks(vector<Point> esLandmarks, QString savePath);
+	void saveEstLandmarks(vector<Point> esLandmarks, string savePath);
 };
 
 } /* namespace impls_2015 */

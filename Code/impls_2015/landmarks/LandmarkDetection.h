@@ -54,40 +54,40 @@ public:
 			Point &distance);
 	Point matCrossCorrelation(Mat templ, Mat scene);
 	vector<Point> crossCorrelation(Image refImage, Image sceneImage,
-			QString lmPath, int templSize);
-	void cCorrelationByDirectory(Image refImage, QString folderpath,
-			QString savepath, QString lmPath);
+			string lmPath, int templSize);
+	void cCorrelationByDirectory(Image refImage, string folderpath,
+			string savepath, string lmPath);
 	double centroidCCorrelation(Image refImage, Image sceneImage,
-			QString lmPath, int size, Point &ebary);
-	void centroidCCorrelations(Image refImage, QString lmPath,
-			QString folderImages);
-	void centroidCCorrelations(Image refImage, QString lmPath,
-			QString folderImages, QString folderlandmarks);
+			string lmPath, int size, Point &ebary);
+	void centroidCCorrelations(Image refImage, string lmPath,
+			string folderImages);
+	void centroidCCorrelations(Image refImage, string lmPath,
+			string folderImages, string folderlandmarks);
 	//Mat rotateImage(Mat source, double angle, Point center);
 	Mat matchingTemplate(Image refImage, Image sceneImage, string lmPath,
 			int templSize, int sceneSize, double &angleDiff,
 			Image::SegmentMethod sgmethod, vector<Point> &mcResult, Point &ePoint);
-	void matchingDirectory(Image refImage, QString folderImages, QString lmPath,
-			QString savePath, int templSize, int sceneSize, double angleDiff,
+	void matchingDirectory(Image refImage, string folderImages, string lmPath,
+			string savePath, int templSize, int sceneSize, double angleDiff,
 			Image::SegmentMethod sgmethod, int save);
 	double measureDistance(vector<Point> landmarks, Point &bary);
 	double measureDistance(vector<Point> refLandmarks,
 			vector<Point> esLandmarks, double &mCentroid, double &eCentroid,
 			Point &mBary, Point &eBary);
-	void centroidMatchingDirectory(Image refImage, QString lmPath,
-			QString folderImages, QString folderlandmarks, int templSize,
-			int sceneSize, QString savePath, Image::SegmentMethod sgmethod);
+	void centroidMatchingDirectory(Image refImage, string lmPath,
+			string folderImages, string folderlandmarks, int templSize,
+			int sceneSize, string savePath, Image::SegmentMethod sgmethod);
 	double centroidMatching(Image refImage, Image sceneImage, string lmPath,
 			int templSize, int sceneSize,Image::SegmentMethod sgmethod, Point &ebary);
-	void centroidMatchingDirectory(Image refImage, QString lmPath,
-			QString folderImages, int templSize, int sceneSize,
-			QString savePath, Image::SegmentMethod sgmethod);
+	void centroidMatchingDirectory(Image refImage, string lmPath,
+			string folderImages, int templSize, int sceneSize,
+			string savePath, Image::SegmentMethod sgmethod);
 	void save_Estimated_Landmarks_To_File(vector<Point> esLandmarks,
-			QString path);
+			string path);
 	void save_Original_And_Estimated_Landmarks_To_File(
 			vector<Point> orgLandmarks, vector<Point> esLandmarks,
-			QString path);
-	Mat loadOriginalLandmarks(Image image, QString lmPath,vector<Point> &orgLandmarks);
+			string path);
+	Mat loadOriginalLandmarks(Image image, string lmPath,vector<Point> &orgLandmarks);
 };
 
 } /* namespace impls_2015 */

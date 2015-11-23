@@ -54,12 +54,12 @@ public:
 	double pghHistogramMatching(Image refImage, Image sceneImage,
 			MatchingMethod matchingMethod, LocalHistogram::AccuracyPGH angleAcc,
 			int distanceAcc,Image::SegmentMethod sgmethod);
-	void pghHistogramDirectoryMatching(Image refImage, QString folderPath,
+	void pghHistogramDirectoryMatching(Image refImage, string folderPath,
 			MatchingMethod matchingMethod, LocalHistogram::AccuracyPGH angleAcc,
-			int distanceAcc, QString fileSave, Image::SegmentMethod sgmethod);
-	void phgHistogramDirMatching(QString folderPath, MatchingMethod method,
+			int distanceAcc, string fileSave, Image::SegmentMethod sgmethod);
+	void phgHistogramDirMatching(string folderPath, MatchingMethod method,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
-	void pairwiseHistogramDirectory(QString folderPath,
+	void pairwiseHistogramDirectory(string folderPath,
 			LocalHistogram::AccuracyPGH angleAcc, int distanceAcc);
 
 };
