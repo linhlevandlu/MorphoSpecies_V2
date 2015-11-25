@@ -174,7 +174,8 @@ vector<Edge> Image::getEdges(int thresholdValue) {
 			"data/resources/segment.rc");
 	int ratio1 = resources["lowerRatio"];
 	int ratio2 = resources["upperRatio"];
-
+	ratio1 = (ratio1 == 0) ? 1 : ratio1;
+	ratio2 = (ratio2 == 0) ? 3 : ratio2;
 	cv::Canny(grayImg, cannyImage, thresholdValue * ratio1,
 			ratio2 * thresholdValue, 5);
 	vector<vector<Point> > contours;
@@ -700,8 +701,7 @@ QFileInfoList Image::readImagesFolder(string folderPath) {
 QString Image::getName() {
 	QString fName(this->fileName.c_str());
 	int index = fName.lastIndexOf("/");
-	QString scenename = fName.mid(index + 1,
-			fName.length() - index - 5);
+	QString scenename = fName.mid(index + 1, fName.length() - index - 5);
 	return scenename;
 }
 QString Image::getTimeName() {

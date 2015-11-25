@@ -40,7 +40,6 @@ PHoughTransform::~PHoughTransform() {
 vector<PHTEntry> PHoughTransform::constructTable(vector<Line> lines,
 		Point refPoint) {
 	vector<PHTEntry> phtransform;
-	ofstream of("results/table_acc.txt");
 	for (size_t i = 0; i < lines.size(); i++) {
 		Line line1 = lines.at(i);
 		for (size_t j = 0; j < lines.size(); j++) {
@@ -60,19 +59,9 @@ vector<PHTEntry> PHoughTransform::constructTable(vector<Line> lines,
 				entry.addHoughSpace(hs1);
 				entry.addHoughSpace(hs2);
 				phtransform.push_back(entry);
-
-				of << "(" << (line1.getP1().x) << "," << (line1.getP1().y)
-						<< ")" << " (" << (line1.getP2().x) << ","
-						<< (line1.getP2().y) << ")" << "(" << (line2.getP1().x)
-						<< "," << (line2.getP1().y) << ")" << " ("
-						<< (line2.getP2().x) << "," << (line2.getP2().y) << ")"
-						<< "(" << hs1.getAngle() << "," << hs1.getDistance()
-						<< ")" << " (" << (hs2.getAngle()) << ","
-						<< (hs2.getDistance()) << ")" << "\n";
 			}
 		}
 	}
-	of.close();
 	return phtransform;
 }
 
@@ -86,6 +75,11 @@ bool PHoughTransform::closetLine(Line line1, Line line2) {
 	int cond1 = resources["PHTClosetC1"];
 	int cond2 = resources["PHTClosetC2"];
 	int cond3 = resources["PHTClosetC3"];
+
+	cond1 = (cond1 == 0) ? 60 : cond1;
+	cond2 = (cond2 == 0) ? 15 : cond2;
+	cond3 = (cond3 == 0) ? 5 : cond3;
+	//cout << "cond1: " << cond1 << "\n";
 
 	double distance1 = line2.perpendicularDistance(line1.getP1());
 	double distance2 = line2.perpendicularDistance(line1.getP2());
@@ -109,6 +103,10 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
 	int cond1 = resources["PHTSimilarC1"];
 	int cond2 = resources["PHTSimilarC2"];
 	int cond3 = resources["PHTSimilarC3"];
+
+	cond1 = (cond1 == 0) ? 1 : cond1;
+	cond2 = (cond2 == 0) ? 1 : cond2;
+	cond3 = (cond3 == 0) ? 2 : cond3;
 
 	double refAngle = ref1.angleBetweenLines(ref2);
 	double rd1 = ref1.perpendicularDistance(ref2.getP1());
@@ -166,6 +164,9 @@ PHTEntry PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
 PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 		vector<Line> sceneLines, int width, int height,
 		vector<Line> &maxVector) {
+	clock_t t1, t2;
+	t1 = clock();
+
 	// initialization an accumulator
 	vector<vector<int> > acc;
 	int rows = floor(sqrt(width * width + height * height));
@@ -212,6 +213,9 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 		}
 	}
 	qDebug() << "Number of maxVector: " << maxVector.size();
+	t2 = clock();
+	qDebug() << "Time find matching in scene: "
+			<< ((float) t2 - (float) t1) / CLOCKS_PER_SEC << " seconds";
 	return maxEntry;
 }
 
@@ -469,12 +473,18 @@ void PHoughTransform::phtDirectory(Image refImage, string reflmPath,
 		qDebug() << scenename;
 
 		vector<Point> esLandmarks;
-		Mat mat = phtPresentation(refImage, sceneImage, reflmPath,
-				esLandmarks, sgmethod);
-		string savePath = saveDir.append("/").append(scenename.toStdString()).append(".JPG");
+		Mat mat = phtPresentation(refImage, sceneImage, reflmPath, esLandmarks,
+				sgmethod);
+		string saveRoot = saveDir;
+		string savePath =
+				saveRoot.append("/").append(scenename.toStdString()).append(
+						".JPG");
 		imwrite(savePath.c_str(), mat);
 		if (save == 1) {
-			string fileTPS = saveDir.append("/").append(scenename.toStdString()).append(".TPS");
+			string tpsRoot = saveDir;
+			string fileTPS =
+					tpsRoot.append("/").append(scenename.toStdString()).append(
+							".TPS");
 			saveEstLandmarks(esLandmarks, fileTPS);
 		}
 	}

@@ -258,7 +258,7 @@ Mat Scenario::landmarksMatching(Image refImage, Image sceneImage,
 		Image::SegmentMethod sgmethod, vector<Point> &mcResult, double &angle,
 		Point &ePoint) {
 	LandmarkDetection lmdetection;
-	return lmdetection.matchingTemplate(refImage, sceneImage,
+	return lmdetection.estimateLandmarks(refImage, sceneImage,
 			reflmPath.toStdString(), templSize, scnSize, angle, sgmethod,
 			mcResult, ePoint);
 }

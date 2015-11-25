@@ -57,16 +57,19 @@ public:
 			string lmPath, int templSize);
 	void cCorrelationByDirectory(Image refImage, string folderpath,
 			string savepath, string lmPath);
-	double centroidCCorrelation(Image refImage, Image sceneImage,
-			string lmPath, int size, Point &ebary);
+	double centroidCCorrelation(Image refImage, Image sceneImage, string lmPath,
+			int size, Point &ebary);
 	void centroidCCorrelations(Image refImage, string lmPath,
 			string folderImages);
 	void centroidCCorrelations(Image refImage, string lmPath,
 			string folderImages, string folderlandmarks);
 	//Mat rotateImage(Mat source, double angle, Point center);
-	Mat matchingTemplate(Image refImage, Image sceneImage, string lmPath,
+	Mat estimateLandmarks(Image refImage, Image sceneImage, string lmPath,
 			int templSize, int sceneSize, double &angleDiff,
-			Image::SegmentMethod sgmethod, vector<Point> &mcResult, Point &ePoint);
+			Image::SegmentMethod sgmethod, vector<Point> &mcResult,
+			Point &ePoint);
+	vector<Point> matchingTemplate(Image mImage, Image sImage, vector<Point> manualLM, vector<Point> esLandmarks,
+			int templSize, int sceneSize, double angleDiff, Point ePoint);
 	void matchingDirectory(Image refImage, string folderImages, string lmPath,
 			string savePath, int templSize, int sceneSize, double angleDiff,
 			Image::SegmentMethod sgmethod, int save);
@@ -78,16 +81,17 @@ public:
 			string folderImages, string folderlandmarks, int templSize,
 			int sceneSize, string savePath, Image::SegmentMethod sgmethod);
 	double centroidMatching(Image refImage, Image sceneImage, string lmPath,
-			int templSize, int sceneSize,Image::SegmentMethod sgmethod, Point &ebary);
+			int templSize, int sceneSize, Image::SegmentMethod sgmethod,
+			Point &ebary);
 	void centroidMatchingDirectory(Image refImage, string lmPath,
-			string folderImages, int templSize, int sceneSize,
-			string savePath, Image::SegmentMethod sgmethod);
+			string folderImages, int templSize, int sceneSize, string savePath,
+			Image::SegmentMethod sgmethod);
 	void save_Estimated_Landmarks_To_File(vector<Point> esLandmarks,
 			string path);
 	void save_Original_And_Estimated_Landmarks_To_File(
-			vector<Point> orgLandmarks, vector<Point> esLandmarks,
-			string path);
-	Mat loadOriginalLandmarks(Image image, string lmPath,vector<Point> &orgLandmarks);
+			vector<Point> orgLandmarks, vector<Point> esLandmarks, string path);
+	Mat loadOriginalLandmarks(Image image, string lmPath,
+			vector<Point> &orgLandmarks);
 };
 
 } /* namespace impls_2015 */
