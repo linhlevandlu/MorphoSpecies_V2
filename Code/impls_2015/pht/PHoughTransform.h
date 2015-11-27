@@ -54,8 +54,9 @@ public:
 	vector<PHTEntry> constructTable(vector<Line> lines, Point refPoint);
 	bool lineSimilar(Line line1, Line line2);
 	bool similarPairLines(Line ref1, Line ref2, Line scene1, Line scene2);
-	PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1,
+	vector<PHTEntry> findHoughSpace(vector<PHTEntry> entryTable, Line line1,
 			Line line2);
+	vector<vector<Line> > getClosetLines(vector<Line> sceneLines);
 	PHTEntry matchingInScene(vector<PHTEntry> entryTable,
 			vector<Line> sceneLines, int width, int height,
 			vector<Line> &maxVector);

@@ -79,7 +79,6 @@ bool PHoughTransform::closetLine(Line line1, Line line2) {
 	cond1 = (cond1 == 0) ? 60 : cond1;
 	cond2 = (cond2 == 0) ? 15 : cond2;
 	cond3 = (cond3 == 0) ? 5 : cond3;
-	//cout << "cond1: " << cond1 << "\n";
 
 	double distance1 = line2.perpendicularDistance(line1.getP1());
 	double distance2 = line2.perpendicularDistance(line1.getP2());
@@ -134,22 +133,38 @@ bool PHoughTransform::similarPairLines(Line ref1, Line ref2, Line scene1,
  * @parameter 1: entryTable - the reference table
  * @parameter 2: line1 - the first scene line
  * @parameter 3: line2 - the second scene line
- * @return: the entry in table, which have best similarity
+ * @return: the list of entries in table, which have best similarity
  */
-PHTEntry PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
+vector<PHTEntry> PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
 		Line line1, Line line2) {
-	PHTEntry entry;
-	//int size = 0;
+	vector<PHTEntry> entries;
 	for (size_t i = 0; i < entryTable.size(); i++) {
 		Line ref1 = entryTable.at(i).getLine1();
 		Line ref2 = entryTable.at(i).getLine2();
 		if (similarPairLines(ref1, ref2, line1, line2)) {
-			entry = entryTable.at(i);
-			//size++;
+			PHTEntry entry = entryTable.at(i);
+			entries.push_back(entry);
 		}
 	}
-	//qDebug()<<"similar count: "<<size;
-	return entry;
+	return entries;
+}
+
+vector<vector<Line> > PHoughTransform::getClosetLines(vector<Line> sceneLines) {
+	vector<vector<Line> > closetLines;
+	for (size_t i = 0; i < sceneLines.size(); i++) {
+		Line objLine1 = sceneLines.at(i);
+		for (size_t j = 0; j < sceneLines.size(); j++) {
+			Line objLine2 = sceneLines.at(j);
+			if (i != j && closetLine(objLine1, objLine2)) {
+				vector<Line> lines;
+				lines.push_back(objLine1);
+				lines.push_back(objLine2);
+
+				closetLines.push_back(lines);
+			}
+		}
+	}
+	return closetLines;
 }
 
 /*
@@ -164,6 +179,9 @@ PHTEntry PHoughTransform::findHoughSpace(vector<PHTEntry> entryTable,
 PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 		vector<Line> sceneLines, int width, int height,
 		vector<Line> &maxVector) {
+
+	vector<vector<Line> > closetLines = getClosetLines(sceneLines);
+
 	clock_t t1, t2;
 	t1 = clock();
 
@@ -176,14 +194,17 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 	}
 
 	int maxValue = 0;
-	//vector<Line> maxVector;
-	PHTEntry maxEntry;
-	for (size_t i = 0; i < sceneLines.size(); i++) {
-		Line objLine1 = sceneLines.at(i);
-		for (size_t j = 0; j < sceneLines.size(); j++) {
-			Line objLine2 = sceneLines.at(j);
-			if (i != j && closetLine(objLine2, objLine1)) {
-				PHTEntry entry = findHoughSpace(entryTable, objLine1, objLine2);
+	vector<PHTEntry> maxEntries;
+
+	for (size_t i = 0; i < closetLines.size(); i++) {
+		vector<Line> lines = closetLines.at(i);
+		if (lines.size() > 0) {
+			Line objLine1 = lines.at(0);
+			Line objLine2 = lines.at(1);
+			vector<PHTEntry> entries = findHoughSpace(entryTable, objLine1,
+					objLine2);
+			for (size_t j = 0; j < entries.size(); j++) {
+				PHTEntry entry = entries.at(j);
 				if (entry.getHoughSpaces().size() > 0) {
 					vector<HoughSpace> hspace = entry.getHoughSpaces();
 					for (size_t k = 0; k < hspace.size(); k++) {
@@ -195,15 +216,17 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 							acc[distance][angle] += 1;
 							if (acc[distance][angle] > maxValue) {
 								maxVector.clear();
+								maxEntries.clear();
 								maxVector.push_back(objLine1);
 								maxVector.push_back(objLine2);
 								maxValue = acc[distance][angle];
-								maxEntry = entry;
+								maxEntries.push_back(entry);
 							} else {
 								if (k == 0
 										&& acc[distance][angle] == maxValue) {
 									maxVector.push_back(objLine1);
 									maxVector.push_back(objLine2);
+									maxEntries.push_back(entry);
 								}
 							}
 						}
@@ -212,11 +235,12 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 			}
 		}
 	}
-	qDebug() << "Number of maxVector: " << maxVector.size();
+	cout << "\n Number of maxVector: " << maxVector.size();
+	cout << "\n Number of max entry: " << maxEntries.size();
 	t2 = clock();
-	qDebug() << "Time find matching in scene: "
+	cout << "\nTime find matching in scene: "
 			<< ((float) t2 - (float) t1) / CLOCKS_PER_SEC << " seconds";
-	return maxEntry;
+	return maxEntries.at(maxEntries.size()-1);
 }
 
 /*
@@ -310,8 +334,7 @@ Point PHoughTransform::refPointInScene(PHTEntry entry, vector<Line> matchLines,
 			}
 		}
 	}
-
-	qDebug() << "Reference point in scene: " << inter.x << ", " << inter.y;
+	cout <<"Reference point in scene: " << inter.x << ", " << inter.y;
 	return inter;
 }
 
@@ -336,7 +359,7 @@ Mat PHoughTransform::phtPresentation(Image refImage, Image sceneImage,
 	Mat sceneMat = sceneImage.getMatrixImage();
 	cv::Mat mat(sceneMat.clone());
 
-	qDebug() << "angle Diff: " << angleDiff;
+	cout << "\n"<< "Angle Diff: " << angleDiff;
 	for (size_t t = 0; t < esLandmarks.size(); t++) {
 		circle(mat, esLandmarks.at(t), 3, Scalar(0, 255, 255), 2, 8);
 
