@@ -201,22 +201,29 @@ PHTEntry PHoughTransform::matchingInScene(vector<PHTEntry> entryTable,
 		if (lines.size() > 0) {
 			Line objLine1 = lines.at(0);
 			Line objLine2 = lines.at(1);
+
 			vector<PHTEntry> entries = findHoughSpace(entryTable, objLine1,
 					objLine2);
+
 			for (size_t j = 0; j < entries.size(); j++) {
+
 				PHTEntry entry = entries.at(j);
 				if (entry.getHoughSpaces().size() > 0) {
 					vector<HoughSpace> hspace = entry.getHoughSpaces();
+
 					for (size_t k = 0; k < hspace.size(); k++) {
 						HoughSpace hsp = hspace.at(k);
 						int angle = round(hsp.getAngle());
 						int distance = round(hsp.getDistance());
+
 						if (!isnan(angle) && !isnan(distance) && angle >= 0
 								&& distance >= 0) {
 							acc[distance][angle] += 1;
 							if (acc[distance][angle] > maxValue) {
+
 								maxVector.clear();
 								maxEntries.clear();
+
 								maxVector.push_back(objLine1);
 								maxVector.push_back(objLine2);
 								maxValue = acc[distance][angle];
